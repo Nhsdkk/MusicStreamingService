@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using MusicStreamingService.Data.Entities;
@@ -13,17 +14,19 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicStreamingService.Data.CompiledModels
 {
     [EntityFrameworkInternal]
-    public partial class RegionEntityEntityType
+    public partial class DeviceEntityEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
             var runtimeEntityType = model.AddEntityType(
-                "MusicStreamingService.Data.Entities.RegionEntity",
-                typeof(RegionEntity),
+                "MusicStreamingService.Data.Entities.DeviceEntity",
+                typeof(DeviceEntity),
                 baseEntityType,
-                propertyCount: 3,
-                skipNavigationCount: 1,
-                keyCount: 2);
+                propertyCount: 4,
+                navigationCount: 2,
+                foreignKeyCount: 1,
+                unnamedIndexCount: 1,
+                keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
                 "Id",
@@ -46,12 +49,19 @@ namespace MusicStreamingService.Data.CompiledModels
             createdAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             createdAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
+            var ownerId = runtimeEntityType.AddProperty(
+                "OwnerId",
+                typeof(Guid),
+                propertyInfo: typeof(DeviceEntity).GetProperty("OwnerId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(DeviceEntity).GetField("<OwnerId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+            ownerId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
             var title = runtimeEntityType.AddProperty(
                 "Title",
                 typeof(string),
-                propertyInfo: typeof(RegionEntity).GetProperty("Title", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(RegionEntity).GetField("<Title>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
+                propertyInfo: typeof(DeviceEntity).GetProperty("Title", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(DeviceEntity).GetField("<Title>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 255);
             title.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
@@ -59,33 +69,35 @@ namespace MusicStreamingService.Data.CompiledModels
                 new[] { id });
             runtimeEntityType.SetPrimaryKey(key);
 
-            var key0 = runtimeEntityType.AddKey(
-                new[] { title });
+            var index = runtimeEntityType.AddIndex(
+                new[] { ownerId });
 
             return runtimeEntityType;
         }
 
-        public static RuntimeSkipNavigation CreateSkipNavigation1(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
+        public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "SongEntity",
-                targetEntityType,
-                joinEntityType.FindForeignKey(
-                    new[] { joinEntityType.FindProperty("RegionId") },
-                    declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
-                    declaringEntityType),
-                true,
-                false,
-                typeof(IEnumerable<SongEntity>));
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("OwnerId") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
+                principalEntityType,
+                deleteBehavior: DeleteBehavior.Cascade,
+                required: true);
 
-            var inverse = targetEntityType.FindSkipNavigation("AllowedRegions");
-            if (inverse != null)
-            {
-                skipNavigation.Inverse = inverse;
-                inverse.Inverse = skipNavigation;
-            }
+            var owner = declaringEntityType.AddNavigation("Owner",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(UserEntity),
+                propertyInfo: typeof(DeviceEntity).GetProperty("Owner", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(DeviceEntity).GetField("<Owner>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            return skipNavigation;
+            var devices = principalEntityType.AddNavigation("Devices",
+                runtimeForeignKey,
+                onDependent: false,
+                typeof(List<DeviceEntity>),
+                propertyInfo: typeof(UserEntity).GetProperty("Devices", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(UserEntity).GetField("<Devices>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            return runtimeForeignKey;
         }
 
         public static void CreateAnnotations(RuntimeEntityType runtimeEntityType)
@@ -93,7 +105,7 @@ namespace MusicStreamingService.Data.CompiledModels
             runtimeEntityType.AddAnnotation("Relational:FunctionName", null);
             runtimeEntityType.AddAnnotation("Relational:Schema", null);
             runtimeEntityType.AddAnnotation("Relational:SqlQuery", null);
-            runtimeEntityType.AddAnnotation("Relational:TableName", "Regions");
+            runtimeEntityType.AddAnnotation("Relational:TableName", "Devices");
             runtimeEntityType.AddAnnotation("Relational:ViewName", null);
             runtimeEntityType.AddAnnotation("Relational:ViewSchema", null);
 

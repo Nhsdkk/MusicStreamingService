@@ -13,15 +13,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicStreamingService.Data.CompiledModels
 {
     [EntityFrameworkInternal]
-    public partial class RegionEntityEntityType
+    public partial class PermissionEntityEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
             var runtimeEntityType = model.AddEntityType(
-                "MusicStreamingService.Data.Entities.RegionEntity",
-                typeof(RegionEntity),
+                "MusicStreamingService.Data.Entities.PermissionEntity",
+                typeof(PermissionEntity),
                 baseEntityType,
-                propertyCount: 3,
+                propertyCount: 5,
                 skipNavigationCount: 1,
                 keyCount: 2);
 
@@ -46,14 +46,31 @@ namespace MusicStreamingService.Data.CompiledModels
             createdAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             createdAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
+            var description = runtimeEntityType.AddProperty(
+                "Description",
+                typeof(string),
+                propertyInfo: typeof(PermissionEntity).GetProperty("Description", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PermissionEntity).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                maxLength: 255);
+            description.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
             var title = runtimeEntityType.AddProperty(
                 "Title",
                 typeof(string),
-                propertyInfo: typeof(RegionEntity).GetProperty("Title", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(RegionEntity).GetField("<Title>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
-                maxLength: 255);
+                propertyInfo: typeof(PermissionEntity).GetProperty("Title", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PermissionEntity).GetField("<Title>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                afterSaveBehavior: PropertySaveBehavior.Throw);
             title.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
+            var updatedAt = runtimeEntityType.AddProperty(
+                "UpdatedAt",
+                typeof(DateTime),
+                propertyInfo: typeof(BaseUpdatableIdEntity).GetProperty("UpdatedAt", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(BaseUpdatableIdEntity).GetField("<UpdatedAt>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                valueGenerated: ValueGenerated.OnAdd,
+                sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+            updatedAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+            updatedAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
             var key = runtimeEntityType.AddKey(
                 new[] { id });
@@ -68,17 +85,19 @@ namespace MusicStreamingService.Data.CompiledModels
         public static RuntimeSkipNavigation CreateSkipNavigation1(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
             var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "SongEntity",
+                "UsedBy",
                 targetEntityType,
                 joinEntityType.FindForeignKey(
-                    new[] { joinEntityType.FindProperty("RegionId") },
+                    new[] { joinEntityType.FindProperty("PermissionId") },
                     declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
                     declaringEntityType),
                 true,
                 false,
-                typeof(IEnumerable<SongEntity>));
+                typeof(List<UserEntity>),
+                propertyInfo: typeof(PermissionEntity).GetProperty("UsedBy", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PermissionEntity).GetField("<UsedBy>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var inverse = targetEntityType.FindSkipNavigation("AllowedRegions");
+            var inverse = targetEntityType.FindSkipNavigation("Permissions");
             if (inverse != null)
             {
                 skipNavigation.Inverse = inverse;
@@ -93,7 +112,7 @@ namespace MusicStreamingService.Data.CompiledModels
             runtimeEntityType.AddAnnotation("Relational:FunctionName", null);
             runtimeEntityType.AddAnnotation("Relational:Schema", null);
             runtimeEntityType.AddAnnotation("Relational:SqlQuery", null);
-            runtimeEntityType.AddAnnotation("Relational:TableName", "Regions");
+            runtimeEntityType.AddAnnotation("Relational:TableName", "Permissions");
             runtimeEntityType.AddAnnotation("Relational:ViewName", null);
             runtimeEntityType.AddAnnotation("Relational:ViewSchema", null);
 

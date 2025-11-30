@@ -12,19 +12,100 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("709ae68c-fa67-4ad8-aa68-551ae4720fd3"), entityTypeCount: 2)
+            : base(skipDetectChanges: false, modelId: new Guid("bf9e699c-29c0-45d9-8e0f-086bdeaa4151"), entityTypeCount: 21)
         {
         }
 
         partial void Initialize()
         {
+            var albumEntity = AlbumEntityEntityType.Create(this);
+            var albumFavoriteEntity = AlbumFavoriteEntityEntityType.Create(this);
+            var albumSongEntity = AlbumSongEntityEntityType.Create(this);
+            var allowedDistributionEntity = AllowedDistributionEntityEntityType.Create(this);
+            var deviceEntity = DeviceEntityEntityType.Create(this);
+            var genreEntity = GenreEntityEntityType.Create(this);
+            var paymentEntity = PaymentEntityEntityType.Create(this);
+            var permissionEntity = PermissionEntityEntityType.Create(this);
+            var playlistEntity = PlaylistEntityEntityType.Create(this);
+            var playlistFavoriteEntity = PlaylistFavoriteEntityEntityType.Create(this);
+            var playlistSongEntity = PlaylistSongEntityEntityType.Create(this);
             var regionEntity = RegionEntityEntityType.Create(this);
+            var songArtistEntity = SongArtistEntityEntityType.Create(this);
+            var songEntity = SongEntityEntityType.Create(this);
+            var songFavoriteEntity = SongFavoriteEntityEntityType.Create(this);
+            var songGenreEntity = SongGenreEntityEntityType.Create(this);
+            var streamingEventEntity = StreamingEventEntityEntityType.Create(this);
+            var subscriberEntity = SubscriberEntityEntityType.Create(this);
+            var subscriptionEntity = SubscriptionEntityEntityType.Create(this);
             var userEntity = UserEntityEntityType.Create(this);
+            var userPermissionEntity = UserPermissionEntityEntityType.Create(this);
 
+            AlbumEntityEntityType.CreateForeignKey1(albumEntity, userEntity);
+            AlbumEntityEntityType.CreateForeignKey2(albumEntity, userEntity);
+            AlbumFavoriteEntityEntityType.CreateForeignKey1(albumFavoriteEntity, albumEntity);
+            AlbumFavoriteEntityEntityType.CreateForeignKey2(albumFavoriteEntity, userEntity);
+            AlbumSongEntityEntityType.CreateForeignKey1(albumSongEntity, albumEntity);
+            AlbumSongEntityEntityType.CreateForeignKey2(albumSongEntity, songEntity);
+            AllowedDistributionEntityEntityType.CreateForeignKey1(allowedDistributionEntity, regionEntity);
+            AllowedDistributionEntityEntityType.CreateForeignKey2(allowedDistributionEntity, songEntity);
+            DeviceEntityEntityType.CreateForeignKey1(deviceEntity, userEntity);
+            PaymentEntityEntityType.CreateForeignKey1(paymentEntity, userEntity);
+            PaymentEntityEntityType.CreateForeignKey2(paymentEntity, subscriptionEntity);
+            PlaylistEntityEntityType.CreateForeignKey1(playlistEntity, userEntity);
+            PlaylistEntityEntityType.CreateForeignKey2(playlistEntity, userEntity);
+            PlaylistFavoriteEntityEntityType.CreateForeignKey1(playlistFavoriteEntity, playlistEntity);
+            PlaylistFavoriteEntityEntityType.CreateForeignKey2(playlistFavoriteEntity, userEntity);
+            PlaylistSongEntityEntityType.CreateForeignKey1(playlistSongEntity, playlistEntity);
+            PlaylistSongEntityEntityType.CreateForeignKey2(playlistSongEntity, songEntity);
+            SongArtistEntityEntityType.CreateForeignKey1(songArtistEntity, userEntity);
+            SongArtistEntityEntityType.CreateForeignKey2(songArtistEntity, songEntity);
+            SongArtistEntityEntityType.CreateForeignKey3(songArtistEntity, userEntity);
+            SongFavoriteEntityEntityType.CreateForeignKey1(songFavoriteEntity, songEntity);
+            SongFavoriteEntityEntityType.CreateForeignKey2(songFavoriteEntity, userEntity);
+            SongGenreEntityEntityType.CreateForeignKey1(songGenreEntity, genreEntity);
+            SongGenreEntityEntityType.CreateForeignKey2(songGenreEntity, songEntity);
+            StreamingEventEntityEntityType.CreateForeignKey1(streamingEventEntity, deviceEntity);
+            StreamingEventEntityEntityType.CreateForeignKey2(streamingEventEntity, songEntity);
+            SubscriberEntityEntityType.CreateForeignKey1(subscriberEntity, userEntity);
+            SubscriberEntityEntityType.CreateForeignKey2(subscriberEntity, subscriptionEntity);
             UserEntityEntityType.CreateForeignKey1(userEntity, regionEntity);
+            UserPermissionEntityEntityType.CreateForeignKey1(userPermissionEntity, permissionEntity);
+            UserPermissionEntityEntityType.CreateForeignKey2(userPermissionEntity, userEntity);
 
+            AlbumEntityEntityType.CreateSkipNavigation1(albumEntity, userEntity, albumFavoriteEntity);
+            GenreEntityEntityType.CreateSkipNavigation1(genreEntity, songEntity, songGenreEntity);
+            PermissionEntityEntityType.CreateSkipNavigation1(permissionEntity, userEntity, userPermissionEntity);
+            PlaylistEntityEntityType.CreateSkipNavigation1(playlistEntity, userEntity, playlistFavoriteEntity);
+            RegionEntityEntityType.CreateSkipNavigation1(regionEntity, songEntity, allowedDistributionEntity);
+            SongEntityEntityType.CreateSkipNavigation1(songEntity, regionEntity, allowedDistributionEntity);
+            SongEntityEntityType.CreateSkipNavigation2(songEntity, genreEntity, songGenreEntity);
+            SongEntityEntityType.CreateSkipNavigation3(songEntity, userEntity, songFavoriteEntity);
+            UserEntityEntityType.CreateSkipNavigation1(userEntity, albumEntity, albumFavoriteEntity);
+            UserEntityEntityType.CreateSkipNavigation2(userEntity, playlistEntity, playlistFavoriteEntity);
+            UserEntityEntityType.CreateSkipNavigation3(userEntity, songEntity, songFavoriteEntity);
+            UserEntityEntityType.CreateSkipNavigation4(userEntity, permissionEntity, userPermissionEntity);
+
+            AlbumEntityEntityType.CreateAnnotations(albumEntity);
+            AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
+            AlbumSongEntityEntityType.CreateAnnotations(albumSongEntity);
+            AllowedDistributionEntityEntityType.CreateAnnotations(allowedDistributionEntity);
+            DeviceEntityEntityType.CreateAnnotations(deviceEntity);
+            GenreEntityEntityType.CreateAnnotations(genreEntity);
+            PaymentEntityEntityType.CreateAnnotations(paymentEntity);
+            PermissionEntityEntityType.CreateAnnotations(permissionEntity);
+            PlaylistEntityEntityType.CreateAnnotations(playlistEntity);
+            PlaylistFavoriteEntityEntityType.CreateAnnotations(playlistFavoriteEntity);
+            PlaylistSongEntityEntityType.CreateAnnotations(playlistSongEntity);
             RegionEntityEntityType.CreateAnnotations(regionEntity);
+            SongArtistEntityEntityType.CreateAnnotations(songArtistEntity);
+            SongEntityEntityType.CreateAnnotations(songEntity);
+            SongFavoriteEntityEntityType.CreateAnnotations(songFavoriteEntity);
+            SongGenreEntityEntityType.CreateAnnotations(songGenreEntity);
+            StreamingEventEntityEntityType.CreateAnnotations(streamingEventEntity);
+            SubscriberEntityEntityType.CreateAnnotations(subscriberEntity);
+            SubscriptionEntityEntityType.CreateAnnotations(subscriptionEntity);
             UserEntityEntityType.CreateAnnotations(userEntity);
+            UserPermissionEntityEntityType.CreateAnnotations(userPermissionEntity);
 
             AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
             AddAnnotation("ProductVersion", "9.0.1");

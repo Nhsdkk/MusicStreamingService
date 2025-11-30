@@ -1,0 +1,49 @@
+namespace MusicStreamingService.Data.Entities;
+
+public sealed record SongEntity : BaseUpdatableIdEntity
+{
+    /// <summary>
+    /// Song title
+    /// </summary>
+    public string Title { get; set; } = null!;
+
+    /// <summary>
+    /// Song duration in milliseconds
+    /// </summary>
+    public long DurationMs { get; set; }
+
+    /// <summary>
+    /// Song filename inside s3 object storage 
+    /// </summary>
+    public string S3MediaFileName { get; set; } = null!;
+
+    /// <summary>
+    /// Amount of song likes
+    /// </summary>
+    public long Likes { get; } = 0;
+    
+    /// <summary>
+    /// Flag for explicit songs
+    /// </summary>
+    public bool Explicit { get; set; }
+
+    /// <summary>
+    /// Artists, who contributed to the creation of the song
+    /// </summary>
+    public List<SongArtistEntity> Artists { get; set; } = new List<SongArtistEntity>();
+
+    /// <summary>
+    /// Regions, where song is available for distribution 
+    /// </summary>
+    public List<RegionEntity> AllowedRegions { get; set; } = new List<RegionEntity>();
+
+    /// <summary>
+    /// Albums in which song appears
+    /// </summary>
+    public List<AlbumSongEntity> Albums { get; set; } = new List<AlbumSongEntity>();
+
+    /// <summary>
+    /// Song genres
+    /// </summary>
+    public List<GenreEntity> Genres { get; set; } = new List<GenreEntity>();
+}
