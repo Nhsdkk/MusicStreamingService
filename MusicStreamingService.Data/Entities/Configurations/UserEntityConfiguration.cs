@@ -18,5 +18,9 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
         builder.HasAlternateKey(x => x.Username);
 
         builder.HasOne(x => x.Region).WithMany().HasForeignKey(x => x.RegionId);
+        builder
+            .HasMany(x => x.FavoriteAlbums)
+            .WithMany(x => x.LikedUsers)
+            .UsingEntity<AlbumFavoriteEntity>();
     }
 }

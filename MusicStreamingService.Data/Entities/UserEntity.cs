@@ -36,4 +36,9 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// Flag, that checks if user's account is disabled
     /// </summary>
     public bool Disabled { get; set; } = false;
+
+    /// <summary>
+    /// User's favorite albums
+    /// </summary>
+    public List<AlbumEntity> FavoriteAlbums { get; set; } = new List<AlbumEntity>();
 };

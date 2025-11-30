@@ -12,17 +12,27 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("709ae68c-fa67-4ad8-aa68-551ae4720fd3"), entityTypeCount: 2)
+            : base(skipDetectChanges: false, modelId: new Guid("ce0e7c9c-eee3-4cff-9f88-dac07773ca5a"), entityTypeCount: 4)
         {
         }
 
         partial void Initialize()
         {
+            var albumEntity = AlbumEntityEntityType.Create(this);
+            var albumFavoriteEntity = AlbumFavoriteEntityEntityType.Create(this);
             var regionEntity = RegionEntityEntityType.Create(this);
             var userEntity = UserEntityEntityType.Create(this);
 
+            AlbumEntityEntityType.CreateForeignKey1(albumEntity, userEntity);
+            AlbumFavoriteEntityEntityType.CreateForeignKey1(albumFavoriteEntity, albumEntity);
+            AlbumFavoriteEntityEntityType.CreateForeignKey2(albumFavoriteEntity, userEntity);
             UserEntityEntityType.CreateForeignKey1(userEntity, regionEntity);
 
+            AlbumEntityEntityType.CreateSkipNavigation1(albumEntity, userEntity, albumFavoriteEntity);
+            UserEntityEntityType.CreateSkipNavigation1(userEntity, albumEntity, albumFavoriteEntity);
+
+            AlbumEntityEntityType.CreateAnnotations(albumEntity);
+            AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
             RegionEntityEntityType.CreateAnnotations(regionEntity);
             UserEntityEntityType.CreateAnnotations(userEntity);
 

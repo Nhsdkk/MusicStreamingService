@@ -10,6 +10,10 @@ public sealed class MusicStreamingContext : DbContext
     public DbSet<UserEntity> Users { get; set; }
     
     public DbSet<RegionEntity> Regions { get; set; }
+    
+    public DbSet<AlbumEntity> Albums { get; set; }
+    
+    public DbSet<AlbumFavoriteEntity> AlbumFavorites { get; set; }
 
     public MusicStreamingContext(DbContextOptions<MusicStreamingContext> options) : base(options) { }
 
@@ -22,5 +26,7 @@ public sealed class MusicStreamingContext : DbContext
     {
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new RegionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AlbumEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AlbumFavoriteEntityConfiguration());
     }
 }

@@ -14,20 +14,20 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicStreamingService.Data.CompiledModels
 {
     [EntityFrameworkInternal]
-    public partial class UserEntityEntityType
+    public partial class AlbumEntityEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
             var runtimeEntityType = model.AddEntityType(
-                "MusicStreamingService.Data.Entities.UserEntity",
-                typeof(UserEntity),
+                "MusicStreamingService.Data.Entities.AlbumEntity",
+                typeof(AlbumEntity),
                 baseEntityType,
                 propertyCount: 9,
                 navigationCount: 1,
                 skipNavigationCount: 1,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 1,
-                keyCount: 3);
+                keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
                 "Id",
@@ -40,6 +40,14 @@ namespace MusicStreamingService.Data.CompiledModels
             id.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             id.AddAnnotation("Relational:DefaultValueSql", "gen_random_uuid()");
 
+            var artistId = runtimeEntityType.AddProperty(
+                "ArtistId",
+                typeof(Guid),
+                propertyInfo: typeof(AlbumEntity).GetProperty("ArtistId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<ArtistId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+            artistId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
             var createdAt = runtimeEntityType.AddProperty(
                 "CreatedAt",
                 typeof(DateTime),
@@ -50,47 +58,45 @@ namespace MusicStreamingService.Data.CompiledModels
             createdAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             createdAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
-            var disabled = runtimeEntityType.AddProperty(
-                "Disabled",
-                typeof(bool),
-                propertyInfo: typeof(UserEntity).GetProperty("Disabled", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<Disabled>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                valueGenerated: ValueGenerated.OnAdd,
-                sentinel: false);
-            disabled.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-            disabled.AddAnnotation("Relational:DefaultValue", false);
-
-            var email = runtimeEntityType.AddProperty(
-                "Email",
+            var description = runtimeEntityType.AddProperty(
+                "Description",
                 typeof(string),
-                propertyInfo: typeof(UserEntity).GetProperty("Email", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<Email>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
+                propertyInfo: typeof(AlbumEntity).GetProperty("Description", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                nullable: true);
+            description.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
+            var likes = runtimeEntityType.AddProperty(
+                "Likes",
+                typeof(int),
+                propertyInfo: typeof(AlbumEntity).GetProperty("Likes", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<Likes>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: 0);
+            likes.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+            likes.AddAnnotation("Relational:DefaultValue", 0);
+
+            var releaseDate = runtimeEntityType.AddProperty(
+                "ReleaseDate",
+                typeof(DateTime),
+                propertyInfo: typeof(AlbumEntity).GetProperty("ReleaseDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<ReleaseDate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+            releaseDate.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
+            var s3ArtworkFilename = runtimeEntityType.AddProperty(
+                "S3ArtworkFilename",
+                typeof(string),
+                propertyInfo: typeof(AlbumEntity).GetProperty("S3ArtworkFilename", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<S3ArtworkFilename>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            s3ArtworkFilename.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
+            var title = runtimeEntityType.AddProperty(
+                "Title",
+                typeof(string),
+                propertyInfo: typeof(AlbumEntity).GetProperty("Title", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<Title>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 maxLength: 255);
-            email.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
-            var fullName = runtimeEntityType.AddProperty(
-                "FullName",
-                typeof(string),
-                propertyInfo: typeof(UserEntity).GetProperty("FullName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<FullName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            fullName.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
-            var password = runtimeEntityType.AddProperty(
-                "Password",
-                typeof(byte[]),
-                propertyInfo: typeof(UserEntity).GetProperty("Password", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<Password>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-            password.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-            password.AddAnnotation("Relational:ColumnType", "bytea");
-
-            var regionId = runtimeEntityType.AddProperty(
-                "RegionId",
-                typeof(Guid),
-                propertyInfo: typeof(UserEntity).GetProperty("RegionId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<RegionId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            regionId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+            title.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var updatedAt = runtimeEntityType.AddProperty(
                 "UpdatedAt",
@@ -102,45 +108,30 @@ namespace MusicStreamingService.Data.CompiledModels
             updatedAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             updatedAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
-            var username = runtimeEntityType.AddProperty(
-                "Username",
-                typeof(string),
-                propertyInfo: typeof(UserEntity).GetProperty("Username", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<Username>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
-                maxLength: 255);
-            username.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
             var key = runtimeEntityType.AddKey(
-                new[] { email });
-
-            var key0 = runtimeEntityType.AddKey(
                 new[] { id });
-            runtimeEntityType.SetPrimaryKey(key0);
-
-            var key1 = runtimeEntityType.AddKey(
-                new[] { username });
+            runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { regionId });
+                new[] { artistId });
 
             return runtimeEntityType;
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("RegionId") },
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("ArtistId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
                 principalEntityType,
                 deleteBehavior: DeleteBehavior.Cascade,
                 required: true);
 
-            var region = declaringEntityType.AddNavigation("Region",
+            var artist = declaringEntityType.AddNavigation("Artist",
                 runtimeForeignKey,
                 onDependent: true,
-                typeof(RegionEntity),
-                propertyInfo: typeof(UserEntity).GetProperty("Region", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<Region>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                typeof(UserEntity),
+                propertyInfo: typeof(AlbumEntity).GetProperty("Artist", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<Artist>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             return runtimeForeignKey;
         }
@@ -148,19 +139,19 @@ namespace MusicStreamingService.Data.CompiledModels
         public static RuntimeSkipNavigation CreateSkipNavigation1(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
             var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "FavoriteAlbums",
+                "LikedUsers",
                 targetEntityType,
                 joinEntityType.FindForeignKey(
-                    new[] { joinEntityType.FindProperty("UserId") },
+                    new[] { joinEntityType.FindProperty("AlbumId") },
                     declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
                     declaringEntityType),
                 true,
                 false,
-                typeof(List<AlbumEntity>),
-                propertyInfo: typeof(UserEntity).GetProperty("FavoriteAlbums", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<FavoriteAlbums>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                typeof(List<UserEntity>),
+                propertyInfo: typeof(AlbumEntity).GetProperty("LikedUsers", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<LikedUsers>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var inverse = targetEntityType.FindSkipNavigation("LikedUsers");
+            var inverse = targetEntityType.FindSkipNavigation("FavoriteAlbums");
             if (inverse != null)
             {
                 skipNavigation.Inverse = inverse;
@@ -175,7 +166,7 @@ namespace MusicStreamingService.Data.CompiledModels
             runtimeEntityType.AddAnnotation("Relational:FunctionName", null);
             runtimeEntityType.AddAnnotation("Relational:Schema", null);
             runtimeEntityType.AddAnnotation("Relational:SqlQuery", null);
-            runtimeEntityType.AddAnnotation("Relational:TableName", "Users");
+            runtimeEntityType.AddAnnotation("Relational:TableName", "Albums");
             runtimeEntityType.AddAnnotation("Relational:ViewName", null);
             runtimeEntityType.AddAnnotation("Relational:ViewSchema", null);
 
