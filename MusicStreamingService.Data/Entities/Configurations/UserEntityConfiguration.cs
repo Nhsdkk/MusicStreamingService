@@ -36,5 +36,13 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .HasMany(x => x.ArtistSongs)
             .WithOne(x => x.Artist)
             .HasForeignKey(x => x.ArtistId);
+        builder
+            .HasMany(x => x.Subscriptions)
+            .WithOne(x => x.Subscriber)
+            .HasForeignKey(x => x.SubscriberId);
+        builder
+            .HasMany(x => x.Payments)
+            .WithOne(x => x.Payer)
+            .HasForeignKey(x => x.PayerId);
     }
 }

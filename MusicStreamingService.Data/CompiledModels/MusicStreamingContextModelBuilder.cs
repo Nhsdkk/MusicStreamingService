@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("66202a7e-1e75-4446-bcb7-12448016c3c1"), entityTypeCount: 11)
+            : base(skipDetectChanges: false, modelId: new Guid("ab0a5069-5100-4ede-adab-7b95b838ad03"), entityTypeCount: 14)
         {
         }
 
@@ -23,11 +23,14 @@ namespace MusicStreamingService.Data.CompiledModels
             var albumSongEntity = AlbumSongEntityEntityType.Create(this);
             var allowedDistributionEntity = AllowedDistributionEntityEntityType.Create(this);
             var genreEntity = GenreEntityEntityType.Create(this);
+            var paymentEntity = PaymentEntityEntityType.Create(this);
             var regionEntity = RegionEntityEntityType.Create(this);
             var songArtistEntity = SongArtistEntityEntityType.Create(this);
             var songEntity = SongEntityEntityType.Create(this);
             var songFavoriteEntity = SongFavoriteEntityEntityType.Create(this);
             var songGenreEntity = SongGenreEntityEntityType.Create(this);
+            var subscriberEntity = SubscriberEntityEntityType.Create(this);
+            var subscriptionEntity = SubscriptionEntityEntityType.Create(this);
             var userEntity = UserEntityEntityType.Create(this);
 
             AlbumEntityEntityType.CreateForeignKey1(albumEntity, userEntity);
@@ -38,6 +41,8 @@ namespace MusicStreamingService.Data.CompiledModels
             AlbumSongEntityEntityType.CreateForeignKey2(albumSongEntity, songEntity);
             AllowedDistributionEntityEntityType.CreateForeignKey1(allowedDistributionEntity, regionEntity);
             AllowedDistributionEntityEntityType.CreateForeignKey2(allowedDistributionEntity, songEntity);
+            PaymentEntityEntityType.CreateForeignKey1(paymentEntity, userEntity);
+            PaymentEntityEntityType.CreateForeignKey2(paymentEntity, subscriptionEntity);
             SongArtistEntityEntityType.CreateForeignKey1(songArtistEntity, userEntity);
             SongArtistEntityEntityType.CreateForeignKey2(songArtistEntity, songEntity);
             SongArtistEntityEntityType.CreateForeignKey3(songArtistEntity, userEntity);
@@ -45,6 +50,8 @@ namespace MusicStreamingService.Data.CompiledModels
             SongFavoriteEntityEntityType.CreateForeignKey2(songFavoriteEntity, userEntity);
             SongGenreEntityEntityType.CreateForeignKey1(songGenreEntity, genreEntity);
             SongGenreEntityEntityType.CreateForeignKey2(songGenreEntity, songEntity);
+            SubscriberEntityEntityType.CreateForeignKey1(subscriberEntity, userEntity);
+            SubscriberEntityEntityType.CreateForeignKey2(subscriberEntity, subscriptionEntity);
             UserEntityEntityType.CreateForeignKey1(userEntity, regionEntity);
 
             AlbumEntityEntityType.CreateSkipNavigation1(albumEntity, userEntity, albumFavoriteEntity);
@@ -61,11 +68,14 @@ namespace MusicStreamingService.Data.CompiledModels
             AlbumSongEntityEntityType.CreateAnnotations(albumSongEntity);
             AllowedDistributionEntityEntityType.CreateAnnotations(allowedDistributionEntity);
             GenreEntityEntityType.CreateAnnotations(genreEntity);
+            PaymentEntityEntityType.CreateAnnotations(paymentEntity);
             RegionEntityEntityType.CreateAnnotations(regionEntity);
             SongArtistEntityEntityType.CreateAnnotations(songArtistEntity);
             SongEntityEntityType.CreateAnnotations(songEntity);
             SongFavoriteEntityEntityType.CreateAnnotations(songFavoriteEntity);
             SongGenreEntityEntityType.CreateAnnotations(songGenreEntity);
+            SubscriberEntityEntityType.CreateAnnotations(subscriberEntity);
+            SubscriptionEntityEntityType.CreateAnnotations(subscriptionEntity);
             UserEntityEntityType.CreateAnnotations(userEntity);
 
             AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);

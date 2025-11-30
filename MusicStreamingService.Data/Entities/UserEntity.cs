@@ -61,4 +61,14 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// User's favorite songs
     /// </summary>
     public List<SongEntity> FavoriteSongs { get; set; } = new List<SongEntity>();
+
+    /// <summary>
+    /// User's subscriptions
+    /// </summary>
+    public List<SubscriberEntity> Subscriptions { get; set; } = new List<SubscriberEntity>();
+
+    /// <summary>
+    /// User's payments
+    /// </summary>
+    public List<PaymentEntity> Payments { get; set; } = new List<PaymentEntity>();
 };
