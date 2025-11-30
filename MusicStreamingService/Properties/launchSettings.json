@@ -12,7 +12,10 @@
         "PsqlConfiguration__Port": "5432",
         "PsqlConfiguration__Username": "postgres",
         "PsqlConfiguration__Password": "postgres",
-        "PsqlConfiguration__Database": "postgres"
+        "PsqlConfiguration__Database": "postgres",
+        "PasswordServiceConfig__SaltSize": "16",
+        "PasswordServiceConfig__IterationsCount": "600000",
+        "PasswordServiceConfig__NumBytesRequested": "32"
       }
     },
     "https": {
@@ -26,7 +29,10 @@
         "PsqlConfiguration__Port": "5432",
         "PsqlConfiguration__Username": "postgres",
         "PsqlConfiguration__Password": "postgres",
-        "PsqlConfiguration__Database": "postgres"
+        "PsqlConfiguration__Database": "postgres",
+        "PasswordServiceConfig__SaltSize": "16",
+        "PasswordServiceConfig__IterationsCount": "600000",
+        "PasswordServiceConfig__NumBytesRequested": "32"
       }
     }
   }
