@@ -40,6 +40,10 @@ public sealed class MusicStreamingContext : DbContext
     public DbSet<PlaylistSongEntity> PlaylistSongs { get; set; }
     
     public DbSet<PlaylistFavoriteEntity> PlaylistFavorites { get; set; }
+    
+    public DbSet<StreamingEventEntity> StreamingEvents { get; set; }
+    
+    public DbSet<DeviceEntity> Devices { get; set; }
 
     public MusicStreamingContext(DbContextOptions<MusicStreamingContext> options) : base(options) { }
 
@@ -67,5 +71,7 @@ public sealed class MusicStreamingContext : DbContext
         modelBuilder.ApplyConfiguration(new PlaylistEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PlaylistFavoriteEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PlaylistSongEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new StreamingEventEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new DeviceEntityConfiguration());
     }
 }

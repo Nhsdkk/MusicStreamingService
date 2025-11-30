@@ -52,5 +52,9 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .HasMany(x => x.FavoritePlaylists)
             .WithMany()
             .UsingEntity<PlaylistFavoriteEntity>();
+        builder
+            .HasMany(x => x.Devices)
+            .WithOne(x => x.Owner)
+            .HasForeignKey(x => x.OwnerId);
     }
 }

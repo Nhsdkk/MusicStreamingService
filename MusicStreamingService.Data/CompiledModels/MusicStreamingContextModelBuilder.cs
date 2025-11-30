@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("e1c643ba-6874-4e7f-9068-8ceb9ac2967b"), entityTypeCount: 17)
+            : base(skipDetectChanges: false, modelId: new Guid("22fb2063-0695-423f-af20-c9b7f789bf91"), entityTypeCount: 19)
         {
         }
 
@@ -22,6 +22,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var albumFavoriteEntity = AlbumFavoriteEntityEntityType.Create(this);
             var albumSongEntity = AlbumSongEntityEntityType.Create(this);
             var allowedDistributionEntity = AllowedDistributionEntityEntityType.Create(this);
+            var deviceEntity = DeviceEntityEntityType.Create(this);
             var genreEntity = GenreEntityEntityType.Create(this);
             var paymentEntity = PaymentEntityEntityType.Create(this);
             var playlistEntity = PlaylistEntityEntityType.Create(this);
@@ -32,6 +33,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var songEntity = SongEntityEntityType.Create(this);
             var songFavoriteEntity = SongFavoriteEntityEntityType.Create(this);
             var songGenreEntity = SongGenreEntityEntityType.Create(this);
+            var streamingEventEntity = StreamingEventEntityEntityType.Create(this);
             var subscriberEntity = SubscriberEntityEntityType.Create(this);
             var subscriptionEntity = SubscriptionEntityEntityType.Create(this);
             var userEntity = UserEntityEntityType.Create(this);
@@ -44,6 +46,7 @@ namespace MusicStreamingService.Data.CompiledModels
             AlbumSongEntityEntityType.CreateForeignKey2(albumSongEntity, songEntity);
             AllowedDistributionEntityEntityType.CreateForeignKey1(allowedDistributionEntity, regionEntity);
             AllowedDistributionEntityEntityType.CreateForeignKey2(allowedDistributionEntity, songEntity);
+            DeviceEntityEntityType.CreateForeignKey1(deviceEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey1(paymentEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey2(paymentEntity, subscriptionEntity);
             PlaylistEntityEntityType.CreateForeignKey1(playlistEntity, userEntity);
@@ -59,6 +62,8 @@ namespace MusicStreamingService.Data.CompiledModels
             SongFavoriteEntityEntityType.CreateForeignKey2(songFavoriteEntity, userEntity);
             SongGenreEntityEntityType.CreateForeignKey1(songGenreEntity, genreEntity);
             SongGenreEntityEntityType.CreateForeignKey2(songGenreEntity, songEntity);
+            StreamingEventEntityEntityType.CreateForeignKey1(streamingEventEntity, deviceEntity);
+            StreamingEventEntityEntityType.CreateForeignKey2(streamingEventEntity, songEntity);
             SubscriberEntityEntityType.CreateForeignKey1(subscriberEntity, userEntity);
             SubscriberEntityEntityType.CreateForeignKey2(subscriberEntity, subscriptionEntity);
             UserEntityEntityType.CreateForeignKey1(userEntity, regionEntity);
@@ -78,6 +83,7 @@ namespace MusicStreamingService.Data.CompiledModels
             AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
             AlbumSongEntityEntityType.CreateAnnotations(albumSongEntity);
             AllowedDistributionEntityEntityType.CreateAnnotations(allowedDistributionEntity);
+            DeviceEntityEntityType.CreateAnnotations(deviceEntity);
             GenreEntityEntityType.CreateAnnotations(genreEntity);
             PaymentEntityEntityType.CreateAnnotations(paymentEntity);
             PlaylistEntityEntityType.CreateAnnotations(playlistEntity);
@@ -88,6 +94,7 @@ namespace MusicStreamingService.Data.CompiledModels
             SongEntityEntityType.CreateAnnotations(songEntity);
             SongFavoriteEntityEntityType.CreateAnnotations(songFavoriteEntity);
             SongGenreEntityEntityType.CreateAnnotations(songGenreEntity);
+            StreamingEventEntityEntityType.CreateAnnotations(streamingEventEntity);
             SubscriberEntityEntityType.CreateAnnotations(subscriberEntity);
             SubscriptionEntityEntityType.CreateAnnotations(subscriptionEntity);
             UserEntityEntityType.CreateAnnotations(userEntity);

@@ -81,4 +81,9 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// Favorite user's playlists
     /// </summary>
     public List<PlaylistEntity> FavoritePlaylists { get; set; } = new List<PlaylistEntity>();
+
+    /// <summary>
+    /// User's devices
+    /// </summary>
+    public List<DeviceEntity> Devices { get; set; } = new List<DeviceEntity>();
 };

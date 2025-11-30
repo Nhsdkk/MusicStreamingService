@@ -23,7 +23,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(UserEntity),
                 baseEntityType,
                 propertyCount: 10,
-                navigationCount: 6,
+                navigationCount: 7,
                 skipNavigationCount: 3,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 1,
