@@ -14,7 +14,7 @@
         "PsqlConfiguration__Password": "postgres",
         "PsqlConfiguration__Database": "postgres",
         "PasswordServiceConfig__SaltSize": "16",
-        "PasswordServiceConfig__IterationsCount": "10000",
+        "PasswordServiceConfig__IterationsCount": "600000",
         "PasswordServiceConfig__NumBytesRequested": "32"
       }
     },
@@ -31,7 +31,7 @@
         "PsqlConfiguration__Password": "postgres",
         "PsqlConfiguration__Database": "postgres",
         "PasswordServiceConfig__SaltSize": "16",
-        "PasswordServiceConfig__IterationsCount": "10000",
+        "PasswordServiceConfig__IterationsCount": "600000",
         "PasswordServiceConfig__NumBytesRequested": "32"
       }
     }

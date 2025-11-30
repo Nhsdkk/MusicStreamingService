@@ -42,7 +42,7 @@ public class PasswordService : IPasswordService
         var (salt, password) = GetSaltAndPasswordFromBytes(encodedPassword);
         var passedPasswordEncoded = Encode(passedPassword, salt);
         
-        return password.SequenceEqual(passedPasswordEncoded);
+        return CryptographicOperations.FixedTimeEquals(password, passedPasswordEncoded);
     }
     
     private byte[] Encode(string password, byte[] salt)
