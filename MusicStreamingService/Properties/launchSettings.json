@@ -13,9 +13,9 @@
         "PsqlConfiguration__Username": "postgres",
         "PsqlConfiguration__Password": "postgres",
         "PsqlConfiguration__Database": "postgres",
-        "PasswordService__SaltSize": "16",
-        "PasswordService__IterationsCount": "10000",
-        "PasswordService__NumBytesRequested": "32"
+        "PasswordServiceConfig__SaltSize": "16",
+        "PasswordServiceConfig__IterationsCount": "10000",
+        "PasswordServiceConfig__NumBytesRequested": "32"
       }
     },
     "https": {
@@ -30,9 +30,9 @@
         "PsqlConfiguration__Username": "postgres",
         "PsqlConfiguration__Password": "postgres",
         "PsqlConfiguration__Database": "postgres",
-        "PasswordService__SaltSize": "16",
-        "PasswordService__IterationsCount": "10000",
-        "PasswordService__NumBytesRequested": "32"
+        "PasswordServiceConfig__SaltSize": "16",
+        "PasswordServiceConfig__IterationsCount": "10000",
+        "PasswordServiceConfig__NumBytesRequested": "32"
       }
     }
   }
