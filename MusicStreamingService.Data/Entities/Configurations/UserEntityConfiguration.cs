@@ -9,10 +9,12 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
 {
     protected override void OnConfigure(EntityTypeBuilder<UserEntity> builder)
     {
-        builder.Property(x => x.Username).HasMaxLength(UserEntityConstraints.MaxUsernameLength);
+        builder.Property(x => x.Username).IsRequired().HasMaxLength(UserEntityConstraints.MaxUsernameLength);
         builder.Property(x => x.Disabled).HasDefaultValue(false);
-        builder.Property(x => x.Email).HasMaxLength(UserEntityConstraints.MaxEmailLength);
-        builder.Property(x => x.Password).HasColumnType("bytea");
+        builder.Property(x => x.Email).IsRequired().HasMaxLength(UserEntityConstraints.MaxEmailLength);
+        builder.Property(x => x.Password).IsRequired().HasColumnType("bytea");
+        builder.Property(x => x.RegionId).IsRequired();
+        builder.Property(x => x.FullName).IsRequired().HasMaxLength(UserEntityConstraints.MaxFullNameLength);
 
         builder.HasAlternateKey(x => x.Email);
         builder.HasAlternateKey(x => x.Username);

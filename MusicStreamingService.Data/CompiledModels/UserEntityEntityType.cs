@@ -73,7 +73,8 @@ namespace MusicStreamingService.Data.CompiledModels
                 "FullName",
                 typeof(string),
                 propertyInfo: typeof(UserEntity).GetProperty("FullName", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<FullName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                fieldInfo: typeof(UserEntity).GetField("<FullName>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                maxLength: 255);
             fullName.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var password = runtimeEntityType.AddProperty(
