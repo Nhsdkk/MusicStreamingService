@@ -23,7 +23,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 baseEntityType,
                 propertyCount: 5,
                 skipNavigationCount: 1,
-                keyCount: 1);
+                keyCount: 2);
 
             var id = runtimeEntityType.AddProperty(
                 "Id",
@@ -58,6 +58,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(string),
                 propertyInfo: typeof(GenreEntity).GetProperty("Title", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(GenreEntity).GetField("<Title>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 255);
             title.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
@@ -74,6 +75,9 @@ namespace MusicStreamingService.Data.CompiledModels
             var key = runtimeEntityType.AddKey(
                 new[] { id });
             runtimeEntityType.SetPrimaryKey(key);
+
+            var key0 = runtimeEntityType.AddKey(
+                new[] { title });
 
             return runtimeEntityType;
         }

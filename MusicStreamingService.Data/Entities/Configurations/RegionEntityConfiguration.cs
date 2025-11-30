@@ -8,6 +8,8 @@ internal sealed class RegionEntityConfiguration : BaseIdEntityConfiguration<Regi
 {
     protected override void OnConfigure(EntityTypeBuilder<RegionEntity> builder)
     {
-        builder.Property(x => x.Title).HasMaxLength(RegionEntityConstraints.RegionNameMaxLength);
+        builder.Property(x => x.Title).HasMaxLength(RegionEntityConstraints.RegionNameMaxLength).IsRequired();
+
+        builder.HasAlternateKey(x => x.Title);
     }
 }
