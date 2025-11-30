@@ -13,6 +13,11 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     public string FullName { get; set; } = null!;
 
     /// <summary>
+    /// User's birth date
+    /// </summary>
+    public DateTime BirthDate { get; set; }
+    
+    /// <summary>
     /// User's username
     /// </summary>
     public string Username { get; set; } = null!;
