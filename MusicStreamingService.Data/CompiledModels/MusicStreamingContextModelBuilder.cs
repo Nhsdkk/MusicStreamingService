@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("22fb2063-0695-423f-af20-c9b7f789bf91"), entityTypeCount: 19)
+            : base(skipDetectChanges: false, modelId: new Guid("9108c1e9-56c8-4762-a8ba-41100de418e9"), entityTypeCount: 21)
         {
         }
 
@@ -25,6 +25,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var deviceEntity = DeviceEntityEntityType.Create(this);
             var genreEntity = GenreEntityEntityType.Create(this);
             var paymentEntity = PaymentEntityEntityType.Create(this);
+            var permissionEntity = PermissionEntityEntityType.Create(this);
             var playlistEntity = PlaylistEntityEntityType.Create(this);
             var playlistFavoriteEntity = PlaylistFavoriteEntityEntityType.Create(this);
             var playlistSongEntity = PlaylistSongEntityEntityType.Create(this);
@@ -37,6 +38,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var subscriberEntity = SubscriberEntityEntityType.Create(this);
             var subscriptionEntity = SubscriptionEntityEntityType.Create(this);
             var userEntity = UserEntityEntityType.Create(this);
+            var userPermissionEntity = UserPermissionEntityEntityType.Create(this);
 
             AlbumEntityEntityType.CreateForeignKey1(albumEntity, userEntity);
             AlbumEntityEntityType.CreateForeignKey2(albumEntity, userEntity);
@@ -67,9 +69,12 @@ namespace MusicStreamingService.Data.CompiledModels
             SubscriberEntityEntityType.CreateForeignKey1(subscriberEntity, userEntity);
             SubscriberEntityEntityType.CreateForeignKey2(subscriberEntity, subscriptionEntity);
             UserEntityEntityType.CreateForeignKey1(userEntity, regionEntity);
+            UserPermissionEntityEntityType.CreateForeignKey1(userPermissionEntity, permissionEntity);
+            UserPermissionEntityEntityType.CreateForeignKey2(userPermissionEntity, userEntity);
 
             AlbumEntityEntityType.CreateSkipNavigation1(albumEntity, userEntity, albumFavoriteEntity);
             GenreEntityEntityType.CreateSkipNavigation1(genreEntity, songEntity, songGenreEntity);
+            PermissionEntityEntityType.CreateSkipNavigation1(permissionEntity, userEntity, userPermissionEntity);
             PlaylistEntityEntityType.CreateSkipNavigation1(playlistEntity, userEntity, playlistFavoriteEntity);
             RegionEntityEntityType.CreateSkipNavigation1(regionEntity, songEntity, allowedDistributionEntity);
             SongEntityEntityType.CreateSkipNavigation1(songEntity, regionEntity, allowedDistributionEntity);
@@ -78,6 +83,7 @@ namespace MusicStreamingService.Data.CompiledModels
             UserEntityEntityType.CreateSkipNavigation1(userEntity, albumEntity, albumFavoriteEntity);
             UserEntityEntityType.CreateSkipNavigation2(userEntity, playlistEntity, playlistFavoriteEntity);
             UserEntityEntityType.CreateSkipNavigation3(userEntity, songEntity, songFavoriteEntity);
+            UserEntityEntityType.CreateSkipNavigation4(userEntity, permissionEntity, userPermissionEntity);
 
             AlbumEntityEntityType.CreateAnnotations(albumEntity);
             AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
@@ -86,6 +92,7 @@ namespace MusicStreamingService.Data.CompiledModels
             DeviceEntityEntityType.CreateAnnotations(deviceEntity);
             GenreEntityEntityType.CreateAnnotations(genreEntity);
             PaymentEntityEntityType.CreateAnnotations(paymentEntity);
+            PermissionEntityEntityType.CreateAnnotations(permissionEntity);
             PlaylistEntityEntityType.CreateAnnotations(playlistEntity);
             PlaylistFavoriteEntityEntityType.CreateAnnotations(playlistFavoriteEntity);
             PlaylistSongEntityEntityType.CreateAnnotations(playlistSongEntity);
@@ -98,6 +105,7 @@ namespace MusicStreamingService.Data.CompiledModels
             SubscriberEntityEntityType.CreateAnnotations(subscriberEntity);
             SubscriptionEntityEntityType.CreateAnnotations(subscriptionEntity);
             UserEntityEntityType.CreateAnnotations(userEntity);
+            UserPermissionEntityEntityType.CreateAnnotations(userPermissionEntity);
 
             AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
             AddAnnotation("ProductVersion", "9.0.1");

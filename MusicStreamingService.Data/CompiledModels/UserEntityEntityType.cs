@@ -24,7 +24,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 baseEntityType,
                 propertyCount: 10,
                 navigationCount: 7,
-                skipNavigationCount: 3,
+                skipNavigationCount: 4,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 1,
                 keyCount: 3);
@@ -220,6 +220,31 @@ namespace MusicStreamingService.Data.CompiledModels
                 fieldInfo: typeof(UserEntity).GetField("<FavoriteSongs>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             var inverse = targetEntityType.FindSkipNavigation("UserEntity");
+            if (inverse != null)
+            {
+                skipNavigation.Inverse = inverse;
+                inverse.Inverse = skipNavigation;
+            }
+
+            return skipNavigation;
+        }
+
+        public static RuntimeSkipNavigation CreateSkipNavigation4(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
+        {
+            var skipNavigation = declaringEntityType.AddSkipNavigation(
+                "Permissions",
+                targetEntityType,
+                joinEntityType.FindForeignKey(
+                    new[] { joinEntityType.FindProperty("UserId") },
+                    declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
+                    declaringEntityType),
+                true,
+                false,
+                typeof(List<PermissionEntity>),
+                propertyInfo: typeof(UserEntity).GetProperty("Permissions", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(UserEntity).GetField("<Permissions>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            var inverse = targetEntityType.FindSkipNavigation("UsedBy");
             if (inverse != null)
             {
                 skipNavigation.Inverse = inverse;

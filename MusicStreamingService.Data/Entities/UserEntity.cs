@@ -86,4 +86,9 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// User's devices
     /// </summary>
     public List<DeviceEntity> Devices { get; set; } = new List<DeviceEntity>();
+
+    /// <summary>
+    /// User's permissions
+    /// </summary>
+    public List<PermissionEntity> Permissions { get; set; } = new List<PermissionEntity>();
 };
