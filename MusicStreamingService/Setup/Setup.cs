@@ -1,4 +1,5 @@
 using MusicStreamingService.Data;
+using MusicStreamingService.Infrastructure.Password;
 using Scalar.AspNetCore;
 
 namespace MusicStreamingService.Setup;
@@ -10,12 +11,13 @@ public static class Setup
         var services = builder.Services;
         var configuration = builder.Configuration;
         configuration.AddEnvironmentVariables();
-
+        
         services
             .ConfigureMusicStreamingDbContext(configuration)
             .AddMediator(
                 options: options =>
-                    options.ServiceLifetime = ServiceLifetime.Scoped);
+                    options.ServiceLifetime = ServiceLifetime.Scoped)
+            .ConfigurePasswordService(configuration);
 
         services.AddOpenApi();
         services.AddControllers();

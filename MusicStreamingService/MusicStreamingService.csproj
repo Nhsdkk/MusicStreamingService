@@ -30,6 +30,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\MusicStreamingService.Data\MusicStreamingService.Data.csproj" />
+      <ProjectReference Include="..\MusicStreamingService.Infrastructure\MusicStreamingService.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>
