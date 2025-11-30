@@ -72,7 +72,7 @@ namespace MusicStreamingService.Data.Migrations
 
             migrationBuilder.Sql(
                 """
-                CREATE OR REPLACE FUNCTION increment_likes()
+                CREATE OR REPLACE FUNCTION increment_likes_albums()
                     RETURNS TRIGGER
                     LANGUAGE plpgsql
                 AS
@@ -89,12 +89,12 @@ namespace MusicStreamingService.Data.Migrations
                 AFTER INSERT
                 ON "AlbumFavorites"
                 FOR EACH ROW
-                EXECUTE FUNCTION increment_likes();
+                EXECUTE FUNCTION increment_likes_albums();
                 """);
             
             migrationBuilder.Sql(
                 """
-                CREATE OR REPLACE FUNCTION decrement_likes()
+                CREATE OR REPLACE FUNCTION decrement_likes_albums()
                     RETURNS TRIGGER
                     LANGUAGE plpgsql
                 AS
@@ -111,15 +111,15 @@ namespace MusicStreamingService.Data.Migrations
                 AFTER DELETE
                 ON "AlbumFavorites"
                 FOR EACH ROW
-                EXECUTE FUNCTION decrement_likes();
+                EXECUTE FUNCTION decrement_likes_albums();
                 """);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("DROP TRIGGER album_unfavorite ON \"AlbumFavorites\"; DROP FUNCTION decrement_likes;");
-            migrationBuilder.Sql("DROP TRIGGER album_favorite ON \"AlbumFavorites\"; DROP FUNCTION increment_likes;");
+            migrationBuilder.Sql("DROP TRIGGER album_unfavorite ON \"AlbumFavorites\"; DROP FUNCTION decrement_likes_albums;");
+            migrationBuilder.Sql("DROP TRIGGER album_favorite ON \"AlbumFavorites\"; DROP FUNCTION increment_likes_albums;");
             
             migrationBuilder.DropTable(
                 name: "AlbumFavorites");

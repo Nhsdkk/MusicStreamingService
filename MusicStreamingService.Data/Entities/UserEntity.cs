@@ -41,4 +41,19 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// User's favorite albums
     /// </summary>
     public List<AlbumEntity> FavoriteAlbums { get; set; } = new List<AlbumEntity>();
+
+    /// <summary>
+    /// User's albums
+    /// </summary>
+    public List<AlbumEntity> ArtistAlbums { get; set; } = new List<AlbumEntity>();
+
+    /// <summary>
+    /// User's songs
+    /// </summary>
+    public List<SongArtistEntity> ArtistSongs { get; set; } = new List<SongArtistEntity>();
+    
+    /// <summary>
+    /// User's favorite songs
+    /// </summary>
+    public List<SongEntity> FavoriteSongs { get; set; } = new List<SongEntity>();
 };

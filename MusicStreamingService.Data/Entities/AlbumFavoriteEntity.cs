@@ -1,6 +1,6 @@
 namespace MusicStreamingService.Data.Entities;
 
-public class AlbumFavoriteEntity
+public sealed record AlbumFavoriteEntity
 {
     /// <summary>
     /// Id of the user, who liked this album

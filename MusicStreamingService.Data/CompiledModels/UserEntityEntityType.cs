@@ -23,8 +23,8 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(UserEntity),
                 baseEntityType,
                 propertyCount: 9,
-                navigationCount: 1,
-                skipNavigationCount: 1,
+                navigationCount: 3,
+                skipNavigationCount: 2,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 1,
                 keyCount: 3);
@@ -161,7 +161,32 @@ namespace MusicStreamingService.Data.CompiledModels
                 propertyInfo: typeof(UserEntity).GetProperty("FavoriteAlbums", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(UserEntity).GetField("<FavoriteAlbums>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var inverse = targetEntityType.FindSkipNavigation("LikedUsers");
+            var inverse = targetEntityType.FindSkipNavigation("UserEntity");
+            if (inverse != null)
+            {
+                skipNavigation.Inverse = inverse;
+                inverse.Inverse = skipNavigation;
+            }
+
+            return skipNavigation;
+        }
+
+        public static RuntimeSkipNavigation CreateSkipNavigation2(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
+        {
+            var skipNavigation = declaringEntityType.AddSkipNavigation(
+                "FavoriteSongs",
+                targetEntityType,
+                joinEntityType.FindForeignKey(
+                    new[] { joinEntityType.FindProperty("UserId") },
+                    declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
+                    declaringEntityType),
+                true,
+                false,
+                typeof(List<SongEntity>),
+                propertyInfo: typeof(UserEntity).GetProperty("FavoriteSongs", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(UserEntity).GetField("<FavoriteSongs>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            var inverse = targetEntityType.FindSkipNavigation("UserEntity");
             if (inverse != null)
             {
                 skipNavigation.Inverse = inverse;

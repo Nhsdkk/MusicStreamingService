@@ -22,7 +22,19 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
         builder.HasOne(x => x.Region).WithMany().HasForeignKey(x => x.RegionId);
         builder
             .HasMany(x => x.FavoriteAlbums)
-            .WithMany(x => x.LikedUsers)
+            .WithMany()
             .UsingEntity<AlbumFavoriteEntity>();
+        builder
+            .HasMany(x => x.FavoriteSongs)
+            .WithMany()
+            .UsingEntity<SongFavoriteEntity>();
+        builder
+            .HasMany(x => x.ArtistAlbums)
+            .WithOne(x => x.Artist)
+            .HasForeignKey(x => x.ArtistId);
+        builder
+            .HasMany(x => x.ArtistSongs)
+            .WithOne(x => x.Artist)
+            .HasForeignKey(x => x.ArtistId);
     }
 }

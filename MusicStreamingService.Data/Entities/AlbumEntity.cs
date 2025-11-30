@@ -33,12 +33,12 @@ public sealed record AlbumEntity : BaseUpdatableIdEntity
     public DateTime ReleaseDate { get; set; }
 
     /// <summary>
-    /// User's who liked this album
-    /// </summary>
-    public List<UserEntity> LikedUsers { get; set; } = new List<UserEntity>();
-
-    /// <summary>
     /// Filename of the album artwork inside s3 object storage
     /// </summary>
     public string S3ArtworkFilename { get; set; } = null!;
+
+    /// <summary>
+    /// Album songs
+    /// </summary>
+    public List<AlbumSongEntity> Songs { get; set; } = new List<AlbumSongEntity>();
 }

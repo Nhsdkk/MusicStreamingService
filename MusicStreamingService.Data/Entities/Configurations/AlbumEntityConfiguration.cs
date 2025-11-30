@@ -14,12 +14,15 @@ internal sealed class AlbumEntityConfiguration : BaseUpdatableEntityConfiguratio
         builder.Property(x => x.ReleaseDate).IsRequired();
         builder.Property(x => x.S3ArtworkFilename).IsRequired();
         
-        builder.HasOne(x => x.Artist).WithMany().HasForeignKey(x => x.ArtistId);
         builder
-            .HasMany(x => x.LikedUsers)
-            .WithMany(x => x.FavoriteAlbums)
-            .UsingEntity<AlbumFavoriteEntity>();
-
+            .HasOne(x => x.Artist)
+            .WithMany()
+            .HasForeignKey(x => x.ArtistId);
+        builder
+            .HasMany(x => x.Songs)
+            .WithOne(x => x.Album)
+            .HasForeignKey(x => x.AlbumId);
+        
         builder.Property(x => x.Likes).HasDefaultValue(0).ValueGeneratedNever();
     }
 }

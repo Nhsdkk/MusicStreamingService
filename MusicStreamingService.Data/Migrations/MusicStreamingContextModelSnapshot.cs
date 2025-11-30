@@ -61,9 +61,14 @@ namespace MusicStreamingService.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<Guid?>("UserEntityId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ArtistId");
+
+                    b.HasIndex("UserEntityId");
 
                     b.ToTable("Albums");
                 });
@@ -81,6 +86,73 @@ namespace MusicStreamingService.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AlbumFavorites");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.AlbumSongEntity", b =>
+                {
+                    b.Property<Guid>("SongId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Title")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("SongId", "AlbumId");
+
+                    b.HasIndex("AlbumId");
+
+                    b.ToTable("AlbumSongs");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.AllowedDistributionEntity", b =>
+                {
+                    b.Property<Guid>("SongId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RegionId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SongId", "RegionId");
+
+                    b.HasIndex("RegionId");
+
+                    b.ToTable("AllowedDistribution");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.GenreEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("MusicStreamingService.Data.Entities.RegionEntity", b =>
@@ -103,6 +175,100 @@ namespace MusicStreamingService.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Regions");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongArtistEntity", b =>
+                {
+                    b.Property<Guid>("SongId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ArtistId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("MainArtist")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("UserEntityId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SongId", "ArtistId");
+
+                    b.HasIndex("ArtistId");
+
+                    b.HasIndex("UserEntityId");
+
+                    b.ToTable("SongArtists");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<long>("DurationMs")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("Explicit")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("Likes")
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
+                    b.Property<string>("S3MediaFileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Songs");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongFavoriteEntity", b =>
+                {
+                    b.Property<Guid>("SongId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SongId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SongFavorites");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongGenreEntity", b =>
+                {
+                    b.Property<Guid>("SongId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GenreId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SongId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("SongGenres");
                 });
 
             modelBuilder.Entity("MusicStreamingService.Data.Entities.UserEntity", b =>
@@ -168,6 +334,10 @@ namespace MusicStreamingService.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MusicStreamingService.Data.Entities.UserEntity", null)
+                        .WithMany("ArtistAlbums")
+                        .HasForeignKey("UserEntityId");
+
                     b.Navigation("Artist");
                 });
 
@@ -190,6 +360,105 @@ namespace MusicStreamingService.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.AlbumSongEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.AlbumEntity", "Album")
+                        .WithMany("Songs")
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.SongEntity", "Song")
+                        .WithMany("Albums")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Album");
+
+                    b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.AllowedDistributionEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.RegionEntity", "Region")
+                        .WithMany()
+                        .HasForeignKey("RegionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.SongEntity", "Song")
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Region");
+
+                    b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongArtistEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.UserEntity", "Artist")
+                        .WithMany()
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.SongEntity", "Song")
+                        .WithMany("Artists")
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.UserEntity", null)
+                        .WithMany("ArtistSongs")
+                        .HasForeignKey("UserEntityId");
+
+                    b.Navigation("Artist");
+
+                    b.Navigation("Song");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongFavoriteEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.SongEntity", "Song")
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.UserEntity", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Song");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongGenreEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.GenreEntity", "Genre")
+                        .WithMany()
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.SongEntity", "Song")
+                        .WithMany()
+                        .HasForeignKey("SongId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
+
+                    b.Navigation("Song");
+                });
+
             modelBuilder.Entity("MusicStreamingService.Data.Entities.UserEntity", b =>
                 {
                     b.HasOne("MusicStreamingService.Data.Entities.RegionEntity", "Region")
@@ -199,6 +468,25 @@ namespace MusicStreamingService.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Region");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.AlbumEntity", b =>
+                {
+                    b.Navigation("Songs");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.SongEntity", b =>
+                {
+                    b.Navigation("Albums");
+
+                    b.Navigation("Artists");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.UserEntity", b =>
+                {
+                    b.Navigation("ArtistAlbums");
+
+                    b.Navigation("ArtistSongs");
                 });
 #pragma warning restore 612, 618
         }
