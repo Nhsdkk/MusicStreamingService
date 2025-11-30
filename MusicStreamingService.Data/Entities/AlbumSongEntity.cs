@@ -30,5 +30,5 @@ public sealed record AlbumSongEntity
     /// <summary>
     /// Position of the song inside the album
     /// </summary>
-    public int Position { get; set; }
+    public long Position { get; set; }
 }

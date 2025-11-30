@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("e2e6be32-29c3-48a1-b0b9-0701561c3aea"), entityTypeCount: 17)
+            : base(skipDetectChanges: false, modelId: new Guid("e1c643ba-6874-4e7f-9068-8ceb9ac2967b"), entityTypeCount: 17)
         {
         }
 

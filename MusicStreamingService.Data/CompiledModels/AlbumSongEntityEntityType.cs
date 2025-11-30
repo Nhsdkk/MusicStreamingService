@@ -48,10 +48,10 @@ namespace MusicStreamingService.Data.CompiledModels
 
             var position = runtimeEntityType.AddProperty(
                 "Position",
-                typeof(int),
+                typeof(long),
                 propertyInfo: typeof(AlbumSongEntity).GetProperty("Position", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(AlbumSongEntity).GetField("<Position>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: 0);
+                sentinel: 0L);
             position.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var title = runtimeEntityType.AddProperty(
