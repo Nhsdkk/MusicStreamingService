@@ -10,6 +10,6 @@ internal sealed class RegionEntityConfiguration : BaseIdEntityConfiguration<Regi
     {
         builder.Property(x => x.Title).HasMaxLength(RegionEntityConstraints.RegionNameMaxLength).IsRequired();
 
-        builder.HasAlternateKey(x => x.Title);
+        builder.HasIndex(x => x.Title).IsUnique();
     }
 }

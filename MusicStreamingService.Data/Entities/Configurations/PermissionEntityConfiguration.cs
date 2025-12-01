@@ -11,7 +11,7 @@ internal sealed class PermissionEntityConfiguration : BaseUpdatableEntityConfigu
         builder.Property(x => x.Description).IsRequired().HasMaxLength(PermissionEntityConstraints.TitleMaxLength);
         builder.Property(x => x.Title).IsRequired();
 
-        builder.HasAlternateKey(x => x.Title);
+        builder.HasIndex(x => x.Title).IsUnique();
 
         builder
             .HasMany(x => x.UsedBy)

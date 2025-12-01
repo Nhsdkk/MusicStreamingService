@@ -11,7 +11,7 @@ internal sealed class GenreEntityConfiguration : BaseUpdatableEntityConfiguratio
         builder.Property(x => x.Title).IsRequired().HasMaxLength(GenreEntityConstraints.TitleMaxLength);
         builder.Property(x => x.Description).IsRequired();
 
-        builder.HasAlternateKey(x => x.Title);
+        builder.HasIndex(x => x.Title).IsUnique();
 
         builder
             .HasMany(x => x.Songs)
