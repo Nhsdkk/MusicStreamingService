@@ -26,8 +26,8 @@ namespace MusicStreamingService.Data.CompiledModels
                 navigationCount: 7,
                 skipNavigationCount: 4,
                 foreignKeyCount: 1,
-                unnamedIndexCount: 1,
-                keyCount: 3);
+                unnamedIndexCount: 3,
+                keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
                 "Id",
@@ -73,7 +73,6 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(string),
                 propertyInfo: typeof(UserEntity).GetProperty("Email", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(UserEntity).GetField("<Email>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 255);
             email.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
@@ -116,22 +115,23 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(string),
                 propertyInfo: typeof(UserEntity).GetProperty("Username", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(UserEntity).GetField("<Username>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
                 maxLength: 255);
             username.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
-                new[] { email });
-
-            var key0 = runtimeEntityType.AddKey(
                 new[] { id });
-            runtimeEntityType.SetPrimaryKey(key0);
-
-            var key1 = runtimeEntityType.AddKey(
-                new[] { username });
+            runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
+                new[] { email },
+                unique: true);
+
+            var index0 = runtimeEntityType.AddIndex(
                 new[] { regionId });
+
+            var index1 = runtimeEntityType.AddIndex(
+                new[] { username },
+                unique: true);
 
             return runtimeEntityType;
         }

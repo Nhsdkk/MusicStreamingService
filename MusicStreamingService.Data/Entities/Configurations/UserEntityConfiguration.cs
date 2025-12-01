@@ -16,8 +16,8 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
         builder.Property(x => x.RegionId).IsRequired();
         builder.Property(x => x.FullName).IsRequired().HasMaxLength(UserEntityConstraints.MaxFullNameLength);
 
-        builder.HasAlternateKey(x => x.Email);
-        builder.HasAlternateKey(x => x.Username);
+        builder.HasIndex(x => x.Email).IsUnique();
+        builder.HasIndex(x => x.Username).IsUnique();
 
         builder.HasOne(x => x.Region).WithMany().HasForeignKey(x => x.RegionId);
         builder
