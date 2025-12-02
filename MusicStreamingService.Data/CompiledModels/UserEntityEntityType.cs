@@ -232,7 +232,7 @@ namespace MusicStreamingService.Data.CompiledModels
         public static RuntimeSkipNavigation CreateSkipNavigation4(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
             var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "Permissions",
+                "Roles",
                 targetEntityType,
                 joinEntityType.FindForeignKey(
                     new[] { joinEntityType.FindProperty("UserId") },
@@ -240,11 +240,11 @@ namespace MusicStreamingService.Data.CompiledModels
                     declaringEntityType),
                 true,
                 false,
-                typeof(List<PermissionEntity>),
-                propertyInfo: typeof(UserEntity).GetProperty("Permissions", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserEntity).GetField("<Permissions>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                typeof(List<RoleEntity>),
+                propertyInfo: typeof(UserEntity).GetProperty("Roles", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(UserEntity).GetField("<Roles>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var inverse = targetEntityType.FindSkipNavigation("UsedBy");
+            var inverse = targetEntityType.FindSkipNavigation("UserEntity");
             if (inverse != null)
             {
                 skipNavigation.Inverse = inverse;

@@ -11,9 +11,4 @@ public sealed record PermissionEntity : BaseUpdatableIdEntity
     /// Description of the permission
     /// </summary>
     public string Description { get; set; } = null!;
-
-    /// <summary>
-    /// User's using current permission
-    /// </summary>
-    public List<UserEntity> UsedBy { get; set; } = new List<UserEntity>();
 }

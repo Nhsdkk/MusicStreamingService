@@ -8,14 +8,9 @@ internal sealed class PermissionEntityConfiguration : BaseUpdatableEntityConfigu
 {
     protected override void OnConfigure(EntityTypeBuilder<PermissionEntity> builder)
     {
-        builder.Property(x => x.Description).IsRequired().HasMaxLength(PermissionEntityConstraints.TitleMaxLength);
-        builder.Property(x => x.Title).IsRequired();
+        builder.Property(x => x.Description).IsRequired();
+        builder.Property(x => x.Title).IsRequired().HasMaxLength(PermissionEntityConstraints.TitleMaxLength);
 
         builder.HasIndex(x => x.Title).IsUnique();
-
-        builder
-            .HasMany(x => x.UsedBy)
-            .WithMany(x => x.Permissions)
-            .UsingEntity<UserPermissionEntity>();
     }
 }

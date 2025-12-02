@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("853e6df1-d96e-48ae-957e-3640fa45aee5"), entityTypeCount: 21)
+            : base(skipDetectChanges: false, modelId: new Guid("fcf87682-98d3-430d-ae57-de51350078ae"), entityTypeCount: 22)
         {
         }
 
@@ -30,6 +30,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var playlistFavoriteEntity = PlaylistFavoriteEntityEntityType.Create(this);
             var playlistSongEntity = PlaylistSongEntityEntityType.Create(this);
             var regionEntity = RegionEntityEntityType.Create(this);
+            var roleEntity = RoleEntityEntityType.Create(this);
             var songArtistEntity = SongArtistEntityEntityType.Create(this);
             var songEntity = SongEntityEntityType.Create(this);
             var songFavoriteEntity = SongFavoriteEntityEntityType.Create(this);
@@ -38,7 +39,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var subscriberEntity = SubscriberEntityEntityType.Create(this);
             var subscriptionEntity = SubscriptionEntityEntityType.Create(this);
             var userEntity = UserEntityEntityType.Create(this);
-            var userPermissionEntity = UserPermissionEntityEntityType.Create(this);
+            var userRoleEntity = UserRoleEntityEntityType.Create(this);
 
             AlbumEntityEntityType.CreateForeignKey1(albumEntity, userEntity);
             AlbumEntityEntityType.CreateForeignKey2(albumEntity, userEntity);
@@ -51,6 +52,7 @@ namespace MusicStreamingService.Data.CompiledModels
             DeviceEntityEntityType.CreateForeignKey1(deviceEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey1(paymentEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey2(paymentEntity, subscriptionEntity);
+            PermissionEntityEntityType.CreateForeignKey1(permissionEntity, roleEntity);
             PlaylistEntityEntityType.CreateForeignKey1(playlistEntity, userEntity);
             PlaylistEntityEntityType.CreateForeignKey2(playlistEntity, userEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey1(playlistFavoriteEntity, playlistEntity);
@@ -69,21 +71,21 @@ namespace MusicStreamingService.Data.CompiledModels
             SubscriberEntityEntityType.CreateForeignKey1(subscriberEntity, userEntity);
             SubscriberEntityEntityType.CreateForeignKey2(subscriberEntity, subscriptionEntity);
             UserEntityEntityType.CreateForeignKey1(userEntity, regionEntity);
-            UserPermissionEntityEntityType.CreateForeignKey1(userPermissionEntity, permissionEntity);
-            UserPermissionEntityEntityType.CreateForeignKey2(userPermissionEntity, userEntity);
+            UserRoleEntityEntityType.CreateForeignKey1(userRoleEntity, roleEntity);
+            UserRoleEntityEntityType.CreateForeignKey2(userRoleEntity, userEntity);
 
             AlbumEntityEntityType.CreateSkipNavigation1(albumEntity, userEntity, albumFavoriteEntity);
             GenreEntityEntityType.CreateSkipNavigation1(genreEntity, songEntity, songGenreEntity);
-            PermissionEntityEntityType.CreateSkipNavigation1(permissionEntity, userEntity, userPermissionEntity);
             PlaylistEntityEntityType.CreateSkipNavigation1(playlistEntity, userEntity, playlistFavoriteEntity);
             RegionEntityEntityType.CreateSkipNavigation1(regionEntity, songEntity, allowedDistributionEntity);
+            RoleEntityEntityType.CreateSkipNavigation1(roleEntity, userEntity, userRoleEntity);
             SongEntityEntityType.CreateSkipNavigation1(songEntity, regionEntity, allowedDistributionEntity);
             SongEntityEntityType.CreateSkipNavigation2(songEntity, genreEntity, songGenreEntity);
             SongEntityEntityType.CreateSkipNavigation3(songEntity, userEntity, songFavoriteEntity);
             UserEntityEntityType.CreateSkipNavigation1(userEntity, albumEntity, albumFavoriteEntity);
             UserEntityEntityType.CreateSkipNavigation2(userEntity, playlistEntity, playlistFavoriteEntity);
             UserEntityEntityType.CreateSkipNavigation3(userEntity, songEntity, songFavoriteEntity);
-            UserEntityEntityType.CreateSkipNavigation4(userEntity, permissionEntity, userPermissionEntity);
+            UserEntityEntityType.CreateSkipNavigation4(userEntity, roleEntity, userRoleEntity);
 
             AlbumEntityEntityType.CreateAnnotations(albumEntity);
             AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
@@ -97,6 +99,7 @@ namespace MusicStreamingService.Data.CompiledModels
             PlaylistFavoriteEntityEntityType.CreateAnnotations(playlistFavoriteEntity);
             PlaylistSongEntityEntityType.CreateAnnotations(playlistSongEntity);
             RegionEntityEntityType.CreateAnnotations(regionEntity);
+            RoleEntityEntityType.CreateAnnotations(roleEntity);
             SongArtistEntityEntityType.CreateAnnotations(songArtistEntity);
             SongEntityEntityType.CreateAnnotations(songEntity);
             SongFavoriteEntityEntityType.CreateAnnotations(songFavoriteEntity);
@@ -105,7 +108,7 @@ namespace MusicStreamingService.Data.CompiledModels
             SubscriberEntityEntityType.CreateAnnotations(subscriberEntity);
             SubscriptionEntityEntityType.CreateAnnotations(subscriptionEntity);
             UserEntityEntityType.CreateAnnotations(userEntity);
-            UserPermissionEntityEntityType.CreateAnnotations(userPermissionEntity);
+            UserRoleEntityEntityType.CreateAnnotations(userRoleEntity);
 
             AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
             AddAnnotation("ProductVersion", "9.0.1");

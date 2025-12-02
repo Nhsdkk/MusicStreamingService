@@ -47,7 +47,7 @@ public sealed class MusicStreamingContext : DbContext
     
     public DbSet<PermissionEntity> Permissions { get; set; }
     
-    public DbSet<UserPermissionEntity> UserPermissions { get; set; }
+    public DbSet<UserRoleEntity> UserPermissions { get; set; }
 
     public MusicStreamingContext(DbContextOptions<MusicStreamingContext> options) : base(options) { }
 
@@ -77,7 +77,7 @@ public sealed class MusicStreamingContext : DbContext
         modelBuilder.ApplyConfiguration(new PlaylistSongEntityConfiguration());
         modelBuilder.ApplyConfiguration(new StreamingEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DeviceEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserPermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
     }
 }

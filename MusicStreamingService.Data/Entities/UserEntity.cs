@@ -90,5 +90,5 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// <summary>
     /// User's permissions
     /// </summary>
-    public List<PermissionEntity> Permissions { get; set; } = new List<PermissionEntity>();
+    public List<RoleEntity> Roles { get; set; } = new List<RoleEntity>();
 };

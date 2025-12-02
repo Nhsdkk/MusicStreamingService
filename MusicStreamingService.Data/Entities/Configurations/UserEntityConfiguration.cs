@@ -19,7 +19,10 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
         builder.HasIndex(x => x.Email).IsUnique();
         builder.HasIndex(x => x.Username).IsUnique();
 
-        builder.HasOne(x => x.Region).WithMany().HasForeignKey(x => x.RegionId);
+        builder
+            .HasOne(x => x.Region)
+            .WithMany()
+            .HasForeignKey(x => x.RegionId);
         builder
             .HasMany(x => x.FavoriteAlbums)
             .WithMany()
@@ -56,5 +59,9 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .HasMany(x => x.Devices)
             .WithOne(x => x.Owner)
             .HasForeignKey(x => x.OwnerId);
+        builder
+            .HasMany(x => x.Roles)
+            .WithMany()
+            .UsingEntity<UserRoleEntity>();
     }
 }

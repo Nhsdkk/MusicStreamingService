@@ -13,12 +13,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicStreamingService.Data.CompiledModels
 {
     [EntityFrameworkInternal]
-    public partial class UserPermissionEntityEntityType
+    public partial class UserRoleEntityEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
             var runtimeEntityType = model.AddEntityType(
-                "MusicStreamingService.Data.Entities.UserPermissionEntity",
+                "MusicStreamingService.Data.Entities.UserRoleEntity",
                 typeof(UserRoleEntity),
                 baseEntityType,
                 propertyCount: 2,
@@ -36,39 +36,39 @@ namespace MusicStreamingService.Data.CompiledModels
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             userId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
-            var permissionId = runtimeEntityType.AddProperty(
-                "PermissionId",
+            var roleId = runtimeEntityType.AddProperty(
+                "RoleId",
                 typeof(Guid),
-                propertyInfo: typeof(UserRoleEntity).GetProperty("PermissionId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserRoleEntity).GetField("<PermissionId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(UserRoleEntity).GetProperty("RoleId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(UserRoleEntity).GetField("<RoleId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            permissionId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+            roleId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var key = runtimeEntityType.AddKey(
-                new[] { userId, permissionId });
+                new[] { userId, roleId });
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { permissionId });
+                new[] { roleId });
 
             return runtimeEntityType;
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PermissionId") },
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("RoleId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
                 principalEntityType,
                 deleteBehavior: DeleteBehavior.Cascade,
                 required: true);
 
-            var permission = declaringEntityType.AddNavigation("Permission",
+            var role = declaringEntityType.AddNavigation("Role",
                 runtimeForeignKey,
                 onDependent: true,
-                typeof(PermissionEntity),
-                propertyInfo: typeof(UserRoleEntity).GetProperty("Permission", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserRoleEntity).GetField("<Permission>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                typeof(RoleEntity),
+                propertyInfo: typeof(UserRoleEntity).GetProperty("Role", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(UserRoleEntity).GetField("<Role>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             return runtimeForeignKey;
         }
