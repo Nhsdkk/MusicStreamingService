@@ -1,9 +1,10 @@
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
-using MusicStreamingService.Result;
+using MusicStreamingService.Infrastructure.Result;
 using OneOf;
 using OneOf.Types;
 
@@ -26,7 +27,8 @@ public sealed class Get : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/users/")]
-    [ProducesResponseType(typeof(UserEntity), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [Authorize(Roles = "mss.users.manage")]
     public async Task<IActionResult> GetUser(
         [FromQuery] Guid id,
         CancellationToken cancellationToken = default)
@@ -38,7 +40,7 @@ public sealed class Get : ControllerBase
             },
             cancellationToken);
         
-        return result.Match<IActionResult>(Ok, BadRequest);
+        return result.Match<IActionResult>(x => Ok(x.Username), BadRequest);
     }
 
     internal sealed record Query : IRequest<Result<UserEntity, string>>

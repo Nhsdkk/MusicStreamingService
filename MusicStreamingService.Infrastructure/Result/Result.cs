@@ -1,10 +1,10 @@
 using OneOf;
 
-namespace MusicStreamingService.Result;
+namespace MusicStreamingService.Infrastructure.Result;
 
 public sealed class Result<T1, T2> : OneOfBase<T1, T2>
 {
-    public Result(OneOf<T1, T2> input) : base(input)
+    private Result(OneOf<T1, T2> input) : base(input)
     {
     }
 
