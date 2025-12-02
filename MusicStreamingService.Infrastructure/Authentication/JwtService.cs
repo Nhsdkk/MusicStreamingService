@@ -10,10 +10,10 @@ namespace MusicStreamingService.Infrastructure.Authentication;
 public interface IClaimConvertable
 {
     /// <summary>
-    /// Get roles to store in jwt
+    /// Get permissions to store in jwt
     /// </summary>
-    /// <returns>Roles, that will be stored in jwt</returns>
-    public IEnumerable<string> GetRoles();
+    /// <returns>Permissions, that will be stored in jwt</returns>
+    public IEnumerable<string> GetPermissions();
     
     /// <summary>
     /// Get username to store in jwt
