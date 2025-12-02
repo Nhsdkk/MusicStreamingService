@@ -11,7 +11,7 @@ public class UserClaims : IClaimConvertable
     
     public UserClaims(UserEntity user)
     {
-        _permissions = user.Permissions.Select(x => x.Title);
+        _permissions = user.Roles.Aggregate(new List<string>(), (list, role) => [..list, role.Title]);
         _username = user.Username;
     }
 

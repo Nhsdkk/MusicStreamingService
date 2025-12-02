@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Result;
-using OneOf;
-using OneOf.Types;
 
 namespace MusicStreamingService.Features.Users;
 

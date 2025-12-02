@@ -1,6 +1,6 @@
 namespace MusicStreamingService.Data.Entities;
 
-public class UserPermissionEntity
+public class UserRoleEntity
 {
     /// <summary>
     /// Id of the user, who has this permission
@@ -13,12 +13,12 @@ public class UserPermissionEntity
     public UserEntity User { get; set; } = null!;
 
     /// <summary>
-    /// Id of user's permission
+    /// Id of user's role
     /// </summary>
-    public Guid PermissionId { get; set; }
+    public Guid RoleId { get; set; }
 
     /// <summary>
-    /// User's permission
+    /// User's role
     /// </summary>
-    public PermissionEntity Permission { get; set; } = null!;
+    public RoleEntity Role { get; set; } = null!;
 }
