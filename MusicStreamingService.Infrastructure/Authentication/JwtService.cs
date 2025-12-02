@@ -158,7 +158,7 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable
             _configuration.Audience,
             claims,
             notBefore: DateTime.UtcNow,
-            DateTime.UtcNow + expiration,
+            expires: DateTime.UtcNow + expiration,
             credentials
         );
 
