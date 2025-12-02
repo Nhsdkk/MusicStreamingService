@@ -15,7 +15,12 @@
         "PsqlConfiguration__Database": "postgres",
         "PasswordServiceConfig__SaltSize": "16",
         "PasswordServiceConfig__IterationsCount": "600000",
-        "PasswordServiceConfig__NumBytesRequested": "32"
+        "PasswordServiceConfig__NumBytesRequested": "32",
+        "JwtConfiguration__SecretKey": "zijByt-zafrat-4menru",
+        "JwtConfiguration__Issuer": "music-streaming-service",
+        "JwtConfiguration__Audience": "music-streaming-service",
+        "JwtConfiguration__AccessTokenExpiration": "04:00:00",
+        "JwtConfiguration__RefreshTokenExpiration": "30.00:00:00"
       }
     },
     "https": {
@@ -32,7 +37,12 @@
         "PsqlConfiguration__Database": "postgres",
         "PasswordServiceConfig__SaltSize": "16",
         "PasswordServiceConfig__IterationsCount": "600000",
-        "PasswordServiceConfig__NumBytesRequested": "32"
+        "PasswordServiceConfig__NumBytesRequested": "32",
+        "JwtConfiguration__SecretKey": "zijByt-zafrat-4menru",
+        "JwtConfiguration__Issuer": "music-streaming-service",
+        "JwtConfiguration__Audience": "music-streaming-service",
+        "JwtConfiguration__AccessTokenExpiration": "04:00:00",
+        "JwtConfiguration__RefreshTokenExpiration": "30.00:00:00"
       }
     }
   }

@@ -1,4 +1,6 @@
 using MusicStreamingService.Data;
+using MusicStreamingService.Data.Entities;
+using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
 using Scalar.AspNetCore;
 
@@ -17,9 +19,13 @@ public static class Setup
             .AddMediator(
                 options: options =>
                     options.ServiceLifetime = ServiceLifetime.Scoped)
-            .ConfigurePasswordService(configuration);
+            .ConfigurePasswordService(configuration)
+            .ConfigureAuth<UserClaims>(configuration);
 
-        services.AddOpenApi();
+        services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        });
         services.AddControllers();
         
         var app = builder.Build();
@@ -33,9 +39,10 @@ public static class Setup
 
         app.MapControllers();
 
-        if (!app.Environment.IsDevelopment())
+        if (app.Environment.IsDevelopment())
         {
             app.UseAuthorization();
+            
         }
 
         return app;
