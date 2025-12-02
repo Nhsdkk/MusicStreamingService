@@ -7,31 +7,6 @@ using MusicStreamingService.Infrastructure.Result;
 
 namespace MusicStreamingService.Infrastructure.Authentication;
 
-public interface IClaimConvertable
-{
-    /// <summary>
-    /// Get permissions to store in jwt
-    /// </summary>
-    /// <returns>Permissions, that will be stored in jwt</returns>
-    public IEnumerable<string> GetPermissions();
-    
-    /// <summary>
-    /// Get username to store in jwt
-    /// </summary>
-    /// <returns>Username, that will be stored in jwt</returns>
-    public string GetUsername();
-}
-
-/// <summary>
-/// Exception, while validating and deserializing jwt token 
-/// </summary>
-public sealed class JwtValidationException : Exception
-{
-    public JwtValidationException(string message, Exception? innerException = null) : base(message, innerException)
-    {
-    }
-}
-
 /// <summary>
 /// Jwt service for jwt generation and validation 
 /// </summary>
@@ -144,7 +119,7 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        claims.AddRange(data.GetRoles().Select(x => new Claim(ClaimTypes.Role, x)));
+        claims.AddRange(data.GetPermissions().Select(x => new Claim(ClaimTypes.Role, x)));
         return claims;
     }
 

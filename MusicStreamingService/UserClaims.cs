@@ -15,7 +15,7 @@ public class UserClaims : IClaimConvertable
         _username = user.Username;
     }
 
-    public IEnumerable<string> GetRoles() => _permissions;
+    public IEnumerable<string> GetPermissions() => _permissions;
 
     public string GetUsername() => _username;
 }

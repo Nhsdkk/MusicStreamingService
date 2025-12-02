@@ -11,7 +11,6 @@ using OneOf.Types;
 namespace MusicStreamingService.Features.Users;
 
 [ApiController]
-[Authorize]
 public sealed class Get : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -29,6 +28,7 @@ public sealed class Get : ControllerBase
     /// <returns></returns>
     [HttpGet("/api/v1/users/")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [Authorize(Roles = "mss.users.manage")]
     public async Task<IActionResult> GetUser(
         [FromQuery] Guid id,
         CancellationToken cancellationToken = default)

@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
 namespace MusicStreamingService.Infrastructure.Authentication;
@@ -11,6 +13,7 @@ public static class AuthInjection
 {
     public static IServiceCollection ConfigureAuth<T>(
         this IServiceCollection services,
+        IWebHostEnvironment environment,
         IConfiguration configuration) where T: IClaimConvertable
     {
         var config = configuration.GetSection(nameof(JwtConfiguration)).Get<JwtConfiguration>();
@@ -18,18 +21,35 @@ public static class AuthInjection
 
         services.Configure<JwtConfiguration>(configuration.GetSection(nameof(JwtConfiguration)));
         services.AddScoped<IJwtService<T>, JwtService<T>>();
-        
-        services
-            .AddAuthentication(options => 
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = jwtService.GetTokenValidationParameters();
-            });
 
+        if (environment.IsDevelopment() && !configuration.GetSection("AuthEnabled").Get<bool>())
+        {
+            services
+                .AddAuthentication("Dev")
+                .AddScheme<AuthenticationSchemeOptions, DevAuthHandler>("Dev", _ => { });
+
+            services.AddOpenApi();
+        }
+        else
+        {
+            services
+                .AddAuthentication(options => 
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = jwtService.GetTokenValidationParameters();
+                });
+            
+            services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+            });
+        }
+
+        services.AddAuthentication();
         services.AddAuthorization();
 
         return services;

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
@@ -13,37 +14,32 @@ public static class Setup
         var services = builder.Services;
         var configuration = builder.Configuration;
         configuration.AddEnvironmentVariables();
-        
+
+        services.AddControllers();
+
         services
             .ConfigureMusicStreamingDbContext(configuration)
             .AddMediator(
                 options: options =>
                     options.ServiceLifetime = ServiceLifetime.Scoped)
             .ConfigurePasswordService(configuration)
-            .ConfigureAuth<UserClaims>(configuration);
+            .ConfigureAuth<UserClaims>(builder.Environment, configuration);
 
-        services.AddOpenApi(options =>
-        {
-            options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-        });
-        services.AddControllers();
-        
         var app = builder.Build();
-        
+
         if (app.Environment.IsDevelopment())
         {
             app.Services.CreateScope().ApplyMigrations<MusicStreamingContext>();
             app.MapOpenApi();
-            app.MapScalarApiReference();
+            app.MapScalarApiReference(opts =>
+                opts.AddPreferredSecuritySchemes(JwtBearerDefaults.AuthenticationScheme));
         }
 
         app.MapControllers();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseAuthorization();
-            
-        }
+        app.UseAuthentication();
+        app.UseAuthorization();
+
 
         return app;
     }
