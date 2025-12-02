@@ -50,7 +50,7 @@ public sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvide
                     Type = SecuritySchemeType.Http,
                     Scheme = JwtBearerDefaults.AuthenticationScheme, 
                     In = ParameterLocation.Header,
-                    BearerFormat = "Json Web Token"
+                    BearerFormat = "JWT"
                 }
             };
             document.Components ??= new OpenApiComponents();
