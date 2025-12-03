@@ -21,9 +21,9 @@ namespace MusicStreamingService.Data.CompiledModels
                 "MusicStreamingService.Data.Entities.PermissionEntity",
                 typeof(PermissionEntity),
                 baseEntityType,
-                propertyCount: 6,
-                foreignKeyCount: 1,
-                unnamedIndexCount: 2,
+                propertyCount: 5,
+                skipNavigationCount: 1,
+                unnamedIndexCount: 1,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -54,12 +54,6 @@ namespace MusicStreamingService.Data.CompiledModels
                 fieldInfo: typeof(PermissionEntity).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
             description.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
-            var roleEntityId = runtimeEntityType.AddProperty(
-                "RoleEntityId",
-                typeof(Guid?),
-                nullable: true);
-            roleEntityId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
             var title = runtimeEntityType.AddProperty(
                 "Title",
                 typeof(string),
@@ -83,29 +77,33 @@ namespace MusicStreamingService.Data.CompiledModels
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { roleEntityId });
-
-            var index0 = runtimeEntityType.AddIndex(
                 new[] { title },
                 unique: true);
 
             return runtimeEntityType;
         }
 
-        public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        public static RuntimeSkipNavigation CreateSkipNavigation1(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("RoleEntityId") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
-                principalEntityType);
+            var skipNavigation = declaringEntityType.AddSkipNavigation(
+                "RoleEntity",
+                targetEntityType,
+                joinEntityType.FindForeignKey(
+                    new[] { joinEntityType.FindProperty("PermissionId") },
+                    declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
+                    declaringEntityType),
+                true,
+                false,
+                typeof(IEnumerable<RoleEntity>));
 
-            var permissions = principalEntityType.AddNavigation("Permissions",
-                runtimeForeignKey,
-                onDependent: false,
-                typeof(List<PermissionEntity>),
-                propertyInfo: typeof(RoleEntity).GetProperty("Permissions", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(RoleEntity).GetField("<Permissions>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            var inverse = targetEntityType.FindSkipNavigation("Permissions");
+            if (inverse != null)
+            {
+                skipNavigation.Inverse = inverse;
+                inverse.Inverse = skipNavigation;
+            }
 
-            return runtimeForeignKey;
+            return skipNavigation;
         }
 
         public static void CreateAnnotations(RuntimeEntityType runtimeEntityType)

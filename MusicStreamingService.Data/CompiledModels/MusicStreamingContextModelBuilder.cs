@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("fcf87682-98d3-430d-ae57-de51350078ae"), entityTypeCount: 22)
+            : base(skipDetectChanges: false, modelId: new Guid("c3120655-2c08-4aee-86dc-eecc686e47c5"), entityTypeCount: 23)
         {
         }
 
@@ -31,6 +31,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var playlistSongEntity = PlaylistSongEntityEntityType.Create(this);
             var regionEntity = RegionEntityEntityType.Create(this);
             var roleEntity = RoleEntityEntityType.Create(this);
+            var rolePermissionEntity = RolePermissionEntityEntityType.Create(this);
             var songArtistEntity = SongArtistEntityEntityType.Create(this);
             var songEntity = SongEntityEntityType.Create(this);
             var songFavoriteEntity = SongFavoriteEntityEntityType.Create(this);
@@ -52,13 +53,14 @@ namespace MusicStreamingService.Data.CompiledModels
             DeviceEntityEntityType.CreateForeignKey1(deviceEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey1(paymentEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey2(paymentEntity, subscriptionEntity);
-            PermissionEntityEntityType.CreateForeignKey1(permissionEntity, roleEntity);
             PlaylistEntityEntityType.CreateForeignKey1(playlistEntity, userEntity);
             PlaylistEntityEntityType.CreateForeignKey2(playlistEntity, userEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey1(playlistFavoriteEntity, playlistEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey2(playlistFavoriteEntity, userEntity);
             PlaylistSongEntityEntityType.CreateForeignKey1(playlistSongEntity, playlistEntity);
             PlaylistSongEntityEntityType.CreateForeignKey2(playlistSongEntity, songEntity);
+            RolePermissionEntityEntityType.CreateForeignKey1(rolePermissionEntity, permissionEntity);
+            RolePermissionEntityEntityType.CreateForeignKey2(rolePermissionEntity, roleEntity);
             SongArtistEntityEntityType.CreateForeignKey1(songArtistEntity, userEntity);
             SongArtistEntityEntityType.CreateForeignKey2(songArtistEntity, songEntity);
             SongArtistEntityEntityType.CreateForeignKey3(songArtistEntity, userEntity);
@@ -76,9 +78,11 @@ namespace MusicStreamingService.Data.CompiledModels
 
             AlbumEntityEntityType.CreateSkipNavigation1(albumEntity, userEntity, albumFavoriteEntity);
             GenreEntityEntityType.CreateSkipNavigation1(genreEntity, songEntity, songGenreEntity);
+            PermissionEntityEntityType.CreateSkipNavigation1(permissionEntity, roleEntity, rolePermissionEntity);
             PlaylistEntityEntityType.CreateSkipNavigation1(playlistEntity, userEntity, playlistFavoriteEntity);
             RegionEntityEntityType.CreateSkipNavigation1(regionEntity, songEntity, allowedDistributionEntity);
-            RoleEntityEntityType.CreateSkipNavigation1(roleEntity, userEntity, userRoleEntity);
+            RoleEntityEntityType.CreateSkipNavigation1(roleEntity, permissionEntity, rolePermissionEntity);
+            RoleEntityEntityType.CreateSkipNavigation2(roleEntity, userEntity, userRoleEntity);
             SongEntityEntityType.CreateSkipNavigation1(songEntity, regionEntity, allowedDistributionEntity);
             SongEntityEntityType.CreateSkipNavigation2(songEntity, genreEntity, songGenreEntity);
             SongEntityEntityType.CreateSkipNavigation3(songEntity, userEntity, songFavoriteEntity);
@@ -100,6 +104,7 @@ namespace MusicStreamingService.Data.CompiledModels
             PlaylistSongEntityEntityType.CreateAnnotations(playlistSongEntity);
             RegionEntityEntityType.CreateAnnotations(regionEntity);
             RoleEntityEntityType.CreateAnnotations(roleEntity);
+            RolePermissionEntityEntityType.CreateAnnotations(rolePermissionEntity);
             SongArtistEntityEntityType.CreateAnnotations(songArtistEntity);
             SongEntityEntityType.CreateAnnotations(songEntity);
             SongFavoriteEntityEntityType.CreateAnnotations(songFavoriteEntity);

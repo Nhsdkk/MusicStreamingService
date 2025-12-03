@@ -1,9 +1,14 @@
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
 using Scalar.AspNetCore;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace MusicStreamingService.Setup;
 
@@ -14,8 +19,21 @@ public static class Setup
         var services = builder.Services;
         var configuration = builder.Configuration;
         configuration.AddEnvironmentVariables();
-
-        services.AddControllers();
+        
+        services
+            .AddControllers()
+            .AddJsonOptions(opts =>
+            {
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+        
+        services.ConfigureHttpJsonOptions(opts =>
+        {
+            opts.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+        
+        services.AddValidatorsFromAssembly(Assembly.GetCallingAssembly());
+        services.AddFluentValidationAutoValidation();
 
         services
             .ConfigureMusicStreamingDbContext(configuration)

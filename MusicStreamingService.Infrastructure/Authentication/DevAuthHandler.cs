@@ -23,7 +23,6 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
             new Claim(ClaimTypes.Role, "mss.tracks.view"),
             new Claim(ClaimTypes.Role, "mss.tracks.manage"),
             new Claim(ClaimTypes.Role, "mss.tracks.playback"),
-            new Claim(ClaimTypes.Role, "mss.tracks.playback-premium"),
             new Claim(ClaimTypes.Role, "mss.tracks.favorite"),
             new Claim(ClaimTypes.Role, "mss.tracks.admin"),
 

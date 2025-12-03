@@ -13,13 +13,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicStreamingService.Data.CompiledModels
 {
     [EntityFrameworkInternal]
-    public partial class UserRoleEntityEntityType
+    public partial class RolePermissionEntityEntityType
     {
         public static RuntimeEntityType Create(RuntimeModel model, RuntimeEntityType baseEntityType = null)
         {
             var runtimeEntityType = model.AddEntityType(
-                "MusicStreamingService.Data.Entities.UserRoleEntity",
-                typeof(UserRoleEntity),
+                "MusicStreamingService.Data.Entities.RolePermissionEntity",
+                typeof(RolePermissionEntity),
                 baseEntityType,
                 propertyCount: 2,
                 navigationCount: 2,
@@ -27,35 +27,53 @@ namespace MusicStreamingService.Data.CompiledModels
                 unnamedIndexCount: 1,
                 keyCount: 1);
 
-            var userId = runtimeEntityType.AddProperty(
-                "UserId",
-                typeof(Guid),
-                propertyInfo: typeof(UserRoleEntity).GetProperty("UserId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserRoleEntity).GetField("<UserId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                afterSaveBehavior: PropertySaveBehavior.Throw,
-                sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
-            userId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
             var roleId = runtimeEntityType.AddProperty(
                 "RoleId",
                 typeof(Guid),
-                propertyInfo: typeof(UserRoleEntity).GetProperty("RoleId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserRoleEntity).GetField("<RoleId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                propertyInfo: typeof(RolePermissionEntity).GetProperty("RoleId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(RolePermissionEntity).GetField("<RoleId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 afterSaveBehavior: PropertySaveBehavior.Throw,
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             roleId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
+            var permissionId = runtimeEntityType.AddProperty(
+                "PermissionId",
+                typeof(Guid),
+                propertyInfo: typeof(RolePermissionEntity).GetProperty("PermissionId", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(RolePermissionEntity).GetField("<PermissionId>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                afterSaveBehavior: PropertySaveBehavior.Throw,
+                sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
+            permissionId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+
             var key = runtimeEntityType.AddKey(
-                new[] { userId, roleId });
+                new[] { roleId, permissionId });
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
-                new[] { roleId });
+                new[] { permissionId });
 
             return runtimeEntityType;
         }
 
         public static RuntimeForeignKey CreateForeignKey1(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
+        {
+            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("PermissionId") },
+                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
+                principalEntityType,
+                deleteBehavior: DeleteBehavior.Cascade,
+                required: true);
+
+            var permission = declaringEntityType.AddNavigation("Permission",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(PermissionEntity),
+                propertyInfo: typeof(RolePermissionEntity).GetProperty("Permission", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(RolePermissionEntity).GetField("<Permission>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            return runtimeForeignKey;
+        }
+
+        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
         {
             var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("RoleId") },
                 principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
@@ -67,26 +85,8 @@ namespace MusicStreamingService.Data.CompiledModels
                 runtimeForeignKey,
                 onDependent: true,
                 typeof(RoleEntity),
-                propertyInfo: typeof(UserRoleEntity).GetProperty("Role", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserRoleEntity).GetField("<Role>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-
-            return runtimeForeignKey;
-        }
-
-        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
-        {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("UserId") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
-                principalEntityType,
-                deleteBehavior: DeleteBehavior.Cascade,
-                required: true);
-
-            var user = declaringEntityType.AddNavigation("User",
-                runtimeForeignKey,
-                onDependent: true,
-                typeof(UserEntity),
-                propertyInfo: typeof(UserRoleEntity).GetProperty("User", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(UserRoleEntity).GetField("<User>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+                propertyInfo: typeof(RolePermissionEntity).GetProperty("Role", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(RolePermissionEntity).GetField("<Role>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             return runtimeForeignKey;
         }
@@ -96,7 +96,7 @@ namespace MusicStreamingService.Data.CompiledModels
             runtimeEntityType.AddAnnotation("Relational:FunctionName", null);
             runtimeEntityType.AddAnnotation("Relational:Schema", null);
             runtimeEntityType.AddAnnotation("Relational:SqlQuery", null);
-            runtimeEntityType.AddAnnotation("Relational:TableName", "UserRoles");
+            runtimeEntityType.AddAnnotation("Relational:TableName", "RolePermissions");
             runtimeEntityType.AddAnnotation("Relational:ViewName", null);
             runtimeEntityType.AddAnnotation("Relational:ViewSchema", null);
 
