@@ -171,7 +171,7 @@ public sealed class Register : ControllerBase
                 cancellationToken);
             if (userWithSameUsernameExists)
             {
-                return new Exception("User with the same email already exists");
+                return new Exception("User with the same username already exists");
             }
 
             var region = await _context.Regions.FindAsync([request.RegionId], cancellationToken: cancellationToken);
