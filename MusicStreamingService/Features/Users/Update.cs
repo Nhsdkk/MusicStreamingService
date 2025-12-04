@@ -161,7 +161,7 @@ public sealed class Update : ControllerBase
             if (newData.Username is not null)
             {
                 var usernameExists =
-                    await _context.Users.AnyAsync(x => x.Username == newData.Username, cancellationToken);
+                    await _context.Users.AnyAsync(x => x.Username == newData.Username && x.Id != request.Id, cancellationToken);
 
                 if (usernameExists)
                 {
