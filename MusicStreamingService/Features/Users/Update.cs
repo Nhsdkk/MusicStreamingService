@@ -174,7 +174,7 @@ public sealed class Update : ControllerBase
             if (newData.Email is not null)
             {
                 var emailExists =
-                    await _context.Users.AnyAsync(x => x.Email == newData.Email, cancellationToken);
+                    await _context.Users.AnyAsync(x => x.Email == newData.Email && x.Id != request.Id, cancellationToken);
 
                 if (emailExists)
                 {
