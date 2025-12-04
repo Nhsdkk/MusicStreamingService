@@ -53,6 +53,7 @@ public sealed class Login : ControllerBase
             {
                 RuleFor(x => x.Username).NotEmpty();
                 RuleFor(x => x.Password).NotEmpty();
+                RuleFor(x => x.DeviceName).NotEmpty();
             }
         }
     }
@@ -135,7 +136,7 @@ public sealed class Login : ControllerBase
                 .ThenInclude(x => x.Permissions)
                 .Include(x => x.Devices.Where(device => device.Id == request.DeviceId))
                 .SingleOrDefaultAsync(
-                    x => x.Username == request.Username,
+                    x => x.Username == request.Username && !x.Disabled,
                     cancellationToken);
 
             if (user is null)

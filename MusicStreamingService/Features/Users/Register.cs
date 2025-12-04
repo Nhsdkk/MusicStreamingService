@@ -132,8 +132,8 @@ public sealed class Register : ControllerBase
         [JsonPropertyName("region")]
         public RegionDto Region { get; set; } = null!;
 
-        [JsonPropertyName("device")]
-        public List<DeviceDto> Devices { get; set; } = null!;
+        [JsonPropertyName("CurrentDevice")]
+        public DeviceDto CurrentDevice { get; set; } = null!;
 
         [JsonPropertyName("permissions")]
         public List<string> Permissions { get; set; } = null!;
@@ -234,12 +234,12 @@ public sealed class Register : ControllerBase
                 },
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                Devices = user.Devices
+                CurrentDevice = user.Devices
                     .Select(x => new ResponseDto.DeviceDto
                     {
                         Id = x.Id,
                         Title = x.Title
-                    }).ToList(),
+                    }).Single(),
                 Permissions = user.GetPermissions().Select(x => x.Title).ToList(),
             };
         }
