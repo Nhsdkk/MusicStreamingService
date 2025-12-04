@@ -89,6 +89,7 @@ public sealed class Register : ControllerBase
                 RuleFor(x => x.BirthDate)
                     .Must(x => x.ToUniversalTime() <= DateTime.UtcNow);
                 RuleFor(x => x.DeviceName).NotEmpty();
+                RuleFor(x => x.RegionId).NotEmpty();
             }
         }
     }
