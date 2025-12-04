@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
+using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Result;
 
 namespace MusicStreamingService.Features.Users;
@@ -37,10 +38,7 @@ public sealed class Get : ControllerBase
         var result = await _mediator.Send(
             new Query
             {
-                Id = new Guid(
-                    User.Claims
-                        .Single(x => x.Type == JwtRegisteredClaimNames.Sid).Value
-                )
+                Id = User.GetUserId()
             },
             cancellationToken);
 
