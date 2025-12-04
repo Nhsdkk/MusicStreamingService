@@ -47,7 +47,7 @@ public sealed class Search : ControllerBase
         [JsonPropertyName("page")]
         public int Page { get; init; } = 0;
 
-        internal sealed class Validator : AbstractValidator<Query>
+        public sealed class Validator : AbstractValidator<Query>
         {
             public Validator()
             {

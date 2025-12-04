@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
+using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Result;
 
 namespace MusicStreamingService.Features.Users;
@@ -33,10 +34,7 @@ public sealed class Disable : ControllerBase
         var result = await _mediator.Send(
             new Command
             {
-                UserId = new Guid(
-                    User.Claims
-                        .Single(x => x.Type == JwtRegisteredClaimNames.Sid).Value
-                ),
+                UserId = User.GetUserId(),
             },
             cancellationToken);
         return result.Match<IActionResult>(_ => Ok(), BadRequest);
