@@ -23,6 +23,12 @@ public sealed class Update : ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// Update user data
+    /// </summary>
+    /// <param name="request">New user data</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpPut("/api/v1/users")]
     [Authorize(Roles = "mss.users.manage")]
     [ProducesResponseType<CommandResponse>(StatusCodes.Status200OK)]
@@ -62,7 +68,7 @@ public sealed class Update : ControllerBase
         [JsonPropertyName("regionId")]
         public Guid? RegionId { get; init; }
 
-        internal sealed class Validator : AbstractValidator<CommandBody>
+        public sealed class Validator : AbstractValidator<CommandBody>
         {
             public Validator()
             {
@@ -184,8 +190,9 @@ public sealed class Update : ControllerBase
                 user.Email = newData.Email;
             }
             
-            user.BirthDate = newData.BirthDate ?? user.BirthDate;
+            user.BirthDate = newData.BirthDate?.ToUniversalTime() ?? user.BirthDate;
             user.FullName = newData.FullName ?? user.FullName;
+            
             if (newData.Password is not null)
             {
                 user.Password = _passwordService.Encode(newData.Password);

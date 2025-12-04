@@ -47,7 +47,7 @@ public sealed class Login : ControllerBase
         [JsonPropertyName("deviceName")]
         public string DeviceName { get; set; } = null!;
 
-        internal sealed class Validator : AbstractValidator<Command>
+        public sealed class Validator : AbstractValidator<Command>
         {
             public Validator()
             {
