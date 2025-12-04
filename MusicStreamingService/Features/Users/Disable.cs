@@ -25,7 +25,7 @@ public sealed class Disable : ControllerBase
     [HttpDelete("/api/v1/users")]
     [ProducesResponseType<Unit>( StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> DisableHandler(
+    public async Task<IActionResult> DisableUser(
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(
