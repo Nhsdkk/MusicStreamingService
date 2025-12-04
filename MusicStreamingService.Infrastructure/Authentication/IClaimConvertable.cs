@@ -13,4 +13,10 @@ public interface IClaimConvertable
     /// </summary>
     /// <returns>Username, that will be stored in jwt</returns>
     public string GetUsername();
+
+    /// <summary>
+    /// Get id of the user to store in jwt
+    /// </summary>
+    /// <returns>User's id, that will be stored in jwt</returns>
+    public Guid GetId();
 }

@@ -116,7 +116,8 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Name, data.GetUsername()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sid, data.GetId().ToString())
         };
 
         claims.AddRange(data.GetPermissions().Select(x => new Claim(ClaimTypes.Role, x)));
