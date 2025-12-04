@@ -34,7 +34,7 @@ public class PasswordService : IPasswordService
     public byte[] Encode(string password)
     {
         var salt = GenerateSalt(_config.SaltSize);
-        return Encode(password, salt);   
+        return salt.Concat(Encode(password, salt)).ToArray();   
     }
 
     public bool Match(byte[] encodedPassword, string passedPassword)
@@ -54,7 +54,7 @@ public class PasswordService : IPasswordService
             iterationCount: _config.IterationsCount,
             numBytesRequested: _config.NumBytesRequested);
 
-        return salt.Concat(hashedPass).ToArray();
+        return hashedPass;
     }
     
     private static byte[] GenerateSalt(int length) => RandomNumberGenerator.GetBytes(length);
