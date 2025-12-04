@@ -31,7 +31,7 @@ public sealed class Register : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("/api/v1/users/register")]
-    [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> RegisterUser(
         CommandDto command,
