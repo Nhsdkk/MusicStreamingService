@@ -9,9 +9,11 @@ public class UserClaims : IClaimConvertable
 {
     private readonly IEnumerable<string> _permissions;
     private readonly string _username;
+    private readonly Guid _id;
 
     public UserClaims(UserEntity user)
     {
+        _id = user.Id;
         _permissions = user.GetPermissions().Select(x => x.Title);
         _username = user.Username;
     }
@@ -19,4 +21,6 @@ public class UserClaims : IClaimConvertable
     public IEnumerable<string> GetPermissions() => _permissions;
 
     public string GetUsername() => _username;
+    
+    public Guid GetId() => _id;
 }
