@@ -100,13 +100,18 @@ public sealed class Get : ControllerBase
                 .Include(x => x.Region)
                 .Include(x => x.Roles)
                 .ThenInclude(x => x.Permissions)
-                .SingleOrDefaultAsync(x => x.Id == request.Id && !x.Disabled, cancellationToken);
+                .SingleOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (user is null)
             {
                 return new Exception("User not found");
             }
 
+            if (user.Disabled)
+            {
+                return new Exception("User is disabled");
+            }
+            
             return new Response
             {
                 Id = user.Id,

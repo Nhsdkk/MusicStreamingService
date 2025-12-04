@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using Mediator;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
@@ -23,7 +24,8 @@ public sealed class Disable : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpDelete("/api/v1/users")]
-    [ProducesResponseType<Unit>( StatusCodes.Status200OK)]
+    [Authorize(Roles = "mss.users.manage")]
+    [ProducesResponseType<Unit>(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DisableUser(
         CancellationToken cancellationToken = default)
@@ -60,11 +62,16 @@ public sealed class Disable : ControllerBase
             CancellationToken cancellationToken)
         {
             var user = await _context.Users.SingleOrDefaultAsync(
-                x => x.Id == request.UserId && !x.Disabled,
+                x => x.Id == request.UserId,
                 cancellationToken);
             if (user == null)
             {
-                return new Exception("User not found or already disabled");
+                return new Exception("User not found");
+            }
+            
+            if (user.Disabled)
+            {
+                return new Exception("User already disabled");
             }
 
             user.Disabled = true;

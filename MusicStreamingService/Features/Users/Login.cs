@@ -136,10 +136,10 @@ public sealed class Login : ControllerBase
                 .ThenInclude(x => x.Permissions)
                 .Include(x => x.Devices.Where(device => device.Id == request.DeviceId))
                 .SingleOrDefaultAsync(
-                    x => x.Username == request.Username && !x.Disabled,
+                    x => x.Username == request.Username,
                     cancellationToken);
 
-            if (user is null)
+            if (user is null || user.Disabled)
             {
                 return new Exception("Invalid credentials");
             }
