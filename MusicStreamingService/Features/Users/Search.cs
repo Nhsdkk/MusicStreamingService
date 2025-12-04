@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,8 +18,16 @@ public sealed class Search : ControllerBase
         _mediator = mediator;
     }
     
+    /// <summary>
+    /// Search users by their username
+    /// </summary>
+    /// <param name="query">Search parameters that include username, page and items per page</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("/api/v1/users/search")]
     [Authorize(Roles = "mss.users.view")]
+    [ProducesResponseType(typeof(QueryResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> SearchUsers(
         [FromQuery] Query query,
         CancellationToken cancellationToken = default)
@@ -37,6 +46,16 @@ public sealed class Search : ControllerBase
 
         [JsonPropertyName("page")]
         public int Page { get; init; } = 0;
+
+        internal sealed class Validator : AbstractValidator<Query>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.Username).NotEmpty().When(x => x is not null);
+                RuleFor(x => x.ItemsPerPage).GreaterThan(0).LessThan(100);
+                RuleFor(x => x.Page).GreaterThanOrEqualTo(0);
+            }
+        }
     }
 
     public sealed record QueryResponseDto
@@ -93,11 +112,12 @@ public sealed class Search : ControllerBase
             CancellationToken cancellationToken)
         {
             var query = _context.Users
-                .AsNoTracking();
+                .AsNoTracking()
+                .Where(x => !x.Disabled);
 
             if (request.Username is not null)
             {
-                query = query.Where(x => x.Username.Contains(request.Username));
+                query = query.Where(x => EF.Functions.ILike(x.Username, $"%{request.Username}%"));
             }
             
             var totalCount = await query.CountAsync(cancellationToken);
@@ -126,7 +146,8 @@ public sealed class Search : ControllerBase
                 Users = usersMapped,
                 TotalCount = totalCount,
                 ItemCount = usersMapped.Count,
-                Page = request.Page
+                Page = request.Page,
+                ItemsPerPage = request.ItemsPerPage
             };
         }
     }
