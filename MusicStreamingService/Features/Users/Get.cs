@@ -100,7 +100,7 @@ public sealed class Get : ControllerBase
                 .Include(x => x.Region)
                 .Include(x => x.Roles)
                 .ThenInclude(x => x.Permissions)
-                .SingleOrDefaultAsync(x => x.Id == request.Id && x.Disabled == false, cancellationToken);
+                .SingleOrDefaultAsync(x => x.Id == request.Id && !x.Disabled, cancellationToken);
 
             if (user is null)
             {
