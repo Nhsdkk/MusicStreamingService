@@ -227,6 +227,13 @@ public class Search : ControllerBase
                 .FilterByOptionalGenres(requestBody.Genres)
                 .EnableExplicit(requestBody.AllowExplicit);
 
+            // Note: Two separate queries are executed here to support pagination with total count.
+            // 1. CountAsync executes without includes for better performance on count operations
+            // 2. Data query executes with includes only for the requested page
+            // This is a standard pattern for paginated results in Entity Framework.
+            // References:
+            // - EF Core Query Performance: https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying
+            // - Pagination Best Practices: https://learn.microsoft.com/en-us/ef/core/querying/pagination
             var totalCount = await query.CountAsync(cancellationToken);
             var songs = await query
                 .Include(x => x.AllowedRegions)
