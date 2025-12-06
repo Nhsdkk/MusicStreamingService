@@ -8,6 +8,7 @@ using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
 using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
 
@@ -21,7 +22,14 @@ public sealed class Login : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Login user using username and password
+    /// </summary>
+    /// <param name="request">User's data</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpPost("/api/v1/users/login")]
+    [Tags(RouteGroups.Users)]
     [ProducesResponseType(typeof(CommandResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginHandler(

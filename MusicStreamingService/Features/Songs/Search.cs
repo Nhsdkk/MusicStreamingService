@@ -9,6 +9,7 @@ using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Songs;
 
@@ -29,6 +30,7 @@ public class Search : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/songs/search")]
+    [Tags(RouteGroups.Songs)]
     [ProducesResponseType<QueryResponse>(StatusCodes.Status200OK)]
     [Authorize(Roles = Permissions.ViewSongsPermission)]
     public async Task<IActionResult> SearchSongs(

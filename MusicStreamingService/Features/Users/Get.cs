@@ -11,6 +11,7 @@ using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
 
@@ -30,6 +31,7 @@ public sealed class Get : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/users/")]
+    [Tags(RouteGroups.Users)]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     [Authorize(Roles = Permissions.ViewUsersPermission)]

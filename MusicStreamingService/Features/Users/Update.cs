@@ -10,6 +10,7 @@ using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Infrastructure.Validations;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
 
@@ -30,6 +31,7 @@ public sealed class Update : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPut("/api/v1/users")]
+    [Tags(RouteGroups.Users)]
     [Authorize(Roles = Permissions.ManageUsersPermission)]
     [ProducesResponseType<CommandResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
