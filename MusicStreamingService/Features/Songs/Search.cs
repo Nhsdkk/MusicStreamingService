@@ -95,7 +95,7 @@ public class SearchSong : ControllerBase
                 [JsonPropertyName("id")]
                 public Guid Id { get; init; }
 
-                [JsonPropertyName("name")]
+                [JsonPropertyName("username")]
                 public string Username { get; init; } = null!;
                 
                 [JsonPropertyName("mainArtist")]
