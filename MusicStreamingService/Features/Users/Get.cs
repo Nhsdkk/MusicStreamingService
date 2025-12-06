@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
+using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
 
 namespace MusicStreamingService.Features.Users;
@@ -31,7 +32,7 @@ public sealed class Get : ControllerBase
     [HttpGet("/api/v1/users/")]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "mss.users.view")]
+    [Authorize(Roles = Permissions.ViewUsersPermission)]
     public async Task<IActionResult> GetUser(
         CancellationToken cancellationToken = default)
     {
