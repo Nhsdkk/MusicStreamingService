@@ -19,4 +19,10 @@ public interface IClaimConvertable
     /// </summary>
     /// <returns>User's id, that will be stored in jwt</returns>
     public Guid GetId();
+
+    /// <summary>
+    /// Get user's region to store in jwt
+    /// </summary>
+    /// <returns>User's region, that will be stored in jwt</returns>
+    public RegionClaim GetRegion();
 }

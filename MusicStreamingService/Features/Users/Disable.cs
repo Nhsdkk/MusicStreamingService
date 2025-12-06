@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
+using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
 
 namespace MusicStreamingService.Features.Users;
@@ -25,7 +26,7 @@ public sealed class Disable : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpDelete("/api/v1/users")]
-    [Authorize(Roles = "mss.users.manage")]
+    [Authorize(Roles = Permissions.ManageUsersPermission)]
     [ProducesResponseType<Unit>(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DisableUser(
