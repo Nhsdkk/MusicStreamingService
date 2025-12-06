@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
 
@@ -26,6 +27,7 @@ public sealed class Search : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/users/search")]
+    [Tags(RouteGroups.Users)]
     [Authorize(Roles = Permissions.ViewUsersPermission)]
     [ProducesResponseType(typeof(QueryResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
