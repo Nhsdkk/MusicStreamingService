@@ -29,6 +29,7 @@ public sealed class Get : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/users/")]
+    [Tags("Users")]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "mss.users.view")]

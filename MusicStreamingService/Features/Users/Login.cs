@@ -22,6 +22,7 @@ public sealed class Login : ControllerBase
     }
 
     [HttpPost("/api/v1/users/login")]
+    [Tags("Users")]
     [ProducesResponseType(typeof(CommandResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> LoginHandler(

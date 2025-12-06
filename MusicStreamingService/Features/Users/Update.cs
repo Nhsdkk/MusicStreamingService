@@ -31,6 +31,7 @@ public sealed class Update : ControllerBase
     /// <returns></returns>
     [HttpPut("/api/v1/users")]
     [Authorize(Roles = "mss.users.manage")]
+    [Tags("Users")]
     [ProducesResponseType<CommandResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateUser(

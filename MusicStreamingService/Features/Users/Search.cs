@@ -25,6 +25,7 @@ public sealed class Search : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/users/search")]
+    [Tags("Users")]
     [Authorize(Roles = "mss.users.view")]
     [ProducesResponseType(typeof(QueryResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]

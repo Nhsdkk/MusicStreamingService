@@ -25,6 +25,7 @@ public sealed class Disable : ControllerBase
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpDelete("/api/v1/users")]
+    [Tags("Users")]
     [Authorize(Roles = "mss.users.manage")]
     [ProducesResponseType<Unit>(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
