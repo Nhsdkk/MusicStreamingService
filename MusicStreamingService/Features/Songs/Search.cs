@@ -17,7 +17,7 @@ public class Search : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public SearchSong(IMediator mediator)
+    public Search(IMediator mediator)
     {
         _mediator = mediator;
     }
@@ -72,7 +72,7 @@ public class Search : ControllerBase
             {
                 public Validator()
                 {
-                    RuleFor(x => x.ItemsPerPage).GreaterThan(0);
+                    RuleFor(x => x.ItemsPerPage).GreaterThan(0).LessThan(100);
                     RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(0);
                     RuleFor(x => x.Genres).NotEmpty().When(x => x.Genres is not null);
                     RuleFor(x => x.Title).NotEmpty().When(x => x.Title is not null);

@@ -37,10 +37,8 @@ public static class SongEntityExtensions
     
     public static IQueryable<SongEntity> EnableExplicit(
         this IQueryable<SongEntity> query,
-        bool? isExplicit) =>
-        isExplicit is null
-            ? query
-            : query
-                .Where(s =>
-                    s.Explicit == isExplicit || !s.Explicit);
+        bool? enableExplicit) =>
+        enableExplicit is null
+            ? query.Where(s => !s.Explicit)
+            : query;
 }
