@@ -13,7 +13,7 @@ using MusicStreamingService.Infrastructure.Authentication;
 namespace MusicStreamingService.Features.Songs;
 
 [ApiController]
-public class SearchSong : ControllerBase
+public class Search : ControllerBase
 {
     private readonly IMediator _mediator;
 
