@@ -117,7 +117,8 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable
         {
             new Claim(JwtRegisteredClaimNames.Name, data.GetUsername()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sid, data.GetId().ToString())
+            new Claim(JwtRegisteredClaimNames.Sid, data.GetId().ToString()),
+            new Claim(CustomClaimTypes.RegionsClaimType, System.Text.Json.JsonSerializer.Serialize(data.GetRegion()))
         };
 
         claims.AddRange(data.GetPermissions().Select(x => new Claim(ClaimTypes.Role, x)));
