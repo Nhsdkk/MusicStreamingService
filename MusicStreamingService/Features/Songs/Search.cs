@@ -10,6 +10,7 @@ using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Openapi;
+using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
 
 namespace MusicStreamingService.Features.Songs;
@@ -51,7 +52,7 @@ public class Search : ControllerBase
 
     public sealed record Query : IRequest<QueryResponse>
     {
-        public sealed record QueryBody
+        public sealed record QueryBody : BasePaginatedRequest
         {
             [JsonPropertyName("title")]
             public string? Title { get; init; }
@@ -64,19 +65,13 @@ public class Search : ControllerBase
 
             [JsonPropertyName("genres")]
             public List<Guid>? Genres { get; init; }
-
-            [JsonPropertyName("itemsPerPage")]
-            public int ItemsPerPage { get; init; } = 10;
-
-            [JsonPropertyName("pageNumber")]
-            public int PageNumber { get; init; } = 0;
             
             public sealed class Validator : AbstractValidator<QueryBody>
             {
                 public Validator()
                 {
                     RuleFor(x => x.ItemsPerPage).GreaterThan(0).LessThan(100);
-                    RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(0);
+                    RuleFor(x => x.Page).GreaterThanOrEqualTo(0);
                     RuleFor(x => x.Genres).NotEmpty().When(x => x.Genres is not null);
                     RuleFor(x => x.Title).NotEmpty().When(x => x.Title is not null);
                     RuleFor(x => x.ArtistName).NotEmpty().When(x => x.ArtistName is not null);
@@ -129,7 +124,7 @@ public class Search : ControllerBase
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Genres)
                 .OrderByDescending(x => x.Likes)
-                .Skip(requestBody.PageNumber * requestBody.ItemsPerPage)
+                .Skip(requestBody.Page * requestBody.ItemsPerPage)
                 .Take(requestBody.ItemsPerPage)
                 .ToListAsync(cancellationToken);
 
@@ -139,7 +134,7 @@ public class Search : ControllerBase
                 TotalCount = totalCount,
                 ItemsPerPage = requestBody.ItemsPerPage,
                 ItemCount = songs.Count,
-                Page = requestBody.PageNumber
+                Page = requestBody.Page
             };
         }
     }

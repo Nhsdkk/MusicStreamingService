@@ -8,6 +8,7 @@ using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
+using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
 
 namespace MusicStreamingService.Features.Songs;
@@ -30,7 +31,7 @@ public sealed class GetContributed : ControllerBase
     /// <returns></returns>
     [HttpGet("/api/v1/songs/contributed-songs")]
     [Tags(RouteGroups.Songs)]
-    [Authorize(Roles = Permissions.ViewUsersPermission)]
+    [Authorize(Roles = Permissions.ViewSongsPermission)]
     [ProducesResponseType(typeof(QueryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetContributedSongs(
@@ -44,17 +45,11 @@ public sealed class GetContributed : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Query : IRequest<Result<QueryResponse, Exception>>
+    public sealed record Query : BasePaginatedRequest, IRequest<Result<QueryResponse, Exception>>
     {
         [JsonPropertyName("userId")]
         public Guid UserId { get; init; }
 
-        [JsonPropertyName("itemsPerPage")]
-        public int ItemsPerPage { get; init; } = 10;
-
-        [JsonPropertyName("page")]
-        public int Page { get; init; } = 0;
-        
         public sealed class Validator : AbstractValidator<Query>
         {
             public Validator()
@@ -87,20 +82,14 @@ public sealed class GetContributed : ControllerBase
         {
             var user = await _context.Users
                 .AsNoTracking()
-                .Include(x => x.Roles)
-                .ThenInclude(x => x.Permissions)
-                .SingleOrDefaultAsync(x => x.Id == request.UserId, cancellationToken);
+                .SingleOrDefaultAsync(
+                    x =>
+                        x.Id == request.UserId,
+                    cancellationToken);
 
             if (user == null || user.Disabled)
             {
-                return new Exception("User not found");
-            }
-
-            var userIsArtist =
-                user.Roles.Any(r => r.Permissions.Any(p => p.Title == Permissions.ManageSongsPermission));
-            if (!userIsArtist)
-            {
-                return new Exception("User is not an artist");
+                return new Exception("Artist not found");
             }
 
             var query = _context.Songs
