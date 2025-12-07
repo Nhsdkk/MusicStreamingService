@@ -65,7 +65,7 @@ public sealed class Update : ControllerBase
             public List<Guid>? ArtistIds { get; init; }
 
             [JsonPropertyName("genreIds")]
-            public List<Guid>? Genres { get; init; }
+            public List<Guid>? GenreIds { get; init; }
         }
 
         public CommandBody Body { get; init; } = null!;
@@ -83,7 +83,11 @@ public sealed class Update : ControllerBase
                     .Must(x => x!.Distinct().Count() == x!.Count)
                     .When(x => x.ArtistIds is not null)
                     .WithMessage("Artist IDs must be unique");
-                RuleFor(x => x.Genres).NotEmpty().When(x => x.Title is not null);
+                RuleFor(x => x.GenreIds).NotEmpty().When(x => x.GenreIds is not null);
+                RuleFor(x => x.GenreIds)
+                    .Must(x => x!.Distinct().Count() == x!.Count)
+                    .When(x => x.GenreIds is not null)
+                    .WithMessage("Genre IDs must be unique");
             }
         }
     }
@@ -105,9 +109,11 @@ public sealed class Update : ControllerBase
         [JsonPropertyName("explicit")]
         public bool Explicit { get; init; }
 
-        [JsonPropertyName("artistIds")]
+        // TODO: Remove and move to album route group
+        [JsonPropertyName("isTitleTrack")]
         public bool IsTitleTrack { get; init; }
 
+        // TODO: Remove and move to album route group
         [JsonPropertyName("albumPosition")]
         public long AlbumPosition { get; init; }
 
@@ -184,7 +190,7 @@ public sealed class Update : ControllerBase
 
             if (song is null)
             {
-                return new Exception("Sound not found");
+                return new Exception("Song not found");
             }
 
             song.Title = body.Title ?? song.Title;
@@ -195,7 +201,7 @@ public sealed class Update : ControllerBase
                 var artists = await _context.Users
                     .Where(a =>
                         body.ArtistIds.Contains(a.Id) &&
-                        a.Disabled == false &&
+                        !a.Disabled &&
                         a.Roles.Any(r =>
                             r.Permissions.Any(p => p.Title == Permissions.ManageSongsPermission)
                         )
@@ -224,15 +230,15 @@ public sealed class Update : ControllerBase
                 ];
             }
 
-            if (body.Genres is not null)
+            if (body.GenreIds is not null)
             {
                 var genres = await _context.Genres
-                    .Where(g => body.Genres.Contains(g.Id))
+                    .Where(g => body.GenreIds.Contains(g.Id))
                     .ToListAsync(cancellationToken);
 
-                if (genres.Count != body.Genres.Count)
+                if (genres.Count != body.GenreIds.Count)
                 {
-                    var diff = body.Genres.Where(gId => genres.All(g => g.Id != gId));
+                    var diff = body.GenreIds.Where(gId => genres.All(g => g.Id != gId));
                     var stringDiff = string.Join(", ", diff);
                     return new Exception($"One or more genres not found: [{stringDiff}]");
                 }
