@@ -46,4 +46,9 @@ public sealed record SongEntity : BaseUpdatableIdEntity
     /// Song genres
     /// </summary>
     public List<GenreEntity> Genres { get; set; } = new List<GenreEntity>();
+    
+    /// <summary>
+    /// Users who liked the song
+    /// </summary>
+    public List<UserEntity> LikedByUsers { get; set; } = new List<UserEntity>();
 }

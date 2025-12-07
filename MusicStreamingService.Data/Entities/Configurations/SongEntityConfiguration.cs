@@ -31,5 +31,9 @@ internal sealed class SongEntityConfiguration : BaseUpdatableEntityConfiguration
             .HasMany(x => x.Genres)
             .WithMany(x => x.Songs)
             .UsingEntity<SongGenreEntity>();
+        builder
+            .HasMany(x => x.LikedByUsers)
+            .WithMany(x => x.FavoriteSongs)
+            .UsingEntity<SongFavoriteEntity>();
     }
 }

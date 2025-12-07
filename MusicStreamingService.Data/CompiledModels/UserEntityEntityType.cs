@@ -219,7 +219,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 propertyInfo: typeof(UserEntity).GetProperty("FavoriteSongs", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(UserEntity).GetField("<FavoriteSongs>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            var inverse = targetEntityType.FindSkipNavigation("UserEntity");
+            var inverse = targetEntityType.FindSkipNavigation("LikedByUsers");
             if (inverse != null)
             {
                 skipNavigation.Inverse = inverse;

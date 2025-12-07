@@ -29,7 +29,7 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .UsingEntity<AlbumFavoriteEntity>();
         builder
             .HasMany(x => x.FavoriteSongs)
-            .WithMany()
+            .WithMany(x => x.LikedByUsers)
             .UsingEntity<SongFavoriteEntity>();
         builder
             .HasMany(x => x.ArtistAlbums)
