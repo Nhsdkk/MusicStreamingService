@@ -8,6 +8,9 @@ public interface IAlbumStorageService
 {
     public Task<Result<string, Exception>> GetPresignedUrl(
         string albumArtworkFileName);
+
+    public Task<Dictionary<string, string?>> GetPresignedUrls(
+        IEnumerable<string> albumArtworkFileNames);
 }
 
 public sealed class AlbumStorageService : IAlbumStorageService
@@ -24,5 +27,21 @@ public sealed class AlbumStorageService : IAlbumStorageService
     }
 
     public async Task<Result<string, Exception>> GetPresignedUrl(string albumArtworkFileName) =>
-        await _client.GetPresignedUrl(Buckets.AlbumCoverBucketName, albumArtworkFileName, _configuration.ExpireTimeInSeconds);
+        await _client.GetPresignedUrl(Buckets.AlbumCoverBucketName, albumArtworkFileName,
+            _configuration.ExpireTimeInSeconds);
+
+    public async Task<Dictionary<string, string?>> GetPresignedUrls(
+        IEnumerable<string> albumArtworkFileNames)
+    {
+        var uniqueFileNames = albumArtworkFileNames.Distinct();
+        var results = await Task.WhenAll(uniqueFileNames.Select(async fileName =>
+        {
+            var urlResult = await GetPresignedUrl(fileName);
+            return urlResult.Match(
+                url => new KeyValuePair<string, string?>(fileName, url),
+                _ => new KeyValuePair<string, string?>(fileName, null));
+        }));
+
+        return new Dictionary<string, string?>(results);
+    }
 }

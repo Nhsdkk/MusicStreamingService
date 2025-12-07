@@ -110,14 +110,8 @@ public sealed class GetFavorite : ControllerBase
                 .ApplyPagination(request.Body.ItemsPerPage, request.Body.Page)
                 .ToListAsync(cancellationToken);
 
-            var mappedSongs = await Task.WhenAll(
-                songs.Select(async s =>
-                    {
-                        var urlResult = await _albumStorageService.GetPresignedUrl(s.Album.S3ArtworkFilename);
-                        return ShortSongDto.FromEntity(s, urlResult.Match<string?>(url => url, _ => null));
-                    }
-                )
-            );
+            var albumArtPaths = songs.Select(x => x.Album.S3ArtworkFilename);
+            var albumArtUrls = await _albumStorageService.GetPresignedUrls(albumArtPaths);
 
             return new QueryResponse
             {
@@ -125,7 +119,10 @@ public sealed class GetFavorite : ControllerBase
                 ItemsPerPage = request.Body.ItemsPerPage,
                 ItemCount = songs.Count,
                 Page = request.Body.Page,
-                Songs = mappedSongs.ToList()
+                Songs = songs
+                    .Select(s =>
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                    ).ToList()
             };
         }
     }

@@ -17,7 +17,7 @@ public static class MinioClientExtensions
         
         if (!objectExists)
         {
-            return new Exception("File does not exist.");
+            return new Exception("File does not exist");
         }
         
         var args = new PresignedGetObjectArgs()
@@ -30,7 +30,7 @@ public static class MinioClientExtensions
             var url = await minioClient.PresignedGetObjectAsync(args);
             if (url is null)
             {
-                return new Exception("Failed to generate presigned URL.");
+                return new Exception("Failed to generate presigned URL");
             }
 
             return url;

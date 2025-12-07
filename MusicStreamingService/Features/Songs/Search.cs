@@ -133,18 +133,15 @@ public class Search : ControllerBase
                 .Take(requestBody.ItemsPerPage)
                 .ToListAsync(cancellationToken);
 
-            var mappedSongs = await Task.WhenAll(
-                songs.Select(async song =>
-                {
-                    var urlResult = await _albumStorageService
-                        .GetPresignedUrl(song.Album.S3ArtworkFilename);
-
-                    return ShortSongDto.FromEntity(song, urlResult.Match<string?>(url => url, ex => null));
-                }));
+            var albumArtPaths = songs.Select(x => x.Album.S3ArtworkFilename);
+            var albumArtUrls = await _albumStorageService.GetPresignedUrls(albumArtPaths);
 
             return new QueryResponse
             {
-                Songs = mappedSongs.ToList(),
+                Songs = songs
+                    .Select(s =>
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                    ).ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = requestBody.ItemsPerPage,
                 ItemCount = songs.Count,
