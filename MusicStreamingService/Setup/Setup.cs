@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Password;
 using Scalar.AspNetCore;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -41,6 +42,7 @@ public static class Setup
                 options: options =>
                     options.ServiceLifetime = ServiceLifetime.Scoped)
             .ConfigurePasswordService(configuration)
+            .ConfigureObjectStorageServices(configuration)
             .ConfigureAuth<UserClaims>(builder.Environment, configuration);
 
         var app = builder.Build();

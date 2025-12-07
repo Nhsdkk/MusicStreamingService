@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
@@ -70,10 +71,14 @@ public sealed class GetContributed : ControllerBase
     public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
     {
         private readonly MusicStreamingContext _context;
+        private readonly IAlbumStorageService _albumStorageService;
 
-        public Handler(MusicStreamingContext context)
+        public Handler(
+            MusicStreamingContext context,
+            IAlbumStorageService albumStorageService)
         {
             _context = context;
+            _albumStorageService = albumStorageService;
         }
 
         public async ValueTask<Result<QueryResponse, Exception>> Handle(
@@ -104,14 +109,21 @@ public sealed class GetContributed : ControllerBase
                 .ThenInclude(a => a.Artist)
                 .Include(s => s.AllowedRegions)
                 .Include(s => s.Genres)
+                .Include(s => s.Album)
                 .OrderByDescending(x => x.Likes)
                 .Skip(request.ItemsPerPage * request.Page)
                 .Take(request.ItemsPerPage)
                 .ToListAsync(cancellationToken);
 
+            var albumArtPaths = songs.Select(x => x.Album.S3ArtworkFilename);
+            var albumArtUrls = await _albumStorageService.GetPresignedUrls(albumArtPaths);
+
             return new QueryResponse
             {
-                Songs = songs.Select(ShortSongDto.FromEntity).ToList(),
+                Songs = songs
+                    .Select(s =>
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                    ).ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = request.ItemsPerPage,
                 ItemCount = songs.Count,

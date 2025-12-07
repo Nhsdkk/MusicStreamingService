@@ -24,9 +24,9 @@ internal sealed class SongEntityConfiguration : BaseUpdatableEntityConfiguration
             .WithMany()
             .UsingEntity<AllowedDistributionEntity>();
         builder
-            .HasMany(x => x.Albums)
-            .WithOne(x => x.Song)
-            .HasForeignKey(x => x.SongId);
+            .HasOne(x => x.Album)
+            .WithMany(x => x.Songs)
+            .HasForeignKey(x => x.AlbumId);
         builder
             .HasMany(x => x.Genres)
             .WithMany(x => x.Songs)

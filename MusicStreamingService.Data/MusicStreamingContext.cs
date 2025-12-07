@@ -15,8 +15,6 @@ public sealed class MusicStreamingContext : DbContext
     
     public DbSet<AlbumFavoriteEntity> AlbumFavorites { get; set; }
     
-    public DbSet<AlbumSongEntity> AlbumSongs { get; set; }
-    
     public DbSet<AllowedDistributionEntity> AllowedDistribution { get; set; }
     
     public DbSet<GenreEntity> Genres { get; set; }
@@ -67,7 +65,6 @@ public sealed class MusicStreamingContext : DbContext
         modelBuilder.ApplyConfiguration(new RegionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new AlbumEntityConfiguration());
         modelBuilder.ApplyConfiguration(new AlbumFavoriteEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new AlbumSongEntityConfiguration());
         modelBuilder.ApplyConfiguration(new AllowedDistributionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GenreEntityConfiguration());
         modelBuilder.ApplyConfiguration(new SongArtistEntityConfiguration());

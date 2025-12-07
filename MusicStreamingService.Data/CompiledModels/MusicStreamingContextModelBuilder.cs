@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("2e50115b-f225-4192-b1bd-0da3a0b317b4"), entityTypeCount: 23)
+            : base(skipDetectChanges: false, modelId: new Guid("dd4e37b6-4c68-4847-af80-879772d559b0"), entityTypeCount: 22)
         {
         }
 
@@ -20,7 +20,6 @@ namespace MusicStreamingService.Data.CompiledModels
         {
             var albumEntity = AlbumEntityEntityType.Create(this);
             var albumFavoriteEntity = AlbumFavoriteEntityEntityType.Create(this);
-            var albumSongEntity = AlbumSongEntityEntityType.Create(this);
             var allowedDistributionEntity = AllowedDistributionEntityEntityType.Create(this);
             var deviceEntity = DeviceEntityEntityType.Create(this);
             var genreEntity = GenreEntityEntityType.Create(this);
@@ -46,8 +45,6 @@ namespace MusicStreamingService.Data.CompiledModels
             AlbumEntityEntityType.CreateForeignKey2(albumEntity, userEntity);
             AlbumFavoriteEntityEntityType.CreateForeignKey1(albumFavoriteEntity, albumEntity);
             AlbumFavoriteEntityEntityType.CreateForeignKey2(albumFavoriteEntity, userEntity);
-            AlbumSongEntityEntityType.CreateForeignKey1(albumSongEntity, albumEntity);
-            AlbumSongEntityEntityType.CreateForeignKey2(albumSongEntity, songEntity);
             AllowedDistributionEntityEntityType.CreateForeignKey1(allowedDistributionEntity, regionEntity);
             AllowedDistributionEntityEntityType.CreateForeignKey2(allowedDistributionEntity, songEntity);
             DeviceEntityEntityType.CreateForeignKey1(deviceEntity, userEntity);
@@ -64,6 +61,7 @@ namespace MusicStreamingService.Data.CompiledModels
             SongArtistEntityEntityType.CreateForeignKey1(songArtistEntity, userEntity);
             SongArtistEntityEntityType.CreateForeignKey2(songArtistEntity, songEntity);
             SongArtistEntityEntityType.CreateForeignKey3(songArtistEntity, userEntity);
+            SongEntityEntityType.CreateForeignKey1(songEntity, albumEntity);
             SongFavoriteEntityEntityType.CreateForeignKey1(songFavoriteEntity, songEntity);
             SongFavoriteEntityEntityType.CreateForeignKey2(songFavoriteEntity, userEntity);
             SongGenreEntityEntityType.CreateForeignKey1(songGenreEntity, genreEntity);
@@ -93,7 +91,6 @@ namespace MusicStreamingService.Data.CompiledModels
 
             AlbumEntityEntityType.CreateAnnotations(albumEntity);
             AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
-            AlbumSongEntityEntityType.CreateAnnotations(albumSongEntity);
             AllowedDistributionEntityEntityType.CreateAnnotations(allowedDistributionEntity);
             DeviceEntityEntityType.CreateAnnotations(deviceEntity);
             GenreEntityEntityType.CreateAnnotations(genreEntity);

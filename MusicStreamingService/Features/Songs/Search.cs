@@ -9,6 +9,8 @@ using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Infrastructure.ObjectStorage;
+using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
@@ -47,10 +49,10 @@ public class Search : ControllerBase
             },
             cancellationToken);
 
-        return Ok(results);
+        return results.Match(Ok, x => throw x);
     }
 
-    public sealed record Query : IRequest<QueryResponse>
+    public sealed record Query : IRequest<Result<QueryResponse, Exception>>
     {
         public sealed record QueryBody : BasePaginatedRequest
         {
@@ -65,7 +67,7 @@ public class Search : ControllerBase
 
             [JsonPropertyName("genres")]
             public List<Guid>? Genres { get; init; }
-            
+
             public sealed class Validator : AbstractValidator<QueryBody>
             {
                 public Validator()
@@ -90,17 +92,19 @@ public class Search : ControllerBase
         public List<ShortSongDto> Songs { get; init; } = null!;
     }
 
-    public sealed class Handler : IRequestHandler<Query, QueryResponse>
+    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
     {
         private readonly MusicStreamingContext _context;
+        private readonly IAlbumStorageService _albumStorageService;
 
         public Handler(
-            MusicStreamingContext context)
+            MusicStreamingContext context, IAlbumStorageService albumStorageService)
         {
             _context = context;
+            _albumStorageService = albumStorageService;
         }
 
-        public async ValueTask<QueryResponse> Handle(
+        public async ValueTask<Result<QueryResponse, Exception>> Handle(
             Query request,
             CancellationToken cancellationToken)
         {
@@ -120,6 +124,7 @@ public class Search : ControllerBase
             // TODO: Look into Microsoft.EntityFrameworkCore.Query[10102]
             var songs = await query
                 .Include(x => x.AllowedRegions)
+                .Include(x => x.Album)
                 .Include(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Genres)
@@ -128,9 +133,15 @@ public class Search : ControllerBase
                 .Take(requestBody.ItemsPerPage)
                 .ToListAsync(cancellationToken);
 
+            var albumArtPaths = songs.Select(x => x.Album.S3ArtworkFilename);
+            var albumArtUrls = await _albumStorageService.GetPresignedUrls(albumArtPaths);
+
             return new QueryResponse
             {
-                Songs = songs.Select(ShortSongDto.FromEntity).ToList(),
+                Songs = songs
+                    .Select(s =>
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                    ).ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = requestBody.ItemsPerPage,
                 ItemCount = songs.Count,
