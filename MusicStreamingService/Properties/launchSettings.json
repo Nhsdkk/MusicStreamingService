@@ -20,7 +20,12 @@
         "JwtConfiguration__Issuer": "music-streaming-service",
         "JwtConfiguration__Audience": "music-streaming-service",
         "JwtConfiguration__AccessTokenExpiration": "04:00:00",
-        "JwtConfiguration__RefreshTokenExpiration": "30.00:00:00"
+        "JwtConfiguration__RefreshTokenExpiration": "30.00:00:00",
+        "MinioConfiguration__Endpoint": "localhost:9000",
+        "MinioConfiguration__AccessKey": "user",
+        "MinioConfiguration__SecretKey": "subvev-jyzcyR-bymcy0",
+        "MinioConfiguration__ExpireTimeInSeconds": "3600",
+        "MinioConfiguration__UseSsl": "false"
       }
     },
     "https": {
@@ -42,7 +47,12 @@
         "JwtConfiguration__Issuer": "music-streaming-service",
         "JwtConfiguration__Audience": "music-streaming-service",
         "JwtConfiguration__AccessTokenExpiration": "04:00:00",
-        "JwtConfiguration__RefreshTokenExpiration": "30.00:00:00"
+        "JwtConfiguration__RefreshTokenExpiration": "30.00:00:00",
+        "MinioConfiguration__Endpoint": "localhost:9000",
+        "MinioConfiguration__AccessKey": "user",
+        "MinioConfiguration__SecretKey": "subvev-jyzcyR-bymcy0",
+        "MinioConfiguration__ExpireTimeInSeconds": "3600",
+        "MinioConfiguration__UseSsl": "false"
       }
     }
   }

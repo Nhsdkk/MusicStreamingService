@@ -38,11 +38,12 @@
       timeout: 10s
       retries: 120
     networks:
-      - shared
+      - common
     command: server /data --console-address ":9001"
     
 volumes:
   pgdata:
+  minio_data:
 
 networks:
   common:
