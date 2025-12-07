@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,12 @@ public sealed class GetFavorite : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Get user's favorite songs
+    /// </summary>
+    /// <param name="request">Pagination params</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("/api/v1/songs/favorite")]
     [Tags(RouteGroups.Songs)]
     [Authorize(Roles = Permissions.ViewSongsPermission)]
@@ -44,16 +51,25 @@ public sealed class GetFavorite : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    
-    public sealed record Query : BasePaginatedRequest, IRequest<Result<QueryResponse, Exception>>
+
+    public sealed record Query : IRequest<Result<QueryResponse, Exception>>
     {
         public Guid UserId { get; init; }
-        
-        public QueryBody Body { get; init; }
+
+        public QueryBody Body { get; init; } = null!;
         
         public sealed record QueryBody : BasePaginatedRequest
         {
             
+        }
+        
+        public sealed class Validator : AbstractValidator<QueryBody>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.ItemsPerPage).GreaterThan(0).LessThan(100);
+                RuleFor(x => x.Page).GreaterThanOrEqualTo(0);
+            }
         }
     }
 
@@ -85,16 +101,16 @@ public sealed class GetFavorite : ControllerBase
                 .Include(s => s.Genres)
                 .Include(s => s.Artists)
                 .ThenInclude(s => s.Artist)
-                .OrderBy(s => s.Likes)
-                .ApplyPagination(request.ItemsPerPage, request.Page)
+                .OrderByDescending(s => s.Likes)
+                .ApplyPagination(request.Body.ItemsPerPage, request.Body.Page)
                 .ToListAsync(cancellationToken);
 
             return new QueryResponse
             {
                 TotalCount = totalCount,
-                ItemsPerPage = request.ItemsPerPage,
+                ItemsPerPage = request.Body.ItemsPerPage,
                 ItemCount = songs.Count,
-                Page = request.Page,
+                Page = request.Body.Page,
                 Songs = songs.Select(ShortSongDto.FromEntity).ToList()
             };
         }
