@@ -157,7 +157,7 @@ namespace MusicStreamingService.Data.CompiledModels
         public static RuntimeSkipNavigation CreateSkipNavigation3(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
             var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "UserEntity",
+                "LikedByUsers",
                 targetEntityType,
                 joinEntityType.FindForeignKey(
                     new[] { joinEntityType.FindProperty("SongId") },
@@ -165,7 +165,9 @@ namespace MusicStreamingService.Data.CompiledModels
                     declaringEntityType),
                 true,
                 false,
-                typeof(IEnumerable<UserEntity>));
+                typeof(List<UserEntity>),
+                propertyInfo: typeof(SongEntity).GetProperty("LikedByUsers", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(SongEntity).GetField("<LikedByUsers>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             var inverse = targetEntityType.FindSkipNavigation("FavoriteSongs");
             if (inverse != null)
