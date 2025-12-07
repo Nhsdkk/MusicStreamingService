@@ -5,7 +5,6 @@ namespace MusicStreamingService.Features.Albums;
 
 public sealed record ShortAlbumDto
 {
-    // TODO: add album art url
     [JsonPropertyName("id")]
     public Guid Id { get; init; }
 
@@ -15,12 +14,17 @@ public sealed record ShortAlbumDto
     [JsonPropertyName("likes")]
     public long Likes { get; init; }
 
+    [JsonPropertyName("albumArtUrl")]
+    public string AlbumArtUrl { get; init; } = null!;
+
     public static ShortAlbumDto FromEntity(
-        AlbumEntity album) =>
+        AlbumEntity album,
+        string albumArtUrl) =>
         new ShortAlbumDto
         {
             Id = album.Id,
             Title = album.Title,
-            Likes = album.Likes
+            Likes = album.Likes,
+            AlbumArtUrl = albumArtUrl
         };
 }

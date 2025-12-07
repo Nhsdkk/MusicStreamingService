@@ -40,5 +40,5 @@ public sealed record AlbumEntity : BaseUpdatableIdEntity
     /// <summary>
     /// Album songs
     /// </summary>
-    public List<AlbumSongEntity> Songs { get; set; } = new List<AlbumSongEntity>();
+    public List<SongEntity> Songs { get; set; } = new List<SongEntity>();
 }

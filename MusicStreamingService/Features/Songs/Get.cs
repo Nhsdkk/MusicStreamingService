@@ -50,7 +50,7 @@ public sealed class Get : ControllerBase
     public sealed record Query : IRequest<Result<QueryResponse, Exception>>
     {
         public Guid SongId { get; init; }
-        
+
         public RegionClaim UserRegion { get; init; } = null!;
     }
 
@@ -58,47 +58,48 @@ public sealed class Get : ControllerBase
     {
         [JsonPropertyName("id")]
         public Guid Id { get; init; }
-        
+
         [JsonPropertyName("title")]
         public string Title { get; init; } = null!;
-        
+
         [JsonPropertyName("durationMs")]
         public long DurationMs { get; init; }
-        
+
         [JsonPropertyName("presignedUrl")]
         public string PresignedUrl { get; init; } = null!;
-        
+
         [JsonPropertyName("likes")]
         public long Likes { get; init; }
-        
+
         [JsonPropertyName("explicit")]
         public bool Explicit { get; init; }
-        
+
         [JsonPropertyName("artists")]
         public List<ShortSongArtistDto> Artists { get; init; } = new();
-        
+
         [JsonPropertyName("allowedRegions")]
         public List<ShortRegionDto> AllowedRegions { get; init; } = new();
-        
+
         [JsonPropertyName("allowedInUserRegion")]
         public bool AllowedInUserRegion { get; init; }
-        
-        [JsonPropertyName("albums")]
-        public List<ShortAlbumDto> Albums { get; init; } = new();
-        
+
+        [JsonPropertyName("album")]
+        public ShortAlbumDto Album { get; init; } = new();
+
         [JsonPropertyName("genres")]
         public List<ShortGenreDto> Genres { get; init; } = new();
-        
+
         public static QueryResponse FromEntity(
             SongEntity song,
-            string presignedUrl,
+            string songUrl,
+            string albumArtUrl,
             RegionClaim userRegion) =>
             new QueryResponse
             {
                 Id = song.Id,
                 Title = song.Title,
                 DurationMs = song.DurationMs,
-                PresignedUrl = presignedUrl,
+                PresignedUrl = songUrl,
                 Likes = song.Likes,
                 Explicit = song.Explicit,
                 Artists = song.Artists
@@ -108,9 +109,7 @@ public sealed class Get : ControllerBase
                     .Select(ShortRegionDto.FromEntity)
                     .ToList(),
                 AllowedInUserRegion = song.AllowedRegions.Any(r => r.Id == userRegion.Id),
-                Albums = song.Albums
-                    .Select(x => ShortAlbumDto.FromEntity(x.Album))
-                    .ToList(),
+                Album = ShortAlbumDto.FromEntity(song.Album, albumArtUrl),
                 Genres = song.Genres
                     .Select(ShortGenreDto.FromEntity)
                     .ToList()
@@ -120,14 +119,17 @@ public sealed class Get : ControllerBase
     public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
     {
         private readonly MusicStreamingContext _context;
-        private readonly ISongStorageService _songStorageClient;
+        private readonly ISongStorageService _songStorageService;
+        private readonly IAlbumStorageService _albumStorageService;
 
         public Handler(
             MusicStreamingContext context,
-            ISongStorageService songStorageClient)
+            ISongStorageService songStorageService,
+            IAlbumStorageService albumStorageService)
         {
-            _songStorageClient = songStorageClient;
+            _songStorageService = songStorageService;
             _context = context;
+            _albumStorageService = albumStorageService;
         }
 
         public async ValueTask<Result<QueryResponse, Exception>> Handle(Query request,
@@ -135,7 +137,7 @@ public sealed class Get : ControllerBase
         {
             var song = await _context.Songs
                 .AsNoTracking()
-                .Include(x => x.Albums)
+                .Include(x => x.Album)
                 .Include(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.AllowedRegions)
@@ -149,12 +151,27 @@ public sealed class Get : ControllerBase
                 return new Exception("Song not found");
             }
 
-            var s3Path = song.S3MediaFileName;
-            var urlGetResult = await _songStorageClient.GetPresignedUrl(s3Path);
+            var s3SongPath = song.S3MediaFileName;
+            var songUrlGetResult = await _songStorageService.GetPresignedUrl(s3SongPath);
 
-            return urlGetResult.Match<Result<QueryResponse, Exception>>(
-                url => QueryResponse.FromEntity(song, url, request.UserRegion),
-                _ => new Exception("Song file is not available"));
+            if (songUrlGetResult.IsT1)
+            {
+                return songUrlGetResult.AsT1;
+            }
+
+            var s3AlbumArtPath = song.Album.S3ArtworkFilename;
+            var albumArtUrlGetResult = await _albumStorageService.GetPresignedUrl(s3AlbumArtPath);
+
+            if (albumArtUrlGetResult.IsT1)
+            {
+                return albumArtUrlGetResult.AsT1;
+            }
+
+            return QueryResponse.FromEntity(
+                song,
+                songUrlGetResult.AsT0,
+                albumArtUrlGetResult.AsT0,
+                request.UserRegion);
         }
     }
 }

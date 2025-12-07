@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
@@ -70,10 +71,14 @@ public sealed class GetContributed : ControllerBase
     public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
     {
         private readonly MusicStreamingContext _context;
+        private readonly IAlbumStorageService _albumStorageService;
 
-        public Handler(MusicStreamingContext context)
+        public Handler(
+            MusicStreamingContext context,
+            IAlbumStorageService albumStorageService)
         {
             _context = context;
+            _albumStorageService = albumStorageService;
         }
 
         public async ValueTask<Result<QueryResponse, Exception>> Handle(
@@ -109,9 +114,27 @@ public sealed class GetContributed : ControllerBase
                 .Take(request.ItemsPerPage)
                 .ToListAsync(cancellationToken);
 
+            var mappedSongs = await Task.WhenAll(
+                songs.Select(async s =>
+                    {
+                        var albumArtworkUrlResult =
+                            await _albumStorageService.GetPresignedUrl(s.Album.S3ArtworkFilename);
+                        return albumArtworkUrlResult.Match<Result<ShortSongDto, Exception>>(url =>
+                                ShortSongDto.FromEntity(s, url),
+                            ex => ex
+                        );
+                    }
+                )
+            );
+
+            if (mappedSongs.Any(x => x.IsT1))
+            {
+                return new Exception("Failed to get album artwork URL");
+            }
+
             return new QueryResponse
             {
-                Songs = songs.Select(ShortSongDto.FromEntity).ToList(),
+                Songs = mappedSongs.Select(x => x.AsT0).ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = request.ItemsPerPage,
                 ItemCount = songs.Count,

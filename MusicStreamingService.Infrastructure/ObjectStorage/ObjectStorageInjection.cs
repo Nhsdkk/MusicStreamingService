@@ -19,7 +19,9 @@ public static class ObjectStorageInjection
             .WithSSL(config.UseSsl)
             .Build());
         
-        services.AddScoped<ISongStorageService, SongStorageService>();
+        services
+            .AddScoped<ISongStorageService, SongStorageService>()
+            .AddScoped<IAlbumStorageService, AlbumStorageService>();
         
         return services;
     }

@@ -13,6 +13,13 @@ public static class MinioClientExtensions
         string objectName,
         int expiryInSeconds)
     {
+        var objectExists = await minioClient.DoesObjectExist(bucketName, objectName);
+        
+        if (!objectExists)
+        {
+            return new Exception("File does not exist.");
+        }
+        
         var args = new PresignedGetObjectArgs()
             .WithBucket(bucketName)
             .WithObject(objectName)
@@ -21,7 +28,7 @@ public static class MinioClientExtensions
         try
         {
             var url = await minioClient.PresignedGetObjectAsync(args);
-            if (url == null)
+            if (url is null)
             {
                 return new Exception("Failed to generate presigned URL.");
             }
@@ -31,6 +38,31 @@ public static class MinioClientExtensions
         catch (ObjectNotFoundException e)
         {
             return e;
+        }
+    }
+    
+    public static async Task<bool> DoesObjectExist(
+        this IMinioClient minioClient,
+        string bucketName,
+        string objectName)
+    {
+        var args = new StatObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(objectName);
+        
+        try
+        {
+            await minioClient.StatObjectAsync(args);
+            return true;
+        }
+        catch (Exception e)
+        {
+            if (e is ObjectNotFoundException or BucketNotFoundException)
+            {
+                return false;   
+            }
+
+            throw;
         }
     }
 }

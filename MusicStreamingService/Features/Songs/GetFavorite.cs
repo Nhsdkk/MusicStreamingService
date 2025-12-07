@@ -8,6 +8,7 @@ using MusicStreamingService.Data;
 using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
+using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
@@ -57,12 +58,11 @@ public sealed class GetFavorite : ControllerBase
         public Guid UserId { get; init; }
 
         public QueryBody Body { get; init; } = null!;
-        
+
         public sealed record QueryBody : BasePaginatedRequest
         {
-            
         }
-        
+
         public sealed class Validator : AbstractValidator<QueryBody>
         {
             public Validator()
@@ -82,10 +82,14 @@ public sealed class GetFavorite : ControllerBase
     public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
     {
         private readonly MusicStreamingContext _context;
+        private readonly IAlbumStorageService _albumStorageService;
 
-        public Handler(MusicStreamingContext context)
+        public Handler(
+            MusicStreamingContext context,
+            IAlbumStorageService albumStorageService)
         {
             _context = context;
+            _albumStorageService = albumStorageService;
         }
 
         public async ValueTask<Result<QueryResponse, Exception>> Handle(Query request,
@@ -97,6 +101,7 @@ public sealed class GetFavorite : ControllerBase
 
             var totalCount = await query.CountAsync(cancellationToken);
             var songs = await query
+                .Include(s => s.Album)
                 .Include(s => s.AllowedRegions)
                 .Include(s => s.Genres)
                 .Include(s => s.Artists)
@@ -105,13 +110,30 @@ public sealed class GetFavorite : ControllerBase
                 .ApplyPagination(request.Body.ItemsPerPage, request.Body.Page)
                 .ToListAsync(cancellationToken);
 
+            var mappedSongs = await Task.WhenAll(
+                songs.Select(async s =>
+                    {
+                        var urlResult = await _albumStorageService.GetPresignedUrl(s.Album.S3ArtworkFilename);
+                        return urlResult.Match<Result<ShortSongDto, Exception>>(
+                            url => ShortSongDto.FromEntity(s, url),
+                            ex => ex
+                        );
+                    }
+                )
+            );
+
+            if (mappedSongs.Any(x => x.IsT1))
+            {
+                return new Exception("Failed to get album artwork URLs");
+            }
+
             return new QueryResponse
             {
                 TotalCount = totalCount,
                 ItemsPerPage = request.Body.ItemsPerPage,
                 ItemCount = songs.Count,
                 Page = request.Body.Page,
-                Songs = songs.Select(ShortSongDto.FromEntity).ToList()
+                Songs = mappedSongs.Select(x => x.AsT0).ToList()
             };
         }
     }

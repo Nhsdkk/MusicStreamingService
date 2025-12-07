@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using MusicStreamingService.Data.Entities;
+using MusicStreamingService.Features.Albums;
 using MusicStreamingService.Features.Genres;
 using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
@@ -31,8 +32,13 @@ public sealed record ShortSongDto
 
     [JsonPropertyName("allowedRegions")]
     public List<ShortRegionDto> AllowedRegions { get; init; } = null!;
+    
+    [JsonPropertyName("album")]
+    public ShortAlbumDto Album { get; init; } = null!;
 
-    public static ShortSongDto FromEntity(SongEntity song) =>
+    public static ShortSongDto FromEntity(
+        SongEntity song,
+        string albumArtworkUrl) =>
         new ShortSongDto
         {
             Id = song.Id,
@@ -43,6 +49,7 @@ public sealed record ShortSongDto
             DurationMs = song.DurationMs,
             Likes = song.Likes,
             IsExplicit = song.Explicit,
+            Album = ShortAlbumDto.FromEntity(song.Album, albumArtworkUrl),
             Genres = song.Genres
                 .Select(ShortGenreDto.FromEntity)
                 .ToList(),

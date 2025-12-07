@@ -38,9 +38,24 @@ public sealed record SongEntity : BaseUpdatableIdEntity
     public List<RegionEntity> AllowedRegions { get; set; } = new List<RegionEntity>();
 
     /// <summary>
-    /// Albums in which song appears
+    /// Album in which song appears 
     /// </summary>
-    public List<AlbumSongEntity> Albums { get; set; } = new List<AlbumSongEntity>();
+    public AlbumEntity Album { get; set; } = null!;
+    
+    /// <summary>
+    /// Id of the album in which song appears
+    /// </summary>
+    public Guid AlbumId { get; set; }
+    
+    /// <summary>
+    /// Flag to determine if the song is the title track of the album
+    /// </summary>
+    public bool IsTitleTrack { get; set; }
+    
+    /// <summary>
+    /// Position of the song within the album
+    /// </summary>
+    public long AlbumPosition { get; set; }
 
     /// <summary>
     /// Song genres
