@@ -12,7 +12,7 @@ public sealed record ShortGenreDto
     public string Title { get; init; } = null!;
 
     public static ShortGenreDto FromEntity(GenreEntity genre) =>
-        new ShortGenreDto()
+        new ShortGenreDto
         {
             Id = genre.Id,
             Title = genre.Title
