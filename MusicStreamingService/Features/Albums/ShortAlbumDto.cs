@@ -15,11 +15,11 @@ public sealed record ShortAlbumDto
     public long Likes { get; init; }
 
     [JsonPropertyName("albumArtUrl")]
-    public string AlbumArtUrl { get; init; } = null!;
+    public string? AlbumArtUrl { get; init; }
 
     public static ShortAlbumDto FromEntity(
         AlbumEntity album,
-        string albumArtUrl) =>
+        string? albumArtUrl) =>
         new ShortAlbumDto
         {
             Id = album.Id,

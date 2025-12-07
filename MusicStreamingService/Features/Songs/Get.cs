@@ -65,8 +65,8 @@ public sealed class Get : ControllerBase
         [JsonPropertyName("durationMs")]
         public long DurationMs { get; init; }
 
-        [JsonPropertyName("presignedUrl")]
-        public string PresignedUrl { get; init; } = null!;
+        [JsonPropertyName("songUrl")]
+        public string? SongUrl { get; init; }
 
         [JsonPropertyName("likes")]
         public long Likes { get; init; }
@@ -91,15 +91,15 @@ public sealed class Get : ControllerBase
 
         public static QueryResponse FromEntity(
             SongEntity song,
-            string songUrl,
-            string albumArtUrl,
+            string? songUrl,
+            string? albumArtUrl,
             RegionClaim userRegion) =>
             new QueryResponse
             {
                 Id = song.Id,
                 Title = song.Title,
                 DurationMs = song.DurationMs,
-                PresignedUrl = songUrl,
+                SongUrl = songUrl,
                 Likes = song.Likes,
                 Explicit = song.Explicit,
                 Artists = song.Artists
@@ -154,23 +154,13 @@ public sealed class Get : ControllerBase
             var s3SongPath = song.S3MediaFileName;
             var songUrlGetResult = await _songStorageService.GetPresignedUrl(s3SongPath);
 
-            if (songUrlGetResult.IsT1)
-            {
-                return songUrlGetResult.AsT1;
-            }
-
             var s3AlbumArtPath = song.Album.S3ArtworkFilename;
             var albumArtUrlGetResult = await _albumStorageService.GetPresignedUrl(s3AlbumArtPath);
 
-            if (albumArtUrlGetResult.IsT1)
-            {
-                return albumArtUrlGetResult.AsT1;
-            }
-
             return QueryResponse.FromEntity(
                 song,
-                songUrlGetResult.AsT0,
-                albumArtUrlGetResult.AsT0,
+                songUrlGetResult.Match<string?>(url => url, _ => null),
+                albumArtUrlGetResult.Match<string?>(url => url, _ => null),
                 request.UserRegion);
         }
     }

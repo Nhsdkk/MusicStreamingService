@@ -117,24 +117,16 @@ public sealed class GetContributed : ControllerBase
             var mappedSongs = await Task.WhenAll(
                 songs.Select(async s =>
                     {
-                        var albumArtworkUrlResult =
+                        var urlResult =
                             await _albumStorageService.GetPresignedUrl(s.Album.S3ArtworkFilename);
-                        return albumArtworkUrlResult.Match<Result<ShortSongDto, Exception>>(url =>
-                                ShortSongDto.FromEntity(s, url),
-                            ex => ex
-                        );
+                        return ShortSongDto.FromEntity(s, urlResult.Match<string?>(url => url, ex => null));
                     }
                 )
             );
 
-            if (mappedSongs.Any(x => x.IsT1))
-            {
-                return new Exception("Failed to get album artwork URL");
-            }
-
             return new QueryResponse
             {
-                Songs = mappedSongs.Select(x => x.AsT0).ToList(),
+                Songs = mappedSongs.ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = request.ItemsPerPage,
                 ItemCount = songs.Count,

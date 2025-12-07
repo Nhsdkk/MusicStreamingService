@@ -139,19 +139,12 @@ public class Search : ControllerBase
                     var urlResult = await _albumStorageService
                         .GetPresignedUrl(song.Album.S3ArtworkFilename);
 
-                    return urlResult.Match<Result<ShortSongDto, Exception>>(
-                        url => ShortSongDto.FromEntity(song, url),
-                        ex => ex);
+                    return ShortSongDto.FromEntity(song, urlResult.Match<string?>(url => url, ex => null));
                 }));
-
-            if (mappedSongs.Any(x => x.IsT1))
-            {
-                return new Exception("Failed to get album artwork URLs");
-            }
 
             return new QueryResponse
             {
-                Songs = mappedSongs.Select(x => x.AsT0).ToList(),
+                Songs = mappedSongs.ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = requestBody.ItemsPerPage,
                 ItemCount = songs.Count,

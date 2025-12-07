@@ -38,7 +38,7 @@ public sealed record ShortSongDto
 
     public static ShortSongDto FromEntity(
         SongEntity song,
-        string albumArtworkUrl) =>
+        string? albumArtworkUrl) =>
         new ShortSongDto
         {
             Id = song.Id,

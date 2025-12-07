@@ -114,18 +114,10 @@ public sealed class GetFavorite : ControllerBase
                 songs.Select(async s =>
                     {
                         var urlResult = await _albumStorageService.GetPresignedUrl(s.Album.S3ArtworkFilename);
-                        return urlResult.Match<Result<ShortSongDto, Exception>>(
-                            url => ShortSongDto.FromEntity(s, url),
-                            ex => ex
-                        );
+                        return ShortSongDto.FromEntity(s, urlResult.Match<string?>(url => url, _ => null));
                     }
                 )
             );
-
-            if (mappedSongs.Any(x => x.IsT1))
-            {
-                return new Exception("Failed to get album artwork URLs");
-            }
 
             return new QueryResponse
             {
@@ -133,7 +125,7 @@ public sealed class GetFavorite : ControllerBase
                 ItemsPerPage = request.Body.ItemsPerPage,
                 ItemCount = songs.Count,
                 Page = request.Body.Page,
-                Songs = mappedSongs.Select(x => x.AsT0).ToList()
+                Songs = mappedSongs.ToList()
             };
         }
     }
