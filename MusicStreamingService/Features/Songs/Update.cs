@@ -255,7 +255,6 @@ public sealed class Update : ControllerBase
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            throw new Exception("qwe");
             
             return CommandResponse.FromEntity(
                 song,
