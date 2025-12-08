@@ -3,6 +3,7 @@ using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
@@ -44,7 +45,7 @@ public sealed class Register : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record CommandDto : IRequest<Result<ResponseDto, Exception>>
+    public sealed record CommandDto : ITransactionWrappedCommand<Result<ResponseDto, Exception>>
     {
         public enum AccountRegisterRole
         {

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
+using MusicStreamingService.Features.Region;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Openapi;
 
@@ -63,15 +64,6 @@ public sealed class Search : ControllerBase
 
     public sealed record QueryResponseDto
     {
-        public sealed record RegionDto
-        {
-            [JsonPropertyName("id")]
-            public Guid Id { get; init; }
-            
-            [JsonPropertyName("title")]
-            public string Title { get; init; } = null!;
-        }
-        
         public sealed record UserSearchDataDto
         {
             [JsonPropertyName("id")]
@@ -81,7 +73,7 @@ public sealed class Search : ControllerBase
             public string Username { get; init; } = null!;
             
             [JsonPropertyName("region")]
-            public RegionDto Region { get; init; } = null!;
+            public ShortRegionDto Region { get; init; } = null!;
         }
         
         [JsonPropertyName("users")]
@@ -137,7 +129,7 @@ public sealed class Search : ControllerBase
             {
                 Id = x.Id,
                 Username = x.Username,
-                Region = new QueryResponseDto.RegionDto
+                Region = new ShortRegionDto
                 {
                     Id = x.Region.Id,
                     Title = x.Region.Title
