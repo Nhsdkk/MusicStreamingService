@@ -38,9 +38,9 @@ public sealed class ClaimValidator : IClaimValidator<UserClaims>
             .ToHashSet();
 
         var claimPermissions = claims.Permissions.ToHashSet();
-        var allRolesMatch = claimPermissions.SetEquals(permissions);
+        var allPermissionsMatch = claimPermissions.SetEquals(permissions);
 
-        if (!allRolesMatch)
+        if (!allPermissionsMatch)
         {
             return new Exception("Invalid claims");
         }
