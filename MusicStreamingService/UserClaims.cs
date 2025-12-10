@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
@@ -11,6 +12,7 @@ public class UserClaims : IClaimConvertable
     private readonly string _username;
     private readonly Guid _id;
     private readonly RegionClaim _region;
+    private readonly DateTime _birthDate;
 
     public UserClaims(UserEntity user)
     {
@@ -22,6 +24,7 @@ public class UserClaims : IClaimConvertable
             Id = user.Region.Id,
             Title = user.Region.Title
         };
+        _birthDate = user.BirthDate;
     }
 
     public IEnumerable<string> GetPermissions() => _permissions;
@@ -31,4 +34,21 @@ public class UserClaims : IClaimConvertable
     public Guid GetId() => _id;
 
     public RegionClaim GetRegion() => _region;
+
+    public DateTime GetBirthDate() => _birthDate;
+
+    public List<Claim> ToClaims()
+    {
+        var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Name, _username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sid, _id.ToString()),
+            new Claim(CustomClaimTypes.RegionsClaimType, System.Text.Json.JsonSerializer.Serialize(_region)),
+            new Claim(CustomClaimTypes.BirthDateClaimType, _birthDate.ToString("MM/dd/yyyy"))
+        };
+
+        claims.AddRange(_permissions.Select(x => new Claim(ClaimTypes.Role, x)));
+        return claims;
+    }
 }

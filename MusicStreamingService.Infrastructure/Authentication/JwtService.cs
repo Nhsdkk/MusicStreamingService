@@ -58,8 +58,9 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable
 
     public (string accessToken, string refreshToken) GetPair(T data)
     {
-        var accessToken = GetToken(GetClaims(data), _configuration.AccessTokenExpiration);
-        var refreshToken = GetToken(GetClaims(data), _configuration.RefreshTokenExpiration);
+        var claims = data.ToClaims();
+        var accessToken = GetToken(claims, _configuration.AccessTokenExpiration);
+        var refreshToken = GetToken(claims, _configuration.RefreshTokenExpiration);
 
         return (accessToken, refreshToken);
     }
@@ -110,20 +111,6 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable
         ValidateLifetime = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.SecretKey)),
     };
-
-    private IEnumerable<Claim> GetClaims(T data)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Name, data.GetUsername()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sid, data.GetId().ToString()),
-            new Claim(CustomClaimTypes.RegionsClaimType, System.Text.Json.JsonSerializer.Serialize(data.GetRegion()))
-        };
-
-        claims.AddRange(data.GetPermissions().Select(x => new Claim(ClaimTypes.Role, x)));
-        return claims;
-    }
 
     private string GetToken(IEnumerable<Claim> claims, TimeSpan expiration)
     {
