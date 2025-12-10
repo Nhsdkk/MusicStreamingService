@@ -4,8 +4,10 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
+using MusicStreamingService.Features.Region;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
 using MusicStreamingService.Infrastructure.Result;
@@ -83,7 +85,7 @@ public sealed class Update : ControllerBase
         }
     }
 
-    public sealed record Command : IRequest<Result<CommandResponse, Exception>>
+    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse, Exception>>
     {
         public Guid Id { get; init; }
 
@@ -92,15 +94,6 @@ public sealed class Update : ControllerBase
 
     public sealed record CommandResponse
     {
-        public sealed record RegionDto
-        {
-            [JsonPropertyName("id")]
-            public Guid Id { get; set; }
-
-            [JsonPropertyName("title")]
-            public string Title { get; set; } = null!;
-        }
-
         [JsonPropertyName("id")]
         public Guid Id { get; set; }
 
@@ -117,7 +110,7 @@ public sealed class Update : ControllerBase
         public string Username { get; set; } = null!;
 
         [JsonPropertyName("region")]
-        public RegionDto Region { get; set; } = null!;
+        public ShortRegionDto Region { get; set; } = null!;
 
         [JsonPropertyName("permissions")]
         public List<string> Permissions { get; set; } = null!;
@@ -235,7 +228,7 @@ public sealed class Update : ControllerBase
                 FullName = user.FullName,
                 BirthDate = user.BirthDate,
                 Username = user.Username,
-                Region = new CommandResponse.RegionDto
+                Region = new ShortRegionDto
                 {
                     Id = user.Region.Id,
                     Title = user.Region.Title

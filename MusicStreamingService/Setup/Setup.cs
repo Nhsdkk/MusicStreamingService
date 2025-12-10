@@ -44,6 +44,7 @@ public static class Setup
             .AddMediator(
                 options: options =>
                     options.ServiceLifetime = ServiceLifetime.Scoped)
+            .ConfigureMediatorPipelines()
             .ConfigurePasswordService(configuration)
             .ConfigureObjectStorageServices(configuration)
             .ConfigureAuth(builder.Environment, configuration);
