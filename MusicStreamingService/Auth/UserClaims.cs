@@ -85,7 +85,7 @@ public sealed class UserClaims : IClaimConvertable
         }
         catch (JsonException)
         {
-            return new JwtValidationException("Can't get username claim");
+            return new JwtValidationException("Can't parse region claim");
         }
     }
 }
