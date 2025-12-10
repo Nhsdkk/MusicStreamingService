@@ -41,7 +41,7 @@ public sealed class RefreshToken : ControllerBase
     public sealed record Command : IRequest<Result<CommandResponse, Exception>>
     {
         [JsonPropertyName("refreshToken")]
-        public string RefreshToken { get; set; } = null!;
+        public string RefreshToken { get; init; } = null!;
 
         public sealed class Validator : AbstractValidator<Command>
         {
