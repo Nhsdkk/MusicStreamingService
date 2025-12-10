@@ -11,7 +11,7 @@ namespace MusicStreamingService.Infrastructure.Authentication;
 /// Jwt service for jwt generation and validation 
 /// </summary>
 /// <typeparam name="T">Type of claim, that will be stored in jwt</typeparam>
-public interface IJwtService<T> where T : IClaimConvertable, new()
+public interface IJwtService<T>
 {
     /// <summary>
     /// Get jwt token pair (access and refresh tokens) using claims
@@ -26,7 +26,8 @@ public interface IJwtService<T> where T : IClaimConvertable, new()
     /// <param name="refreshToken">Refresh token</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Either refreshed access token, or <see cref="JwtValidationException"/>, that occured while validating refresh token</returns>
-    public Task<Result<string, JwtValidationException>> RefreshAccessToken(string refreshToken, CancellationToken cancellationToken = default);
+    public Task<Result<string, JwtValidationException>> RefreshAccessToken(string refreshToken,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Validate token and get claims from it
@@ -34,31 +35,42 @@ public interface IJwtService<T> where T : IClaimConvertable, new()
     /// <param name="token">Token to be validated</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Either a collection of claims or <see cref="JwtValidationException"/>, that occured while validating token</returns>
-    public Task<Result<T, JwtValidationException>> ValidateToken(string token, CancellationToken cancellationToken = default);
+    public Task<Result<T, JwtValidationException>> ValidateToken(string token,
+        CancellationToken cancellationToken = default);
 }
 
 /// <inheritdoc/>
-public class JwtService<T> : IJwtService<T> where T : IClaimConvertable, new()
+public class JwtService<T> : IJwtService<T>
 {
     private readonly JwtConfiguration _configuration;
-    private readonly IClaimValidator _validator;
+    private readonly IClaimValidator<T> _validator;
+    private readonly IClaimConverter<T> _converter;
 
-    public JwtService(IOptions<JwtConfiguration> options, IClaimValidator claimsValidator)
+    public JwtService(
+        IOptions<JwtConfiguration> options,
+        IClaimValidator<T> claimsValidator,
+        IClaimConverter<T> converter)
     {
         _configuration = options.Value;
         _validator = claimsValidator;
+        _converter = converter;
     }
-    
-    public JwtService(JwtConfiguration config, IClaimValidator validator)
+
+    public JwtService(
+        JwtConfiguration config,
+        IClaimValidator<T> validator,
+        IClaimConverter<T> converter)
     {
         _configuration = config;
         _validator = validator;
+        _converter = converter;
     }
 
     public (string accessToken, string refreshToken) GetPair(T data)
     {
-        var accessToken = GetToken(GetClaims(data), _configuration.AccessTokenExpiration);
-        var refreshToken = GetToken(GetClaims(data), _configuration.RefreshTokenExpiration);
+        var claims = _converter.ToClaims(data).ToList();
+        var accessToken = GetToken(claims, _configuration.AccessTokenExpiration);
+        var refreshToken = GetToken(claims, _configuration.RefreshTokenExpiration);
 
         return (accessToken, refreshToken);
     }
@@ -71,7 +83,7 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable, new()
 
         Result<string, JwtValidationException> result = null!;
         claims.Switch(
-            c => result = GetToken(GetClaims(c), _configuration.AccessTokenExpiration),
+            c => result = GetToken(_converter.ToClaims(c), _configuration.AccessTokenExpiration),
             ex => result = ex
         );
 
@@ -92,21 +104,20 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable, new()
                 out _
             );
 
-            var claimsResult = new T().FromClaims(principal.Claims.ToList());
-            if (claimsResult.IsT1)
+            var claims = principal.Claims.ToList();
+            var convertedClaimsResult = _converter.FromClaims(claims);
+            if (convertedClaimsResult.IsT1)
             {
-                return new JwtValidationException("Failed to parse claims from token");
+                return new JwtValidationException("Token claims conversion failed");
             }
 
-            var claims = claimsResult.AsT0!;
-            
-            var validatorResult = await _validator.Validate(claims, cancellationToken);
-            if (!validatorResult)
+            var validatorResult = await _validator.Validate(convertedClaimsResult.AsT0, cancellationToken);
+            if (validatorResult is not null)
             {
                 return new JwtValidationException("Token claims validation failed");
             }
 
-            return (T)claims;
+            return convertedClaimsResult.AsT0;
         }
         catch (SecurityTokenArgumentException ex)
         {
@@ -116,20 +127,6 @@ public class JwtService<T> : IJwtService<T> where T : IClaimConvertable, new()
         {
             return new JwtValidationException("Token decryption failed", ex);
         }
-    }
-
-    private IEnumerable<Claim> GetClaims(T data)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Name, data.GetUsername()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sid, data.GetId().ToString()),
-            new Claim(CustomClaimTypes.RegionsClaimType, System.Text.Json.JsonSerializer.Serialize(data.GetRegion()))
-        };
-
-        claims.AddRange(data.GetPermissions().Select(x => new Claim(ClaimTypes.Role, x)));
-        return claims;
     }
 
     private string GetToken(IEnumerable<Claim> claims, TimeSpan expiration)

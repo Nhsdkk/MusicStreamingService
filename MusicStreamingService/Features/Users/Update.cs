@@ -4,7 +4,6 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MusicStreamingService.Auth;
 using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
@@ -19,12 +18,12 @@ namespace MusicStreamingService.Features.Users;
 public sealed class Update : ControllerBase
 {
     private readonly IMediator _mediator;
-    
+
     public Update(IMediator mediator)
     {
         _mediator = mediator;
     }
-    
+
     /// <summary>
     /// Update user data
     /// </summary>
@@ -40,7 +39,7 @@ public sealed class Update : ControllerBase
         CommandBody request,
         CancellationToken cancellationToken)
     {
-        var result = await _mediator.Send( 
+        var result = await _mediator.Send(
             new Command
             {
                 Id = User.GetUserId(),
@@ -101,7 +100,7 @@ public sealed class Update : ControllerBase
             [JsonPropertyName("title")]
             public string Title { get; set; } = null!;
         }
-        
+
         [JsonPropertyName("id")]
         public Guid Id { get; set; }
 
@@ -170,37 +169,39 @@ public sealed class Update : ControllerBase
             if (newData.Username is not null)
             {
                 var usernameExists =
-                    await _context.Users.AnyAsync(x => x.Username == newData.Username && x.Id != request.Id, cancellationToken);
+                    await _context.Users.AnyAsync(x => x.Username == newData.Username && x.Id != request.Id,
+                        cancellationToken);
 
                 if (usernameExists)
                 {
                     return new Exception("Username is already taken");
                 }
-                
+
                 user.Username = newData.Username;
             }
-            
+
             if (newData.Email is not null)
             {
                 var emailExists =
-                    await _context.Users.AnyAsync(x => x.Email == newData.Email && x.Id != request.Id, cancellationToken);
+                    await _context.Users.AnyAsync(x => x.Email == newData.Email && x.Id != request.Id,
+                        cancellationToken);
 
                 if (emailExists)
                 {
                     return new Exception("User with the same email already exists");
                 }
-                
+
                 user.Email = newData.Email;
             }
-            
+
             user.BirthDate = newData.BirthDate?.ToUniversalTime() ?? user.BirthDate;
             user.FullName = newData.FullName ?? user.FullName;
-            
+
             if (newData.Password is not null)
             {
                 user.Password = _passwordService.Encode(newData.Password);
             }
-            
+
             if (newData.RegionId is not null)
             {
                 var region = await _context.Regions.FindAsync([newData.RegionId], cancellationToken: cancellationToken);
@@ -211,10 +212,20 @@ public sealed class Update : ControllerBase
 
                 user.RegionId = newData.RegionId.Value;
             }
-            
+
             await _context.SaveChangesAsync(cancellationToken);
 
-            var claims = new UserClaims(user);
+            var claims = new UserClaims
+            {
+                Permissions = user.GetPermissions().Select(x => x.Title).ToList(),
+                Username = user.Username,
+                Id = user.Id,
+                Region = new RegionClaim
+                {
+                    Id = user.Region.Id,
+                    Title = user.Region.Title
+                }
+            };
             var (accessToken, refreshToken) = _jwtService.GetPair(claims);
 
             return new CommandResponse

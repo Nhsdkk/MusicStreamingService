@@ -37,7 +37,7 @@ public static class Setup
         services.AddValidatorsFromAssembly(Assembly.GetCallingAssembly());
         services.AddFluentValidationAutoValidation();
 
-        services.AddScoped<IClaimValidator, ClaimValidator>();
+        services.AddScoped<IClaimValidator<UserClaims>, ClaimValidator>();
         
         services
             .ConfigureMusicStreamingDbContext(configuration)
@@ -46,7 +46,7 @@ public static class Setup
                     options.ServiceLifetime = ServiceLifetime.Scoped)
             .ConfigurePasswordService(configuration)
             .ConfigureObjectStorageServices(configuration)
-            .ConfigureAuth<UserClaims>(builder.Environment, configuration);
+            .ConfigureAuth(builder.Environment, configuration);
 
         var app = builder.Build();
 

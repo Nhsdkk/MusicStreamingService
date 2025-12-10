@@ -1,13 +1,14 @@
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MusicStreamingService.Auth;
 using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
 
@@ -21,11 +22,19 @@ public sealed class RefreshToken : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Refresh access token using refresh token
+    /// </summary>
+    /// <param name="command">Refresh token</param>
+    /// <returns></returns>
     [HttpPost("/api/v1/users/refresh-token")]
+    [Tags(RouteGroups.Users)]
+    [ProducesResponseType(typeof(CommandResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Refresh(
         [FromBody] Command command)
     {
-        var result =  await _mediator.Send(command);
+        var result = await _mediator.Send(command);
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
@@ -33,8 +42,16 @@ public sealed class RefreshToken : ControllerBase
     {
         [JsonPropertyName("refreshToken")]
         public string RefreshToken { get; set; } = null!;
+
+        public sealed class Validator : AbstractValidator<Command>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.RefreshToken).NotEmpty();
+            }
+        }
     }
-    
+
     public sealed record CommandResponse
     {
         [JsonPropertyName("accessToken")]

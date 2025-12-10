@@ -4,18 +4,22 @@ using MusicStreamingService.Infrastructure.Authentication;
 
 namespace MusicStreamingService.Auth;
 
-public sealed class ClaimValidator : IClaimValidator
+public sealed class ClaimValidator : IClaimValidator<UserClaims>
 {
     private readonly MusicStreamingContext _context;
-    
-    public ClaimValidator(MusicStreamingContext context)
+    private readonly IClaimConverter<UserClaims> _claimConverter;
+
+    public ClaimValidator(
+        MusicStreamingContext context, 
+        IClaimConverter<UserClaims> claimConverter)
     {
         _context = context;
+        _claimConverter = claimConverter;
     }
-    
-    public async Task<bool> Validate(IClaimConvertable claims, CancellationToken cancellationToken)
+
+    public async Task<Exception?> Validate(UserClaims claims, CancellationToken cancellationToken)
     {
-        var userId = claims.GetId();
+        var userId = claims.Id;
         var user = await _context.Users
             .AsNoTracking()
             .Include(x => x.Region)
@@ -25,28 +29,28 @@ public sealed class ClaimValidator : IClaimValidator
 
         if (user is null || user.Disabled)
         {
-            return false;
+            return new Exception("Invalid claims");
         }
 
         var permissions = user.Roles
             .SelectMany(x => x.Permissions)
             .Select(x => x.Title)
-            .ToList();
-        
-        var claimPermissions = claims.GetPermissions().ToList();
-        var allRolesMatch = permissions.All(r => claimPermissions.Any(cr => cr == r));
-            
-        if (claimPermissions.Count != permissions.Count || !allRolesMatch)
+            .ToHashSet();
+
+        var claimPermissions = claims.Permissions.ToHashSet();
+        var allRolesMatch = claimPermissions.SetEquals(permissions);
+
+        if (!allRolesMatch)
         {
-            return false;
+            return new Exception("Invalid claims");
         }
 
-        var claimRegion = claims.GetRegion();
+        var claimRegion = claims.Region;
         if (user.Region.Id != claimRegion.Id || user.Region.Title != claimRegion.Title)
         {
-            return false;
+            return new Exception("Invalid claims");
         }
 
-        return true;
+        return null;
     }
 }

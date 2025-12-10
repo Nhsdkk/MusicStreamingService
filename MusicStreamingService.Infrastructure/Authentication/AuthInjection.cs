@@ -11,15 +11,18 @@ namespace MusicStreamingService.Infrastructure.Authentication;
 
 public static class AuthInjection
 {
-    public static IServiceCollection ConfigureAuth<T>(
+    public static IServiceCollection ConfigureAuth(
         this IServiceCollection services,
         IWebHostEnvironment environment,
-        IConfiguration configuration) where T : IClaimConvertable, new()
+        IConfiguration configuration)
     {
         var config = configuration.GetSection(nameof(JwtConfiguration)).Get<JwtConfiguration>();
 
         services.Configure<JwtConfiguration>(configuration.GetSection(nameof(JwtConfiguration)));
-        services.AddScoped<IJwtService<T>, JwtService<T>>();
+        services
+            .AddScoped<IJwtService<UserClaims>, JwtService<UserClaims>>()
+            .AddScoped<IClaimConverter<UserClaims>, ClaimConverter>();
+        
 
         if (environment.IsDevelopment() && !configuration.GetSection("AuthEnabled").Get<bool>())
         {
@@ -44,13 +47,20 @@ public static class AuthInjection
                     {
                         OnTokenValidated = async ctx =>
                         {
-                            var validator = ctx.HttpContext.RequestServices.GetRequiredService<IClaimValidator>();
+                            var validator = ctx.HttpContext.RequestServices
+                                .GetRequiredService<IClaimValidator<UserClaims>>();
+                            var converter = ctx.HttpContext.RequestServices
+                                .GetRequiredService<IClaimConverter<UserClaims>>();
 
-                            var claims = new T();
-                            claims.FromClaims(ctx.Principal!.Claims.ToList());
-
-                            var valid = await validator.Validate(claims, ctx.HttpContext.RequestAborted);
-                            if (!valid)
+                            var claimsResult = converter.FromClaims(ctx.Principal!.Claims.ToList());
+                            if (claimsResult.IsT1)
+                            {
+                                ctx.Fail("Unauthorized");
+                                return;
+                            }
+                            
+                            var validationError = await validator.Validate(claimsResult.AsT0, ctx.HttpContext.RequestAborted);
+                            if (validationError is not null)
                             {
                                 ctx.Fail("Unauthorized");
                             }
