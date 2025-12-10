@@ -11,16 +11,18 @@ namespace MusicStreamingService.Infrastructure.Authentication;
 
 public static class AuthInjection
 {
-    public static IServiceCollection ConfigureAuth<T>(
+    public static IServiceCollection ConfigureAuth(
         this IServiceCollection services,
         IWebHostEnvironment environment,
-        IConfiguration configuration) where T: IClaimConvertable
+        IConfiguration configuration)
     {
         var config = configuration.GetSection(nameof(JwtConfiguration)).Get<JwtConfiguration>();
-        var jwtService = new JwtService<T>(config!);
 
         services.Configure<JwtConfiguration>(configuration.GetSection(nameof(JwtConfiguration)));
-        services.AddScoped<IJwtService<T>, JwtService<T>>();
+        services
+            .AddScoped<IJwtService<UserClaims>, JwtService<UserClaims>>()
+            .AddScoped<IClaimConverter<UserClaims>, ClaimConverter>();
+        
 
         if (environment.IsDevelopment() && !configuration.GetSection("AuthEnabled").Get<bool>())
         {
@@ -33,20 +35,40 @@ public static class AuthInjection
         else
         {
             services
-                .AddAuthentication(options => 
+                .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
                 .AddJwtBearer(options =>
                 {
-                    options.TokenValidationParameters = jwtService.GetTokenValidationParameters();
+                    options.TokenValidationParameters = config!.GetTokenValidationParameters();
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = async ctx =>
+                        {
+                            var validator = ctx.HttpContext.RequestServices
+                                .GetRequiredService<IClaimValidator<UserClaims>>();
+                            var converter = ctx.HttpContext.RequestServices
+                                .GetRequiredService<IClaimConverter<UserClaims>>();
+
+                            var claimsResult = converter.FromClaims(ctx.Principal!.Claims.ToList());
+                            if (claimsResult.IsT1)
+                            {
+                                ctx.Fail("Unauthorized");
+                                return;
+                            }
+                            
+                            var validationError = await validator.Validate(claimsResult.AsT0, ctx.HttpContext.RequestAborted);
+                            if (validationError is not null)
+                            {
+                                ctx.Fail("Unauthorized");
+                            }
+                        },
+                    };
                 });
-            
-            services.AddOpenApi(options =>
-            {
-                options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
-            });
+
+            services.AddOpenApi(options => { options.AddDocumentTransformer<BearerSecuritySchemeTransformer>(); });
         }
 
         services.AddAuthentication();
@@ -56,9 +78,11 @@ public static class AuthInjection
     }
 }
 
-public sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authenticationSchemeProvider) : IOpenApiDocumentTransformer
+public sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvider authenticationSchemeProvider)
+    : IOpenApiDocumentTransformer
 {
-    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
+    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context,
+        CancellationToken cancellationToken)
     {
         var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
         if (authenticationSchemes.Any(authScheme => authScheme.Name == JwtBearerDefaults.AuthenticationScheme))
@@ -68,7 +92,7 @@ public sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvide
                 [JwtBearerDefaults.AuthenticationScheme] = new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.Http,
-                    Scheme = JwtBearerDefaults.AuthenticationScheme, 
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
                     In = ParameterLocation.Header,
                     BearerFormat = "JWT"
                 }
@@ -80,7 +104,8 @@ public sealed class BearerSecuritySchemeTransformer(IAuthenticationSchemeProvide
             {
                 operation.Value.Security.Add(new OpenApiSecurityRequirement
                 {
-                    [new OpenApiSecurityScheme { Reference = new OpenApiReference { Id = JwtBearerDefaults.AuthenticationScheme, Type = ReferenceType.SecurityScheme } }] = Array.Empty<string>()
+                    [new OpenApiSecurityScheme { Reference = new OpenApiReference { Id = JwtBearerDefaults.AuthenticationScheme, Type = ReferenceType.SecurityScheme } }] =
+                        Array.Empty<string>()
                 });
             }
         }

@@ -218,7 +218,18 @@ public sealed class Register : ControllerBase
             await _context.Users.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var (accessToken, refreshToken) = _jwtService.GetPair(new UserClaims(user));
+            var claims = new UserClaims
+            {
+                Permissions = user.GetPermissions().Select(x => x.Title).ToList(),
+                Username = user.Username,
+                Id = user.Id,
+                Region = new RegionClaim
+                {
+                    Id = user.Region.Id,
+                    Title = user.Region.Title
+                }
+            };
+            var (accessToken, refreshToken) = _jwtService.GetPair(claims);
             return new ResponseDto
             {
                 Id = user.Id,

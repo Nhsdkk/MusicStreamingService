@@ -177,7 +177,17 @@ public sealed class Login : ControllerBase
                 await _context.SaveChangesAsync(cancellationToken);
             }
 
-            var userClaims = new UserClaims(user);
+            var userClaims = new UserClaims
+            {
+                Permissions = user.GetPermissions().Select(x => x.Title).ToList(),
+                Username = user.Username,
+                Id = user.Id,
+                Region = new RegionClaim
+                {
+                    Id = user.Region.Id,
+                    Title = user.Region.Title
+                }
+            };
             var (accessToken, refreshToken) = _jwtService.GetPair(userClaims);
 
             return new CommandResponse
