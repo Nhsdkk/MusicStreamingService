@@ -8,6 +8,7 @@ using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
+using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Result;
@@ -46,6 +47,7 @@ public class Search : ControllerBase
             {
                 Body = query,
                 Region = User.GetUserRegion(),
+                Age = User.GetUserAge()
             },
             cancellationToken);
 
@@ -84,6 +86,8 @@ public class Search : ControllerBase
         public QueryBody Body { get; init; } = null!;
 
         public RegionClaim Region { get; init; } = null!;
+
+        public int Age { get; init; }
     }
 
     public sealed record QueryResponse : BasePaginatedResponse
@@ -108,6 +112,11 @@ public class Search : ControllerBase
             Query request,
             CancellationToken cancellationToken)
         {
+            if (request.Body.AllowExplicit == true && request.Age < UserConstants.AdultLegalAge)
+            {
+                return new Exception("User is not allowed to view explicit songs");
+            }
+
             var requestBody = request.Body;
             var userRegion = request.Region;
 

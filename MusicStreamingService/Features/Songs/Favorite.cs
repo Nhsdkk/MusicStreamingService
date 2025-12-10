@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
+using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
@@ -41,7 +42,8 @@ public sealed class Favorite : ControllerBase
         var result = await _mediator.Send(new Command
         {
             Body = request,
-            UserId = User.GetUserId()
+            UserId = User.GetUserId(),
+            Age = User.GetUserAge(),
         }, cancellationToken);
 
         return result.Match<IActionResult>(_ => Ok(), BadRequest);
@@ -66,6 +68,8 @@ public sealed class Favorite : ControllerBase
         public CommandBody Body { get; init; } = null!;
 
         public Guid UserId { get; init; }
+        
+        public int Age { get; init; }
     }
 
     public sealed class Handler : IRequestHandler<Command, Result<Unit, Exception>>
@@ -90,6 +94,11 @@ public sealed class Favorite : ControllerBase
             if (song == null)
             {
                 return new Exception("Song not found");
+            }
+
+            if (song.Explicit && request.Age < UserConstants.AdultLegalAge)
+            {
+                return new Exception("User is not allowed to favorite explicit songs");
             }
 
             var alreadyFavorite = await _context.SongFavorites

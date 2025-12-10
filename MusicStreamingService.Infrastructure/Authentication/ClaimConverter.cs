@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
+using MusicStreamingService.Infrastructure.DateUtils;
 using MusicStreamingService.Infrastructure.Result;
 
 namespace MusicStreamingService.Infrastructure.Authentication;
@@ -55,6 +56,14 @@ public sealed class ClaimConverter : IClaimConverter<UserClaims>
             return new JwtValidationException("Can't get region claim");
         }
 
+        var birthDateClaim = claims.FirstOrDefault(x => x.Type is CustomClaimTypes.BirthDateClaimType);
+        if (birthDateClaim is null)
+        {
+            return new JwtValidationException("Can't get birth date claim");
+        }
+        
+        var birthDate = DateTime.ParseExact(birthDateClaim.Value, DateFormats.FullDateFormat, null);
+
         try
         {
             var region = JsonSerializer.Deserialize<RegionClaim>(regionClaim.Value);
@@ -68,7 +77,8 @@ public sealed class ClaimConverter : IClaimConverter<UserClaims>
                 Permissions = permissions,
                 Id = id,
                 Region = region,
-                Username = username
+                Username = username,
+                BirthDate = birthDate
             };
         }
         catch (JsonException)
@@ -84,7 +94,8 @@ public sealed class ClaimConverter : IClaimConverter<UserClaims>
             new Claim(JwtRegisteredClaimNames.Name, data.Username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Sid, data.Id.ToString()),
-            new Claim(CustomClaimTypes.RegionsClaimType, System.Text.Json.JsonSerializer.Serialize(data.Region))
+            new Claim(CustomClaimTypes.RegionsClaimType, JsonSerializer.Serialize(data.Region)),
+            new Claim(CustomClaimTypes.BirthDateClaimType, data.BirthDate.ToString(DateFormats.FullDateFormat))
         };
 
         claims.AddRange(data.Permissions.Select(x => new Claim(ClaimTypes.Role, x)));
