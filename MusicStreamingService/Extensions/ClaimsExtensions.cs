@@ -20,7 +20,12 @@ public static class ClaimsExtensions
             claimsPrincipal.FindFirstValue(CustomClaimTypes.BirthDateClaimType)!,
             DateFormats.FullDateFormat,
             null).ToUniversalTime();
-        
-        return new DateTime((DateTime.UtcNow - birthDate).Ticks).Year - 1;
+
+        var age = DateTime.UtcNow.Year - birthDate.Year;
+        if (birthDate.AddYears(age) > DateTime.UtcNow)
+        {
+            age--;
+        }
+        return age;
     }
 }
