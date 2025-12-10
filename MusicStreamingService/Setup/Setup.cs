@@ -1,11 +1,10 @@
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MusicStreamingService.Auth;
+using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
-using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Password;
