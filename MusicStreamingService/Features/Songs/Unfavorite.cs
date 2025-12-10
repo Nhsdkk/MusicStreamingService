@@ -84,14 +84,6 @@ public sealed class Unfavorite : ControllerBase
             var songId = request.Body.SongId;
             var userId = request.UserId;
 
-            var song = await _context.Songs
-                .SingleOrDefaultAsync(s => s.Id == songId, cancellationToken);
-
-            if (song == null)
-            {
-                return new Exception("Song not found");
-            }
-
             var songFavorite = await _context.SongFavorites
                 .SingleOrDefaultAsync(
                     fs => fs.SongId == songId && fs.UserId == userId,
