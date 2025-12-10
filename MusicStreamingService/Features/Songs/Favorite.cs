@@ -98,7 +98,7 @@ public sealed class Favorite : ControllerBase
 
             if (song.Explicit && request.Age < UserConstants.AdultLegalAge)
             {
-                return new Exception("User is not allowed to favorite explicit songs");
+                return new Exception($"Users under {UserConstants.AdultLegalAge} years old are not allowed to favorite explicit songs");
             }
 
             var alreadyFavorite = await _context.SongFavorites
