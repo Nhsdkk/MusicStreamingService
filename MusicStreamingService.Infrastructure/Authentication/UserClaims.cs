@@ -9,4 +9,6 @@ public sealed class UserClaims
     public Guid Id { get; init; }
 
     public RegionClaim Region { get; init; } = null!;
+    
+    public DateTime BirthDate { get; init; }
 }

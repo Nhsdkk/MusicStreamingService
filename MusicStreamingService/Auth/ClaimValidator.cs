@@ -7,14 +7,11 @@ namespace MusicStreamingService.Auth;
 public sealed class ClaimValidator : IClaimValidator<UserClaims>
 {
     private readonly MusicStreamingContext _context;
-    private readonly IClaimConverter<UserClaims> _claimConverter;
 
     public ClaimValidator(
-        MusicStreamingContext context, 
-        IClaimConverter<UserClaims> claimConverter)
+        MusicStreamingContext context)
     {
         _context = context;
-        _claimConverter = claimConverter;
     }
 
     public async Task<Exception?> Validate(UserClaims claims, CancellationToken cancellationToken)
