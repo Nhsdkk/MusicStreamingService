@@ -14,7 +14,7 @@ using MusicStreamingService.Openapi;
 namespace MusicStreamingService.Features.Songs;
 
 [ApiController]
-public class Unfavorite : ControllerBase
+public sealed class Unfavorite : ControllerBase
 {
     private readonly IMediator _mediator;
 
