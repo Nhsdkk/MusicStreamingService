@@ -253,7 +253,6 @@ public sealed class Update : ControllerBase
                 return songUrlResult.AsT1;
             }
 
-            await _context.SaveChangesAsync(cancellationToken);
 
             
             return CommandResponse.FromEntity(
