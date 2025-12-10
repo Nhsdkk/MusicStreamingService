@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MusicStreamingService.Auth;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
@@ -36,6 +37,8 @@ public static class Setup
         services.AddValidatorsFromAssembly(Assembly.GetCallingAssembly());
         services.AddFluentValidationAutoValidation();
 
+        services.AddScoped<IClaimValidator, ClaimValidator>();
+        
         services
             .ConfigureMusicStreamingDbContext(configuration)
             .AddMediator(

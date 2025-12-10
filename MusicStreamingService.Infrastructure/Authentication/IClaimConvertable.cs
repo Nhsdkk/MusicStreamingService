@@ -1,3 +1,6 @@
+using System.Security.Claims;
+using MusicStreamingService.Infrastructure.Result;
+
 namespace MusicStreamingService.Infrastructure.Authentication;
 
 public interface IClaimConvertable
@@ -25,4 +28,10 @@ public interface IClaimConvertable
     /// </summary>
     /// <returns>User's region, that will be stored in jwt</returns>
     public RegionClaim GetRegion();
+
+    /// <summary>
+    /// Construct object from claims
+    /// </summary>
+    /// <param name="claims">List of claims</param>
+    public Result<IClaimConvertable, Exception> FromClaims(List<Claim> claims);
 }

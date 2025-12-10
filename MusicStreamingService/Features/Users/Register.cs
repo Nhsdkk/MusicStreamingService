@@ -3,6 +3,7 @@ using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Auth;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;

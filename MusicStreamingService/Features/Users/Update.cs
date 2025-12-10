@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Auth;
 using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
