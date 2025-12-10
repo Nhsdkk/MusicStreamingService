@@ -114,7 +114,7 @@ public class Search : ControllerBase
         {
             if (request.Body.AllowExplicit == true && request.Age < UserConstants.AdultLegalAge)
             {
-                return new Exception("User is not allowed to view explicit songs");
+                return new Exception($"Users under {UserConstants.AdultLegalAge} years old are not allowed to search for explicit songs");
             }
 
             var requestBody = request.Body;
