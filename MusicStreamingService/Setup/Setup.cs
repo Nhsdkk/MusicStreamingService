@@ -1,11 +1,10 @@
 using System.Reflection;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MusicStreamingService.Auth;
 using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
-using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Password;
@@ -37,6 +36,8 @@ public static class Setup
         services.AddValidatorsFromAssembly(Assembly.GetCallingAssembly());
         services.AddFluentValidationAutoValidation();
 
+        services.AddScoped<IClaimValidator<UserClaims>, ClaimValidator>();
+        
         services
             .ConfigureMusicStreamingDbContext(configuration)
             .AddMediator(
@@ -45,7 +46,7 @@ public static class Setup
             .ConfigureMediatorPipelines()
             .ConfigurePasswordService(configuration)
             .ConfigureObjectStorageServices(configuration)
-            .ConfigureAuth<UserClaims>(builder.Environment, configuration);
+            .ConfigureAuth(builder.Environment, configuration);
 
         var app = builder.Build();
 

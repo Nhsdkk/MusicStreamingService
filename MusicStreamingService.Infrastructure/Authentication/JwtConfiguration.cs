@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+
 namespace MusicStreamingService.Infrastructure.Authentication;
 
 public sealed record JwtConfiguration
@@ -26,4 +29,14 @@ public sealed record JwtConfiguration
     /// Expiration time of the refresh token
     /// </summary>
     public TimeSpan RefreshTokenExpiration { get; init; }
+    
+    public TokenValidationParameters GetTokenValidationParameters() => new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = Issuer,
+        ValidateAudience = true,
+        ValidAudience = Audience,
+        ValidateLifetime = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
+    };
 }
