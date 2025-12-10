@@ -26,15 +26,17 @@ public sealed class RefreshToken : ControllerBase
     /// Refresh access token using refresh token
     /// </summary>
     /// <param name="command">Refresh token</param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("/api/v1/users/refresh-token")]
     [Tags(RouteGroups.Users)]
     [ProducesResponseType(typeof(CommandResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Refresh(
-        [FromBody] Command command)
+        [FromBody] Command command,
+        CancellationToken cancellationToken = default)
     {
-        var result = await _mediator.Send(command);
+        var result = await _mediator.Send(command, cancellationToken);
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
