@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
@@ -48,7 +49,7 @@ public sealed class Update : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Command : IRequest<Result<CommandResponse, Exception>>
+    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse, Exception>>
     {
         public sealed record CommandBody
         {
@@ -252,7 +253,7 @@ public sealed class Update : ControllerBase
                 return songUrlResult.AsT1;
             }
 
-            await _context.SaveChangesAsync(cancellationToken);
+
             
             return CommandResponse.FromEntity(
                 song,

@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Infrastructure.Authentication;
@@ -41,6 +42,7 @@ public static class Setup
             .AddMediator(
                 options: options =>
                     options.ServiceLifetime = ServiceLifetime.Scoped)
+            .ConfigureMediatorPipelines()
             .ConfigurePasswordService(configuration)
             .ConfigureObjectStorageServices(configuration)
             .ConfigureAuth<UserClaims>(builder.Environment, configuration);
