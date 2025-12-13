@@ -47,7 +47,7 @@ public sealed class Unfavorite : ControllerBase
         return result.Match<IActionResult>(_ => Ok(), BadRequest);
     }
 
-    public sealed record Command : IRequest<Result<Unit, Exception>>
+    public sealed record Command : IRequest<Result<Unit>>
     {
         public sealed record CommandBody
         {
@@ -68,7 +68,7 @@ public sealed class Unfavorite : ControllerBase
         public Guid UserId { get; init; }
     }
 
-    public sealed class Handler : IRequestHandler<Command, Result<Unit, Exception>>
+    public sealed class Handler : IRequestHandler<Command, Result<Unit>>
     {
         private readonly MusicStreamingContext _context;
 
@@ -77,7 +77,7 @@ public sealed class Unfavorite : ControllerBase
             _context = context;
         }
 
-        public async ValueTask<Result<Unit, Exception>> Handle(
+        public async ValueTask<Result<Unit>> Handle(
             Command request,
             CancellationToken cancellationToken)
         {

@@ -1,14 +1,20 @@
 using Mediator;
 using MusicStreamingService.Data;
+using MusicStreamingService.Infrastructure.Result;
+using IResult = MusicStreamingService.Infrastructure.Result.IResult;
 
 namespace MusicStreamingService.Commands;
 
-public interface ITransactionWrappedCommand<out T> : IRequest<T>
+public interface ITransactionWrappedCommand<TD> : IRequest<TD>
+    where TD : IResult
 {
 }
 
-public sealed class TransactionalPipelineBehavior<T1, T2> : IPipelineBehavior<T1, T2>
-    where T1 : ITransactionWrappedCommand<T2>
+public sealed class TransactionalPipelineBehavior<TCommand, TResponseData>
+    : IPipelineBehavior<TCommand, TResponseData>
+    where TCommand : ITransactionWrappedCommand<TResponseData>
+    where TResponseData : IResult
+
 {
     private readonly MusicStreamingContext _context;
 
@@ -18,9 +24,9 @@ public sealed class TransactionalPipelineBehavior<T1, T2> : IPipelineBehavior<T1
         _context = context;
     }
 
-    public async ValueTask<T2> Handle(
-        T1 message,
-        MessageHandlerDelegate<T1, T2> next,
+    public async ValueTask<TResponseData> Handle(
+        TCommand message,
+        MessageHandlerDelegate<TCommand, TResponseData> next,
         CancellationToken cancellationToken)
     {
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
@@ -28,6 +34,12 @@ public sealed class TransactionalPipelineBehavior<T1, T2> : IPipelineBehavior<T1
         try
         {
             var response = await next(message, cancellationToken);
+
+            if (response.IsError)
+            {
+                return response;
+            }
+            
             await _context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return response;

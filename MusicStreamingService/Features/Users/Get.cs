@@ -48,7 +48,7 @@ public sealed class Get : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    internal sealed record Query : IRequest<Result<Response, Exception>>
+    internal sealed record Query : IRequest<Result<Response>>
     {
         public Guid Id { get; init; }
     }
@@ -86,7 +86,7 @@ public sealed class Get : ControllerBase
         public List<string> Permissions { get; set; } = null!;
     }
 
-    internal sealed class Handler : IRequestHandler<Query, Result<Response, Exception>>
+    internal sealed class Handler : IRequestHandler<Query, Result<Response>>
     {
         private readonly MusicStreamingContext _context;
 
@@ -95,7 +95,7 @@ public sealed class Get : ControllerBase
             _context = context;
         }
 
-        public async ValueTask<Result<Response, Exception>> Handle(Query request, CancellationToken cancellationToken)
+        public async ValueTask<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
         {
             var user = await _context.Users
                 .Include(x => x.Region)

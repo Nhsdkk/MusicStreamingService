@@ -1,3 +1,4 @@
+using System.Net.Mime;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
@@ -7,7 +8,7 @@ namespace MusicStreamingService.Infrastructure.ObjectStorage;
 
 public static class MinioClientExtensions
 {
-    public static async Task<Result<string, Exception>> GetPresignedUrl(
+    public static async Task<Result<string>> GetPresignedUrl(
         this IMinioClient minioClient,
         string bucketName,
         string objectName,
@@ -40,8 +41,8 @@ public static class MinioClientExtensions
             return e;
         }
     }
-    
-    public static async Task<bool> DoesObjectExist(
+
+    private static async Task<bool> DoesObjectExist(
         this IMinioClient minioClient,
         string bucketName,
         string objectName)
@@ -64,5 +65,22 @@ public static class MinioClientExtensions
 
             throw;
         }
+    }
+    
+    public static async Task UploadObject(
+        this IMinioClient minioClient,
+        string bucketName,
+        string objectName,
+        Stream data,
+        string contentType)
+    {
+        var args = new PutObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(objectName)
+            .WithStreamData(data)
+            .WithObjectSize(data.Length)
+            .WithContentType(contentType);
+        
+        await minioClient.PutObjectAsync(args);
     }
 }

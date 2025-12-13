@@ -54,7 +54,7 @@ public class Search : ControllerBase
         return results.Match(Ok, x => throw x);
     }
 
-    public sealed record Query : IRequest<Result<QueryResponse, Exception>>
+    public sealed record Query : IRequest<Result<QueryResponse>>
     {
         public sealed record QueryBody : BasePaginatedRequest
         {
@@ -96,7 +96,7 @@ public class Search : ControllerBase
         public List<ShortSongDto> Songs { get; init; } = null!;
     }
 
-    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
+    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IAlbumStorageService _albumStorageService;
@@ -108,7 +108,7 @@ public class Search : ControllerBase
             _albumStorageService = albumStorageService;
         }
 
-        public async ValueTask<Result<QueryResponse, Exception>> Handle(
+        public async ValueTask<Result<QueryResponse>> Handle(
             Query request,
             CancellationToken cancellationToken)
         {

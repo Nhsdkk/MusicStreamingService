@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Auth;
 using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
@@ -85,7 +86,7 @@ public sealed class Update : ControllerBase
         }
     }
 
-    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse, Exception>>
+    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse>>
     {
         public Guid Id { get; init; }
 
@@ -122,7 +123,7 @@ public sealed class Update : ControllerBase
         public string RefreshToken { get; set; } = null!;
     }
 
-    internal sealed class Handler : IRequestHandler<Command, Result<CommandResponse, Exception>>
+    internal sealed class Handler : IRequestHandler<Command, Result<CommandResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IPasswordService _passwordService;
@@ -138,7 +139,7 @@ public sealed class Update : ControllerBase
             _jwtService = jwtService;
         }
 
-        public async ValueTask<Result<CommandResponse, Exception>> Handle(
+        public async ValueTask<Result<CommandResponse>> Handle(
             Command request,
             CancellationToken cancellationToken)
         {
@@ -208,17 +209,7 @@ public sealed class Update : ControllerBase
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var claims = new UserClaims
-            {
-                Permissions = user.GetPermissions().Select(x => x.Title).ToList(),
-                Username = user.Username,
-                Id = user.Id,
-                Region = new RegionClaim
-                {
-                    Id = user.Region.Id,
-                    Title = user.Region.Title
-                }
-            };
+            var claims = UserClaimsCreator.FromEntity(user);
             var (accessToken, refreshToken) = _jwtService.GetPair(claims);
 
             return new CommandResponse

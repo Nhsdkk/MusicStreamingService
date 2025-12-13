@@ -43,12 +43,12 @@ public sealed class Disable : ControllerBase
         return result.Match<IActionResult>(_ => Ok(), BadRequest);
     }
 
-    public sealed record Command : IRequest<Result<Unit, Exception>>
+    public sealed record Command : IRequest<Result<Unit>>
     {
         public Guid UserId { get; init; }
     }
 
-    internal sealed class Handler : IRequestHandler<Command, Result<Unit, Exception>>
+    internal sealed class Handler : IRequestHandler<Command, Result<Unit>>
     {
         private readonly MusicStreamingContext _context;
 
@@ -58,7 +58,7 @@ public sealed class Disable : ControllerBase
             _context = context;
         }
 
-        public async ValueTask<Result<Unit, Exception>> Handle(
+        public async ValueTask<Result<Unit>> Handle(
             Command request,
             CancellationToken cancellationToken)
         {

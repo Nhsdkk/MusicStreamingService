@@ -46,7 +46,7 @@ public sealed class GetContributed : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Query : BasePaginatedRequest, IRequest<Result<QueryResponse, Exception>>
+    public sealed record Query : BasePaginatedRequest, IRequest<Result<QueryResponse>>
     {
         [JsonPropertyName("userId")]
         public Guid UserId { get; init; }
@@ -68,7 +68,7 @@ public sealed class GetContributed : ControllerBase
         public List<ShortSongDto> Songs { get; init; } = null!;
     }
 
-    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
+    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IAlbumStorageService _albumStorageService;
@@ -81,7 +81,7 @@ public sealed class GetContributed : ControllerBase
             _albumStorageService = albumStorageService;
         }
 
-        public async ValueTask<Result<QueryResponse, Exception>> Handle(
+        public async ValueTask<Result<QueryResponse>> Handle(
             Query request,
             CancellationToken cancellationToken)
         {

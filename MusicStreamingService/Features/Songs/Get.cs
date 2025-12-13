@@ -47,7 +47,7 @@ public sealed class Get : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Query : IRequest<Result<QueryResponse, Exception>>
+    public sealed record Query : IRequest<Result<QueryResponse>>
     {
         public Guid SongId { get; init; }
 
@@ -116,7 +116,7 @@ public sealed class Get : ControllerBase
             };
     }
 
-    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
+    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly ISongStorageService _songStorageService;
@@ -132,7 +132,7 @@ public sealed class Get : ControllerBase
             _albumStorageService = albumStorageService;
         }
 
-        public async ValueTask<Result<QueryResponse, Exception>> Handle(Query request,
+        public async ValueTask<Result<QueryResponse>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var song = await _context.Songs

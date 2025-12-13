@@ -40,7 +40,7 @@ public sealed class RefreshToken : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Command : IRequest<Result<CommandResponse, Exception>>
+    public sealed record Command : IRequest<Result<CommandResponse>>
     {
         [JsonPropertyName("refreshToken")]
         public string RefreshToken { get; init; } = null!;
@@ -60,7 +60,7 @@ public sealed class RefreshToken : ControllerBase
         public string AccessToken { get; init; } = null!;
     }
 
-    public sealed class Handler : IRequestHandler<Command, Result<CommandResponse, Exception>>
+    public sealed class Handler : IRequestHandler<Command, Result<CommandResponse>>
     {
         private readonly IJwtService<UserClaims> _jwtService;
 
@@ -70,12 +70,12 @@ public sealed class RefreshToken : ControllerBase
             _jwtService = jwtService;
         }
 
-        public async ValueTask<Result<CommandResponse, Exception>> Handle(
+        public async ValueTask<Result<CommandResponse>> Handle(
             Command request,
             CancellationToken cancellationToken)
         {
             var result = await _jwtService.RefreshAccessToken(request.RefreshToken, cancellationToken);
-            return result.Match<Result<CommandResponse, Exception>>(
+            return result.Match<Result<CommandResponse>>(
                 accessToken => new CommandResponse
                 {
                     AccessToken = accessToken

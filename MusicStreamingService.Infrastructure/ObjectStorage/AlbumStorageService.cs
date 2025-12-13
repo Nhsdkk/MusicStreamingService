@@ -6,11 +6,16 @@ namespace MusicStreamingService.Infrastructure.ObjectStorage;
 
 public interface IAlbumStorageService
 {
-    public Task<Result<string, Exception>> GetPresignedUrl(
+    public Task<Result<string>> GetPresignedUrl(
         string albumArtworkFileName);
 
     public Task<Dictionary<string, string?>> GetPresignedUrls(
         IEnumerable<string> albumArtworkFileNames);
+    
+    public Task<Result<string>> UploadAlbumArtwork(
+        string albumArtworkFileName,
+        string contentType,
+        Stream albumArtworkData);
 }
 
 public sealed class AlbumStorageService : IAlbumStorageService
@@ -26,7 +31,7 @@ public sealed class AlbumStorageService : IAlbumStorageService
         _configuration = configuration.Value;
     }
 
-    public async Task<Result<string, Exception>> GetPresignedUrl(string albumArtworkFileName) =>
+    public async Task<Result<string>> GetPresignedUrl(string albumArtworkFileName) =>
         await _client.GetPresignedUrl(Buckets.AlbumCoverBucketName, albumArtworkFileName,
             _configuration.ExpireTimeInSeconds);
 
@@ -43,5 +48,14 @@ public sealed class AlbumStorageService : IAlbumStorageService
         }));
 
         return new Dictionary<string, string?>(results);
+    }
+
+    public async Task<Result<string>> UploadAlbumArtwork(
+        string albumArtworkFileName,
+        string contentType,
+        Stream albumArtworkData)
+    {
+        await _client.UploadObject(Buckets.AlbumCoverBucketName, albumArtworkFileName, albumArtworkData, contentType);
+        return await GetPresignedUrl(albumArtworkFileName);
     }
 }
