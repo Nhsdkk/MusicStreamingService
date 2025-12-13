@@ -252,7 +252,6 @@ public sealed class Update : ControllerBase
             {
                 return songUrlResult.Error();
             }
-            
             return CommandResponse.FromEntity(
                 song,
                 albumCoverUrl: songUrlResult.Success()
