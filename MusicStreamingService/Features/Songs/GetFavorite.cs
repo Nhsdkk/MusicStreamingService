@@ -53,7 +53,7 @@ public sealed class GetFavorite : ControllerBase
     }
 
 
-    public sealed record Query : IRequest<Result<QueryResponse, Exception>>
+    public sealed record Query : IRequest<Result<QueryResponse>>
     {
         public Guid UserId { get; init; }
 
@@ -79,7 +79,7 @@ public sealed class GetFavorite : ControllerBase
         public List<ShortSongDto> Songs { get; init; } = null!;
     }
 
-    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse, Exception>>
+    public sealed class Handler : IRequestHandler<Query, Result<QueryResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IAlbumStorageService _albumStorageService;
@@ -92,7 +92,7 @@ public sealed class GetFavorite : ControllerBase
             _albumStorageService = albumStorageService;
         }
 
-        public async ValueTask<Result<QueryResponse, Exception>> Handle(Query request,
+        public async ValueTask<Result<QueryResponse>> Handle(Query request,
             CancellationToken cancellationToken)
         {
             var query = _context.Songs

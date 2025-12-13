@@ -53,13 +53,13 @@ public static class AuthInjection
                                 .GetRequiredService<IClaimConverter<UserClaims>>();
 
                             var claimsResult = converter.FromClaims(ctx.Principal!.Claims.ToList());
-                            if (claimsResult.IsT1)
+                            if (claimsResult.IsError)
                             {
                                 ctx.Fail("Unauthorized");
                                 return;
                             }
                             
-                            var validationError = await validator.Validate(claimsResult.AsT0, ctx.HttpContext.RequestAborted);
+                            var validationError = await validator.Validate(claimsResult.Success(), ctx.HttpContext.RequestAborted);
                             if (validationError is not null)
                             {
                                 ctx.Fail("Unauthorized");

@@ -3,6 +3,7 @@ using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Auth;
 using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
@@ -45,7 +46,7 @@ public sealed class Register : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record CommandDto : ITransactionWrappedCommand<Result<ResponseDto, Exception>>
+    public sealed record CommandDto : ITransactionWrappedCommand<Result<ResponseDto>>
     {
         public enum AccountRegisterRole
         {
@@ -144,7 +145,7 @@ public sealed class Register : ControllerBase
         public string RefreshToken { get; set; } = null!;
     }
 
-    public sealed class Handler : IRequestHandler<CommandDto, Result<ResponseDto, Exception>>
+    public sealed class Handler : IRequestHandler<CommandDto, Result<ResponseDto>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IPasswordService _passwordService;
@@ -160,7 +161,7 @@ public sealed class Register : ControllerBase
             _jwtService = jwtService;
         }
 
-        public async ValueTask<Result<ResponseDto, Exception>> Handle(CommandDto request,
+        public async ValueTask<Result<ResponseDto>> Handle(CommandDto request,
             CancellationToken cancellationToken)
         {
             var userWithSameEmailExists = await _context.Users.AnyAsync(
@@ -218,17 +219,7 @@ public sealed class Register : ControllerBase
             await _context.Users.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            var claims = new UserClaims
-            {
-                Permissions = user.GetPermissions().Select(x => x.Title).ToList(),
-                Username = user.Username,
-                Id = user.Id,
-                Region = new RegionClaim
-                {
-                    Id = user.Region.Id,
-                    Title = user.Region.Title
-                }
-            };
+            var claims = UserClaimsCreator.FromEntity(user);
             var (accessToken, refreshToken) = _jwtService.GetPair(claims);
             return new ResponseDto
             {

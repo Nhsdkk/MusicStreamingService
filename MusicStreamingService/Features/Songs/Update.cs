@@ -49,7 +49,7 @@ public sealed class Update : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse, Exception>>
+    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse>>
     {
         public sealed record CommandBody
         {
@@ -154,7 +154,7 @@ public sealed class Update : ControllerBase
             };
     }
 
-    public sealed class Handler : IRequestHandler<Command, Result<CommandResponse, Exception>>
+    public sealed class Handler : IRequestHandler<Command, Result<CommandResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IAlbumStorageService _albumStorageService;
@@ -167,7 +167,7 @@ public sealed class Update : ControllerBase
             _albumStorageService = albumStorageService;
         }
 
-        public async ValueTask<Result<CommandResponse, Exception>> Handle(
+        public async ValueTask<Result<CommandResponse>> Handle(
             Command request,
             CancellationToken cancellationToken)
         {
@@ -248,16 +248,14 @@ public sealed class Update : ControllerBase
             }
 
             var songUrlResult = await _albumStorageService.GetPresignedUrl(song.Album.S3ArtworkFilename);
-            if (songUrlResult.IsT1)
+            if (songUrlResult.IsError)
             {
-                return songUrlResult.AsT1;
+                return songUrlResult.Error();
             }
-
-
             
             return CommandResponse.FromEntity(
                 song,
-                albumCoverUrl: songUrlResult.AsT0
+                albumCoverUrl: songUrlResult.Success()
             );
         }
     }

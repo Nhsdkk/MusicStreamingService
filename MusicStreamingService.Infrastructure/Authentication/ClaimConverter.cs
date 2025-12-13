@@ -17,7 +17,7 @@ public interface IClaimConverter<T>
     /// </summary>
     /// <param name="claims">Claims</param>
     /// <returns></returns>
-    public Result<T, Exception> FromClaims(List<Claim> claims);
+    public Result<T> FromClaims(List<Claim> claims);
 
     /// <summary>
     /// Convert user data to claims
@@ -29,17 +29,17 @@ public interface IClaimConverter<T>
 
 public sealed class ClaimConverter : IClaimConverter<UserClaims>
 {
-    public Result<UserClaims, Exception> FromClaims(List<Claim> claims)
+    public Result<UserClaims> FromClaims(List<Claim> claims)
     {
         var permissions = claims.Where(x => x.Type is ClaimTypes.Role).Select(x => x.Value).ToList();
 
-        var username = claims.FirstOrDefault(x => x.Type is JwtRegisteredClaimNames.Name)?.Value;
+        var username = claims.FirstOrDefault(x => x.Type is ClaimTypes.Name)?.Value;
         if (username is null)
         {
             return new JwtValidationException("Can't get username claim");
         }
 
-        var idClaim = claims.FirstOrDefault(x => x.Type is JwtRegisteredClaimNames.Sid);
+        var idClaim = claims.FirstOrDefault(x => x.Type is ClaimTypes.Sid);
         if (idClaim is null)
         {
             return new JwtValidationException("Can't get user id claim");
@@ -56,7 +56,7 @@ public sealed class ClaimConverter : IClaimConverter<UserClaims>
             return new JwtValidationException("Can't get region claim");
         }
 
-        var birthDateClaim = claims.FirstOrDefault(x => x.Type is CustomClaimTypes.BirthDateClaimType);
+        var birthDateClaim = claims.FirstOrDefault(x => x.Type is ClaimTypes.DateOfBirth);
         if (birthDateClaim is null)
         {
             return new JwtValidationException("Can't get birth date claim");
@@ -91,11 +91,10 @@ public sealed class ClaimConverter : IClaimConverter<UserClaims>
     {
         var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Name, data.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Sid, data.Id.ToString()),
+            new Claim(ClaimTypes.Name, data.Username),
+            new Claim(ClaimTypes.Sid, data.Id.ToString()),
             new Claim(CustomClaimTypes.RegionsClaimType, JsonSerializer.Serialize(data.Region)),
-            new Claim(CustomClaimTypes.BirthDateClaimType, data.BirthDate.ToString(DateFormats.FullDateFormat))
+            new Claim(ClaimTypes.DateOfBirth, data.BirthDate.ToString(DateFormats.FullDateFormat))
         };
 
         claims.AddRange(data.Permissions.Select(x => new Claim(ClaimTypes.Role, x)));
