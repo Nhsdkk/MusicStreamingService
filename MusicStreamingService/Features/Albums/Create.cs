@@ -130,7 +130,7 @@ public sealed class Create : ControllerBase
                 RuleFor(x => x.Title).NotEmpty();
                 RuleFor(x => x.AlbumZip.ContentType).Equal("application/zip");
                 RuleFor(x => x.AlbumZip.Length).GreaterThan(0);
-                RuleFor(x => x.ArtworkImage.ContentType).Matches("image/(png|jpeg)");
+                RuleFor(x => x.ArtworkImage.ContentType).Matches("^image/(png|jpeg)$");
                 RuleFor(x => x.ArtworkImage.Length).GreaterThan(0);
                 RuleFor(x => x.Songs).NotEmpty();
                 RuleFor(x => x.Description).NotEmpty().When(x => x.Description is not null);
