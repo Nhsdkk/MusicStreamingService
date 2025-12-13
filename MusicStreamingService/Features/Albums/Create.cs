@@ -32,7 +32,7 @@ public sealed class Create : ControllerBase
     /// <summary>
     /// Create a new album
     /// </summary>
-    /// <param name="request">Album data</param>
+    /// <param name="request">Album data, including a zip file containing audio files and a metadata file.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("/api/v1/albums")]
@@ -151,7 +151,7 @@ public sealed class Create : ControllerBase
                         s.RuleFor(x => x.DurationMs).NotEmpty();
 
                         s.RuleFor(x => x.Artists)
-                            .Must(x => x.Distinct().Count() == x.Count)
+                            .Must(x => x.Select(a => a.ArtistId).Distinct().Count() == x.Count)
                             .WithMessage("Song artists must be distinct.");
                         s.RuleFor(x => x.GenreIds)
                             .Must(x => x.Distinct().Count() == x.Count)
@@ -159,7 +159,12 @@ public sealed class Create : ControllerBase
                     });
 
                 RuleFor(x => x)
-                    .Must(x => x.Songs.Count == x.Songs.Select(s => s.AlbumPosition).Distinct().Count())
+                    .Must(x => x.Songs
+                        .Select(s => s.AlbumPosition)
+                        .Distinct()
+                        .ToHashSet()
+                        .SetEquals(x.Songs.Select((_, idx) => (long)idx).ToHashSet())
+                    )
                     .WithMessage("Album songs must have continuous album positions starting from 0.");
             }
         }
@@ -180,7 +185,7 @@ public sealed class Create : ControllerBase
         public int Likes { get; init; }
 
         [JsonPropertyName("artist")]
-        public AlbumCreator Artist { get; init; } = null!;
+        public ShortAlbumCreatorDto Artist { get; init; } = null!;
 
         [JsonPropertyName("releaseDate")]
         public DateTime ReleaseDate { get; init; }
@@ -200,7 +205,7 @@ public sealed class Create : ControllerBase
                 Title = album.Title,
                 Description = album.Description,
                 Likes = album.Likes,
-                Artist = AlbumCreator.FromEntity(album.Artist),
+                Artist = ShortAlbumCreatorDto.FromEntity(album.Artist),
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl ?? string.Empty,
                 Songs = album.Songs.Select(ShortAlbumSongDto.FromEntity).ToList()
@@ -291,6 +296,10 @@ public sealed class Create : ControllerBase
             await _context.Albums.AddAsync(album, cancellationToken);
 
             var songsToAdd = new List<SongEntity>();
+            
+            var allowedSongRegions = regions
+                .Where(x => requestBody.AllowedRegions.Contains(x.Id))
+                .ToList();
 
             foreach (var songData in requestBody.Songs)
             {
@@ -300,19 +309,15 @@ public sealed class Create : ControllerBase
                 await using var memoryMp3FileStream = new MemoryStream();
                 await mp3FileStream.CopyToAsync(memoryMp3FileStream, cancellationToken);
                 memoryMp3FileStream.Position = 0;
-
-                var allowedSongRegions = regions
-                    .Where(x => requestBody.AllowedRegions.Contains(x.Id))
-                    .ToList();
+                
                 var songGenres = genres.Where(x => songData.GenreIds.Contains(x.Id)).ToList();
                 var song = CreateSong(songData, allowedSongRegions, album, songGenres);
-                
-                await using var songStream = mp3FileZipArchiveEntry.Open();
+
                 var songUploadResult = await _songStorageService.UploadSong(song.S3MediaFileName, memoryMp3FileStream);
 
                 if (songUploadResult.IsError)
                 {
-                    return songUploadResult.Error();
+                    throw songUploadResult.Error();
                 }
 
                 album.Songs.Add(song);
@@ -355,7 +360,6 @@ public sealed class Create : ControllerBase
             song.Artists.AddRange(songArtists);
             return song;
         }
-
 
         private async Task<Result<List<GenreEntity>>> GetValidateGenres(
             Command request,
@@ -433,7 +437,7 @@ public sealed class Create : ControllerBase
             ZipArchive zipArchive)
         {
             var zipArchiveFileNames = zipArchive.Entries.Select(x => x.Name).ToList();
-            if (zipArchiveFileNames.Any(x => x.Split(".").Last() != "mp3"))
+            if (zipArchiveFileNames.Any(x => !Path.GetExtension(x).Equals(".mp3", StringComparison.OrdinalIgnoreCase)))
             {
                 return new Exception("All song files must be in mp3 format.");
             }
