@@ -26,7 +26,7 @@ public interface IJwtService<T>
     /// <param name="refreshToken">Refresh token</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Either refreshed access token, or <see cref="JwtValidationException"/>, that occured while validating refresh token</returns>
-    public Task<Result<string, JwtValidationException>> RefreshAccessToken(string refreshToken,
+    public Task<Result<string>> RefreshAccessToken(string refreshToken,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -35,7 +35,7 @@ public interface IJwtService<T>
     /// <param name="token">Token to be validated</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Either a collection of claims or <see cref="JwtValidationException"/>, that occured while validating token</returns>
-    public Task<Result<T, JwtValidationException>> ValidateToken(string token,
+    public Task<Result<T>> ValidateToken(string token,
         CancellationToken cancellationToken = default);
 }
 
@@ -75,22 +75,19 @@ public class JwtService<T> : IJwtService<T>
         return (accessToken, refreshToken);
     }
 
-    public async Task<Result<string, JwtValidationException>> RefreshAccessToken(
+    public async Task<Result<string>> RefreshAccessToken(
         string refreshToken,
         CancellationToken cancellationToken = default)
     {
         var claims = await ValidateToken(refreshToken, cancellationToken);
 
-        Result<string, JwtValidationException> result = null!;
-        claims.Switch(
-            c => result = GetToken(_converter.ToClaims(c), _configuration.AccessTokenExpiration),
-            ex => result = ex
+        return claims.Match<Result<string>>(
+            c => GetToken(_converter.ToClaims(c), _configuration.AccessTokenExpiration),
+            ex => ex
         );
-
-        return result;
     }
 
-    public async Task<Result<T, JwtValidationException>> ValidateToken(
+    public async Task<Result<T>> ValidateToken(
         string token,
         CancellationToken cancellationToken = default)
     {
@@ -106,18 +103,18 @@ public class JwtService<T> : IJwtService<T>
 
             var claims = principal.Claims.ToList();
             var convertedClaimsResult = _converter.FromClaims(claims);
-            if (convertedClaimsResult.IsT1)
+            if (convertedClaimsResult.IsError)
             {
                 return new JwtValidationException("Token claims conversion failed");
             }
 
-            var validatorResult = await _validator.Validate(convertedClaimsResult.AsT0, cancellationToken);
+            var validatorResult = await _validator.Validate(convertedClaimsResult.Success(), cancellationToken);
             if (validatorResult is not null)
             {
                 return new JwtValidationException("Token claims validation failed");
             }
 
-            return convertedClaimsResult.AsT0;
+            return convertedClaimsResult.Success();
         }
         catch (SecurityTokenArgumentException ex)
         {

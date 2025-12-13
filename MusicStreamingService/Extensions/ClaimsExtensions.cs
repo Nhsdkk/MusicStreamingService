@@ -8,7 +8,7 @@ namespace MusicStreamingService.Extensions;
 public static class ClaimsExtensions
 {
     public static Guid GetUserId(this ClaimsPrincipal claimsPrincipal) =>
-        Guid.Parse(claimsPrincipal.FindFirstValue(JwtRegisteredClaimNames.Sid)!);
+        Guid.Parse(claimsPrincipal.FindFirstValue(ClaimTypes.Sid)!);
 
     public static RegionClaim GetUserRegion(this ClaimsPrincipal claimsPrincipal) =>
         System.Text.Json.JsonSerializer.Deserialize<RegionClaim>(
@@ -17,7 +17,7 @@ public static class ClaimsExtensions
     public static int GetUserAge(this ClaimsPrincipal claimsPrincipal)
     {
         var birthDate = DateTime.ParseExact(
-            claimsPrincipal.FindFirstValue(CustomClaimTypes.BirthDateClaimType)!,
+            claimsPrincipal.FindFirstValue(ClaimTypes.DateOfBirth)!,
             DateFormats.FullDateFormat,
             null).ToUniversalTime();
 
