@@ -15,7 +15,7 @@ public sealed record AlbumEntity : BaseUpdatableIdEntity
     /// <summary>
     /// Like count
     /// </summary>
-    public int Likes { get; } = 0;
+    public long Likes { get; } = 0;
     
     /// <summary>
     /// Id of the corresponding creator
