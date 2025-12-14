@@ -39,7 +39,7 @@ public sealed class Update : ControllerBase
     [Tags(RouteGroups.Albums)]
     [Consumes("multipart/form-data")]
     [ProducesResponseType<CommandResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<Exception>( StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateAlbum(
         [FromForm] Command.CommandBody request,
         CancellationToken cancellationToken = default)
