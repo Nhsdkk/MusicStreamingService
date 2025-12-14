@@ -35,7 +35,7 @@ public sealed class Unfavorite : ControllerBase
         var result = await _mediator.Send(
             new Command
             {
-                UserId = Guid.Parse(User.Identity!.Name!),
+                UserId = User.GetUserId(),
                 AlbumId = albumId
             },
             cancellationToken);
