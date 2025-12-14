@@ -50,7 +50,7 @@ public sealed class Update : ControllerBase
                 UserId = User.GetUserId(),
                 Body = request
             }, cancellationToken);
-        
+
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
@@ -65,11 +65,11 @@ public sealed class Update : ControllerBase
 
                 [JsonPropertyName("order")]
                 public int Order { get; init; }
-                
+
                 [JsonPropertyName("isTitleTrack")]
                 public bool IsTitleTrack { get; init; }
             }
-            
+
             [JsonPropertyName("id")]
             public Guid Id { get; init; }
 
@@ -89,7 +89,7 @@ public sealed class Update : ControllerBase
             [FromForm]
             [ModelBinder(BinderType = typeof(JsonFormBinder))]
             public List<SongOrdering>? SongOrderings { get; init; }
-            
+
             [JsonPropertyName("artworkFile")]
             public IFormFile? ArtworkFile { get; init; }
         }
@@ -131,9 +131,9 @@ public sealed class Update : ControllerBase
                             .SetEquals(s!.Select((_, idx) => idx)))
                     .When(x => x.SongOrderings is not null)
                     .WithMessage("Song orderings must contain all orders from 0 to n-1 without gaps.");
-                
+
                 RuleFor(x => x.SongOrderings)
-                    .Must(s => 
+                    .Must(s =>
                         s!.Select(x => x.SongId)
                             .Distinct()
                             .Count() == s!.Count)
@@ -171,7 +171,8 @@ public sealed class Update : ControllerBase
 
         public static CommandResponse FromEntity(
             AlbumEntity album,
-            string? artworkUrl) =>
+            string? artworkUrl,
+            Dictionary<string, string?> songUrlMapping) =>
             new CommandResponse
             {
                 Id = album.Id,
@@ -181,7 +182,10 @@ public sealed class Update : ControllerBase
                 Artist = ShortAlbumCreatorDto.FromEntity(album.Artist),
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl ?? string.Empty,
-                Songs = album.Songs.Select(ShortAlbumSongDto.FromEntity).OrderBy(x => x.AlbumPosition).ToList()
+                Songs = album.Songs
+                    .Select(x => ShortAlbumSongDto.FromEntity(x, songUrlMapping[x.S3MediaFileName]))
+                    .OrderBy(x => x.AlbumPosition)
+                    .ToList()
             };
     }
 
@@ -207,7 +211,7 @@ public sealed class Update : ControllerBase
                 .ThenInclude(x => x.Artists)
                 .ThenInclude(x => x.Artist)
                 .Include(x => x.Songs)
-                .ThenInclude(x => x.AllowedRegions) 
+                .ThenInclude(x => x.AllowedRegions)
                 .Include(x => x.Songs)
                 .ThenInclude(x => x.Genres)
                 .SingleOrDefaultAsync(x => x.Id == body.Id, cancellationToken);
@@ -221,7 +225,7 @@ public sealed class Update : ControllerBase
             {
                 return new Exception("User is not the creator of the album");
             }
-            
+
             album.Title = body.Title ?? album.Title;
             album.Description = body.DescriptionFilled ? body.Description : album.Description;
             album.ReleaseDate = body.ReleaseDate ?? album.ReleaseDate;
@@ -234,7 +238,7 @@ public sealed class Update : ControllerBase
                 {
                     return new Exception("Song orderings count does not match the number of songs in the album");
                 }
-                
+
                 var dbSongIdsHashSet = album.Songs
                     .Select(x => x.Id)
                     .ToHashSet();
@@ -253,21 +257,21 @@ public sealed class Update : ControllerBase
                 {
                     var position = songOrderMapping[song.Id].Order;
                     var isTitleTrack = songOrderMapping[song.Id].IsTitleTrack;
-                    
+
                     song.AlbumPosition = position;
                     song.IsTitleTrack = isTitleTrack;
                 }
             }
-            
+
             string? presignedArtworkUrl = null;
-                
+
             if (body.ArtworkFile is not null)
             {
                 var fileExtension = ContentTypeUtils.GetFileExtensionByContentType(body.ArtworkFile.ContentType);
                 var oldFilename = album.S3ArtworkFilename;
                 var newFilename = $"{Guid.NewGuid()}.{fileExtension}";
-                    
-                var uploadResult = await _albumStorageService.UploadAlbumArtwork( 
+
+                var uploadResult = await _albumStorageService.UploadAlbumArtwork(
                     newFilename,
                     body.ArtworkFile.ContentType,
                     body.ArtworkFile.OpenReadStream());
@@ -279,11 +283,11 @@ public sealed class Update : ControllerBase
 
                 presignedArtworkUrl = uploadResult.Success();
                 album.S3ArtworkFilename = newFilename;
-                    
+
                 // TODO: Consider marking files for deletion and deleting them later in a background job
                 await _albumStorageService.DeleteAlbumArtwork(oldFilename);
             }
-                
+
             if (presignedArtworkUrl is null)
             {
                 var getUrlResult = await _albumStorageService.GetPresignedUrl(album.S3ArtworkFilename);
@@ -295,7 +299,10 @@ public sealed class Update : ControllerBase
                 presignedArtworkUrl = getUrlResult.Success();
             }
 
-            return CommandResponse.FromEntity(album, presignedArtworkUrl);
+            var songFileNames = album.Songs.Select(x => x.S3MediaFileName).ToList();
+            var songUrlMapping = await _albumStorageService.GetPresignedUrls(songFileNames);
+
+            return CommandResponse.FromEntity(album, presignedArtworkUrl, songUrlMapping);
         }
     }
 }
