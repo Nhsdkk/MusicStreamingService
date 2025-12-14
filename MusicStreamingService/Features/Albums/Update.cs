@@ -135,7 +135,6 @@ public sealed class Update : ControllerBase
                 RuleFor(x => x.SongOrderings)
                     .Must(s => 
                         s!.Select(x => x.SongId)
-                            .ToHashSet()
                             .Distinct()
                             .Count() == s!.Count)
                     .When(x => x.SongOrderings is not null)
@@ -248,12 +247,15 @@ public sealed class Update : ControllerBase
                     return new Exception("Some song ids not found in the album");
                 }
 
-                var songOrderMapping = body.SongOrderings.ToDictionary(x => x.SongId, x => x.Order);
+                var songOrderMapping = body.SongOrderings.ToDictionary(x => x.SongId, x => x);
 
                 foreach (var song in album.Songs)
                 {
-                    var position = songOrderMapping[song.Id];
+                    var position = songOrderMapping[song.Id].Order;
+                    var isTitleTrack = songOrderMapping[song.Id].IsTitleTrack;
+                    
                     song.AlbumPosition = position;
+                    song.IsTitleTrack = isTitleTrack;
                 }
             }
             
