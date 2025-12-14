@@ -48,6 +48,12 @@ public sealed class ClaimValidator : IClaimValidator<UserClaims>
             return new Exception("Invalid claims");
         }
 
+        var birthDate = claims.BirthDate;
+        if (user.BirthDate != birthDate)
+        {
+            return new Exception("Invalid claims");
+        }
+
         return null;
     }
 }

@@ -62,7 +62,7 @@ public sealed class ClaimConverter : IClaimConverter<UserClaims>
             return new JwtValidationException("Can't get birth date claim");
         }
         
-        var birthDate = DateTime.ParseExact(birthDateClaim.Value, DateFormats.FullDateFormat, null);
+        var birthDate = DateOnly.ParseExact(birthDateClaim.Value, DateFormats.FullDateFormat, null);
 
         try
         {

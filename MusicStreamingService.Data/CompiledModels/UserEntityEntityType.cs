@@ -42,10 +42,10 @@ namespace MusicStreamingService.Data.CompiledModels
 
             var birthDate = runtimeEntityType.AddProperty(
                 "BirthDate",
-                typeof(DateTime),
+                typeof(DateOnly),
                 propertyInfo: typeof(UserEntity).GetProperty("BirthDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(UserEntity).GetField("<BirthDate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                sentinel: new DateOnly(1, 1, 1));
             birthDate.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var createdAt = runtimeEntityType.AddProperty(

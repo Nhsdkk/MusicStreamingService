@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
+using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Result;
@@ -41,7 +42,8 @@ public sealed class Delete : ControllerBase
         var result = await _mediator.Send(
             new Command
             {
-                Body = request
+                Body = request,
+                UserId = User.GetUserId(),
             },
             cancellationToken);
         

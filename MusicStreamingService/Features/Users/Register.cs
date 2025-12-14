@@ -61,7 +61,7 @@ public sealed class Register : ControllerBase
         public string FullName { get; set; } = null!;
 
         [JsonPropertyName("birthDate")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         [JsonPropertyName("username")]
         public string Username { get; set; } = null!;
@@ -87,7 +87,7 @@ public sealed class Register : ControllerBase
                 RuleFor(x => x.Username).MinimumLength(7);
                 RuleFor(x => x.FullName).MinimumLength(10);
                 RuleFor(x => x.BirthDate)
-                    .Must(x => x.ToUniversalTime() <= DateTime.UtcNow);
+                    .Must(x => x <= DateOnly.FromDateTime(DateTime.UtcNow));
                 RuleFor(x => x.DeviceName).NotEmpty();
                 RuleFor(x => x.RegionId).NotEmpty();
             }
@@ -124,7 +124,7 @@ public sealed class Register : ControllerBase
         public string FullName { get; set; } = null!;
 
         [JsonPropertyName("birthDate")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         [JsonPropertyName("username")]
         public string Username { get; set; } = null!;
@@ -207,7 +207,7 @@ public sealed class Register : ControllerBase
             {
                 Email = request.Email,
                 Username = request.Username,
-                BirthDate = request.BirthDate.ToUniversalTime(),
+                BirthDate = request.BirthDate,
                 Devices = [device],
                 FullName = request.FullName,
                 RegionId = request.RegionId,

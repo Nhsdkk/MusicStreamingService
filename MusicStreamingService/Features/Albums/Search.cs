@@ -45,7 +45,7 @@ public sealed class Search : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(request, cancellationToken);
-        return Ok(result);
+        return Ok(result.Success());
     }
 
     public sealed record Query : BasePaginatedRequest, IRequest<Result<QueryResponse>>
@@ -61,7 +61,7 @@ public sealed class Search : ControllerBase
 
         public sealed class Validator : BasePaginatedRequestValidator<Query>
         {
-            public Validator() : base()
+            public Validator()
             {
                 RuleFor(x => x.Title)
                     .NotEmpty()

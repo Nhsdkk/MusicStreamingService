@@ -68,7 +68,7 @@ public sealed class Update : ControllerBase
         public string? Password { get; init; }
 
         [JsonPropertyName("birthDate")]
-        public DateTime? BirthDate { get; init; }
+        public DateOnly? BirthDate { get; init; }
 
         [JsonPropertyName("regionId")]
         public Guid? RegionId { get; init; }
@@ -81,7 +81,9 @@ public sealed class Update : ControllerBase
                 RuleFor(x => x.RegionId).NotEmpty().When(x => x.RegionId is not null);
                 RuleFor(x => x.Password!).Password().When(x => x.Password is not null);
                 RuleFor(x => x.Email).EmailAddress().When(x => x.Email is not null);
-                RuleFor(x => x.BirthDate!.Value).Before(DateTime.UtcNow).When(x => x.BirthDate is not null);
+                RuleFor(x => x.BirthDate!.Value)
+                    .Before(DateOnly.FromDateTime(DateTime.UtcNow))
+                    .When(x => x.BirthDate is not null);
             }
         }
     }
@@ -105,7 +107,7 @@ public sealed class Update : ControllerBase
         public string FullName { get; set; } = null!;
 
         [JsonPropertyName("birthDate")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         [JsonPropertyName("username")]
         public string Username { get; set; } = null!;
@@ -188,7 +190,7 @@ public sealed class Update : ControllerBase
                 user.Email = newData.Email;
             }
 
-            user.BirthDate = newData.BirthDate?.ToUniversalTime() ?? user.BirthDate;
+            user.BirthDate = newData.BirthDate ?? user.BirthDate;
             user.FullName = newData.FullName ?? user.FullName;
 
             if (newData.Password is not null)

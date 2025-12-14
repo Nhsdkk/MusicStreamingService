@@ -10,5 +10,5 @@ public sealed class UserClaims
 
     public RegionClaim Region { get; init; } = null!;
     
-    public DateTime BirthDate { get; init; }
+    public DateOnly BirthDate { get; init; }
 }

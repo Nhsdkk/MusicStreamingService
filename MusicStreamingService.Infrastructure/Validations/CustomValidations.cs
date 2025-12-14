@@ -12,9 +12,9 @@ public static class CustomValidations
             .Matches("[0-9]").WithMessage("Password must contain at least one digit.")
             .Matches("[^a-zA-Z0-9]").WithMessage("Password must contain at least one special character.");
 
-    public static IRuleBuilderOptions<T, DateTime> Before<T>(
-        this IRuleBuilder<T, DateTime> ruleBuilder,
-        DateTime other) =>
+    public static IRuleBuilderOptions<T, DateOnly> Before<T>(
+        this IRuleBuilder<T, DateOnly> ruleBuilder,
+        DateOnly other) =>
         ruleBuilder
             .Must(date => date < other)
             .WithMessage($"Date must be before {other:yyyy-MM-dd}.");

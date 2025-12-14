@@ -15,7 +15,7 @@ public sealed record UserEntity : BaseUpdatableIdEntity
     /// <summary>
     /// User's birth date
     /// </summary>
-    public DateTime BirthDate { get; set; }
+    public DateOnly BirthDate { get; set; }
     
     /// <summary>
     /// User's username

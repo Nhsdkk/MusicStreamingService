@@ -97,7 +97,7 @@ public sealed class Login : ControllerBase
         public string FullName { get; set; } = null!;
 
         [JsonPropertyName("birthDate")]
-        public DateTime BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
 
         [JsonPropertyName("username")]
         public string Username { get; set; } = null!;
