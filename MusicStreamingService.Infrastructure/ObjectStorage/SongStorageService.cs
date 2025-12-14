@@ -1,3 +1,4 @@
+using System.Reactive;
 using Microsoft.Extensions.Options;
 using Minio;
 using MusicStreamingService.Infrastructure.Result;
@@ -12,6 +13,9 @@ public interface ISongStorageService
     public Task<Result<string>> UploadSong(
         string songFileName,
         Stream songData);
+    
+    public Task<Result<Unit>> DeleteSongs(
+        List<string> songFileNames);
 }
 
 public sealed class SongStorageService : ISongStorageService
@@ -38,4 +42,7 @@ public sealed class SongStorageService : ISongStorageService
         await _client.UploadObject(Buckets.SongBucketName, songFileName, songData, ContentType);
         return await GetPresignedUrl(songFileName);
     }
+
+    public Task<Result<Unit>> DeleteSongs(List<string> songFileNames) =>
+        _client.RemoveObjects(Buckets.SongBucketName, songFileNames);
 }
