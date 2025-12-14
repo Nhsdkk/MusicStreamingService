@@ -27,6 +27,12 @@ public sealed class Get : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Get song data
+    /// </summary>
+    /// <param name="songId">Id of the song</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("/api/v1/songs/{songId}")]
     [Tags(RouteGroups.Songs)]
     [Authorize(Roles = Permissions.ViewSongsPermission)]
@@ -40,7 +46,8 @@ public sealed class Get : ControllerBase
             new Query
             {
                 SongId = songId,
-                UserRegion = User.GetUserRegion()
+                UserRegion = User.GetUserRegion(),
+                UserAge = User.GetUserAge(),
             },
             cancellationToken);
 
@@ -52,6 +59,8 @@ public sealed class Get : ControllerBase
         public Guid SongId { get; init; }
 
         public RegionClaim UserRegion { get; init; } = null!;
+        
+        public int UserAge { get; init; }
     }
 
     public sealed record QueryResponse
@@ -149,6 +158,11 @@ public sealed class Get : ControllerBase
             if (song is null)
             {
                 return new Exception("Song not found");
+            }
+            
+            if (song.Explicit && request.UserAge < UserConstants.AdultLegalAge)
+            {
+                return new Exception("User is not allowed to access explicit songs");
             }
 
             var s3SongPath = song.S3MediaFileName;

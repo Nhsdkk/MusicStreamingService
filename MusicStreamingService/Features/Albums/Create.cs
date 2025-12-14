@@ -182,7 +182,7 @@ public sealed class Create : ControllerBase
         public string? Description { get; init; }
 
         [JsonPropertyName("likes")]
-        public int Likes { get; init; }
+        public long Likes { get; init; }
 
         [JsonPropertyName("artist")]
         public ShortAlbumCreatorDto Artist { get; init; } = null!;
