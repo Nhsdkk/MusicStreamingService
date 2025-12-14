@@ -162,7 +162,7 @@ public sealed class Get : ControllerBase
             
             if (song.Explicit && request.UserAge < UserConstants.AdultLegalAge)
             {
-                return new Exception("User is not allowed to access explicit songs");
+                return new Exception($"Users under {UserConstants.AdultLegalAge} years old are not allowed to access explicit songs");
             }
 
             var s3SongPath = song.S3MediaFileName;
