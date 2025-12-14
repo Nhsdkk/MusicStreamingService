@@ -9,7 +9,7 @@ using MusicStreamingService.Infrastructure.Result;
 namespace MusicStreamingService.Features.Albums;
 
 [ApiController]
-public class Unfavorite : ControllerBase
+public sealed class Unfavorite : ControllerBase
 {
     private readonly IMediator _mediator;
 
