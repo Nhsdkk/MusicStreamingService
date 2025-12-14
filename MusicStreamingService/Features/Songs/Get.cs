@@ -96,7 +96,7 @@ public sealed class Get : ControllerBase
         public ShortAlbumDto Album { get; init; } = new();
 
         [JsonPropertyName("genres")]
-        public List<ShortGenreDto> Genres { get; init; } = new();
+        public List<GenreDto> Genres { get; init; } = new();
 
         public static QueryResponse FromEntity(
             SongEntity song,
@@ -120,7 +120,7 @@ public sealed class Get : ControllerBase
                 AllowedInUserRegion = song.AllowedRegions.Any(r => r.Id == userRegion.Id),
                 Album = ShortAlbumDto.FromEntity(song.Album, albumArtUrl),
                 Genres = song.Genres
-                    .Select(ShortGenreDto.FromEntity)
+                    .Select(GenreDto.FromEntity)
                     .ToList()
             };
     }
