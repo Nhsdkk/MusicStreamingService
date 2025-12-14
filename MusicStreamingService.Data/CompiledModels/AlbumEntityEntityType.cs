@@ -68,12 +68,12 @@ namespace MusicStreamingService.Data.CompiledModels
 
             var likes = runtimeEntityType.AddProperty(
                 "Likes",
-                typeof(int),
+                typeof(long),
                 propertyInfo: typeof(AlbumEntity).GetProperty("Likes", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(AlbumEntity).GetField("<Likes>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: 0);
+                sentinel: 0L);
             likes.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-            likes.AddAnnotation("Relational:DefaultValue", 0);
+            likes.AddAnnotation("Relational:DefaultValue", 0L);
 
             var releaseDate = runtimeEntityType.AddProperty(
                 "ReleaseDate",
