@@ -30,7 +30,7 @@ public sealed record AlbumEntity : BaseUpdatableIdEntity
     /// <summary>
     /// Release date of the album
     /// </summary>
-    public DateTime ReleaseDate { get; set; }
+    public DateOnly ReleaseDate { get; set; }
 
     /// <summary>
     /// Filename of the album artwork inside s3 object storage

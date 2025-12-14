@@ -51,7 +51,7 @@ public class Search : ControllerBase
             },
             cancellationToken);
 
-        return results.Match(Ok, x => throw x);
+        return results.Match<IActionResult>(Ok, BadRequest);
     }
 
     public sealed record Query : IRequest<Result<QueryResponse>>

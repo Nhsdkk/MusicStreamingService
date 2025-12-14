@@ -1,3 +1,4 @@
+using System.Reactive;
 using Microsoft.Extensions.Options;
 using Minio;
 using MusicStreamingService.Infrastructure.Result;
@@ -11,11 +12,14 @@ public interface IAlbumStorageService
 
     public Task<Dictionary<string, string?>> GetPresignedUrls(
         IEnumerable<string> albumArtworkFileNames);
-    
+
     public Task<Result<string>> UploadAlbumArtwork(
         string albumArtworkFileName,
         string contentType,
         Stream albumArtworkData);
+
+    public Task<Result<Unit>> DeleteAlbumArtwork(
+        string albumArtworkFileName);
 }
 
 public sealed class AlbumStorageService : IAlbumStorageService
@@ -58,4 +62,7 @@ public sealed class AlbumStorageService : IAlbumStorageService
         await _client.UploadObject(Buckets.AlbumCoverBucketName, albumArtworkFileName, albumArtworkData, contentType);
         return await GetPresignedUrl(albumArtworkFileName);
     }
+
+    public async Task<Result<Unit>> DeleteAlbumArtwork(string albumArtworkFileName) =>
+        await _client.RemoveObjects(Buckets.AlbumCoverBucketName, [albumArtworkFileName]);
 }

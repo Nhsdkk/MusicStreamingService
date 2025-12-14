@@ -188,7 +188,7 @@ public sealed class Create : ControllerBase
         public ShortAlbumCreatorDto Artist { get; init; } = null!;
 
         [JsonPropertyName("releaseDate")]
-        public DateTime ReleaseDate { get; init; }
+        public DateOnly ReleaseDate { get; init; }
 
         [JsonPropertyName("artworkUrl")]
         public string ArtworkUrl { get; init; } = null!;
@@ -288,7 +288,7 @@ public sealed class Create : ControllerBase
                 Title = requestBody.Title,
                 Description = requestBody.Description,
                 ArtistId = request.UserId,
-                ReleaseDate = requestBody.ReleaseDate.ToDateTime(new TimeOnly()).ToUniversalTime(),
+                ReleaseDate = requestBody.ReleaseDate,
                 S3ArtworkFilename = albumCoverFileName,
                 Songs = [],
             };

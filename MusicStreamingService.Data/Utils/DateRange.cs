@@ -5,8 +5,8 @@ namespace MusicStreamingService.Data.Utils;
 public sealed class DateRange
 {
     [JsonPropertyName("start")]
-    public DateTime? Start { get; init; }
+    public DateOnly? Start { get; init; }
     
     [JsonPropertyName("end")]
-    public DateTime? End { get; init; }
+    public DateOnly? End { get; init; }
 }

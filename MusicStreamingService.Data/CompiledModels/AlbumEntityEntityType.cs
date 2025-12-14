@@ -77,10 +77,10 @@ namespace MusicStreamingService.Data.CompiledModels
 
             var releaseDate = runtimeEntityType.AddProperty(
                 "ReleaseDate",
-                typeof(DateTime),
+                typeof(DateOnly),
                 propertyInfo: typeof(AlbumEntity).GetProperty("ReleaseDate", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(AlbumEntity).GetField("<ReleaseDate>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+                sentinel: new DateOnly(1, 1, 1));
             releaseDate.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
             var s3ArtworkFilename = runtimeEntityType.AddProperty(
