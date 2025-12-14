@@ -9,6 +9,7 @@ using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Password;
 using Scalar.AspNetCore;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Enums;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace MusicStreamingService.Setup;
@@ -34,7 +35,11 @@ public static class Setup
         });
         
         services.AddValidatorsFromAssembly(Assembly.GetCallingAssembly());
-        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationAutoValidation(opts =>
+        {
+            opts.EnableFormBindingSourceAutomaticValidation = true;
+            opts.EnableCustomBindingSourceAutomaticValidation = true;
+        });
 
         services.AddScoped<IClaimValidator<UserClaims>, ClaimValidator>();
         

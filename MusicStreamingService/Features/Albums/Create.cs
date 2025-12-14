@@ -208,7 +208,7 @@ public sealed class Create : ControllerBase
                 Artist = ShortAlbumCreatorDto.FromEntity(album.Artist),
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl ?? string.Empty,
-                Songs = album.Songs.Select(ShortAlbumSongDto.FromEntity).ToList()
+                Songs = album.Songs.Select(ShortAlbumSongDto.FromEntity).OrderBy(x => x.AlbumPosition).ToList()
             };
     }
 
