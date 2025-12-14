@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Data.QueryExtensions;
+using MusicStreamingService.Data.Utils;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.DateUtils;
@@ -14,6 +16,7 @@ using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
+using MusicStreamingService.Validators;
 
 namespace MusicStreamingService.Features.Albums;
 
@@ -55,6 +58,26 @@ public sealed class Search : ControllerBase
 
         [JsonPropertyName("releaseDateRange")]
         public DateRange? ReleaseDateRange { get; init; }
+
+        public sealed class Validator : BasePaginatedRequestValidator<Query>
+        {
+            public Validator() : base()
+            {
+                RuleFor(x => x.Title)
+                    .NotEmpty()
+                    .MaximumLength(255)
+                    .When(x => x.Title is not null);
+
+                RuleFor(x => x.ArtistName)
+                    .NotEmpty()
+                    .MaximumLength(255)
+                    .When(x => x.ArtistName is not null);
+
+                RuleFor(x => x.ReleaseDateRange)
+                    .SetValidator(new DateRangeValidator()!)
+                    .When(x => x.ReleaseDateRange is not null);
+            }
+        }
     }
 
     public sealed record QueryResponse : BasePaginatedResponse
@@ -69,7 +92,7 @@ public sealed class Search : ControllerBase
 
             public ShortAlbumCreatorDto AlbumCreator { get; init; } = null!;
 
-            public string? ArtworkUrl { get; init; } = null!;
+            public string? ArtworkUrl { get; init; }
 
             public static ShortAlbumInfo FromEntity(
                 AlbumEntity album,
@@ -128,6 +151,8 @@ public sealed class Search : ControllerBase
 
             var totalCount = await albumsSearchQuery.CountAsync(cancellationToken);
             var albums = await albumsSearchQuery
+                .Include(x => x.Artist)
+                .OrderByDescending(x => x.Likes)
                 .ApplyPagination(request.ItemsPerPage, request.Page)
                 .ToListAsync(cancellationToken);
 

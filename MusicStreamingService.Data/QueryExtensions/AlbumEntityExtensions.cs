@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data.Entities;
-using MusicStreamingService.Infrastructure.DateUtils;
+using MusicStreamingService.Data.Utils;
 
 namespace MusicStreamingService.Data.QueryExtensions;
 
