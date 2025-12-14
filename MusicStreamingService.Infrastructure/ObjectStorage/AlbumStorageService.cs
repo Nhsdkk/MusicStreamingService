@@ -63,6 +63,6 @@ public sealed class AlbumStorageService : IAlbumStorageService
         return await GetPresignedUrl(albumArtworkFileName);
     }
 
-    public Task<Result<Unit>> DeleteAlbumArtwork(string albumArtworkFileName) =>
-        _client.RemoveObjects(Buckets.AlbumCoverBucketName, [albumArtworkFileName]);
+    public async Task<Result<Unit>> DeleteAlbumArtwork(string albumArtworkFileName) =>
+        await _client.RemoveObjects(Buckets.AlbumCoverBucketName, [albumArtworkFileName]);
 }

@@ -43,6 +43,6 @@ public sealed class SongStorageService : ISongStorageService
         return await GetPresignedUrl(songFileName);
     }
 
-    public Task<Result<Unit>> DeleteSongs(List<string> songFileNames) =>
-        _client.RemoveObjects(Buckets.SongBucketName, songFileNames);
+    public async Task<Result<Unit>> DeleteSongs(List<string> songFileNames) =>
+        await _client.RemoveObjects(Buckets.SongBucketName, songFileNames);
 }
