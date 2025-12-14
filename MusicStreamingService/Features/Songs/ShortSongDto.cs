@@ -31,7 +31,7 @@ public sealed record ShortSongDto
     public List<ShortGenreDto> Genres { get; init; } = null!;
 
     [JsonPropertyName("allowedRegions")]
-    public List<ShortRegionDto> AllowedRegions { get; init; } = null!;
+    public List<RegionDto> AllowedRegions { get; init; } = null!;
     
     [JsonPropertyName("album")]
     public ShortAlbumDto Album { get; init; } = null!;
@@ -54,7 +54,7 @@ public sealed record ShortSongDto
                 .Select(ShortGenreDto.FromEntity)
                 .ToList(),
             AllowedRegions = song.AllowedRegions
-                .Select(ShortRegionDto.FromEntity)
+                .Select(RegionDto.FromEntity)
                 .ToList()
         };
 }
