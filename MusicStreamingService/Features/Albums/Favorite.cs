@@ -1,16 +1,20 @@
+using System.Text.Json.Serialization;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
+using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Albums;
 
 [ApiController]
-public class Favorite : ControllerBase
+public sealed class Favorite : ControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -22,22 +26,23 @@ public class Favorite : ControllerBase
     /// <summary>
     /// Add album to favorites
     /// </summary>
-    /// <param name="albumId">Id of the album</param>
+    /// <param name="request">Id of the album</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpPost("/api/v1/albums/favorite")]
+    [Tags(RouteGroups.Albums)]
     [Authorize(Roles = Permissions.FavoriteAlbumsPermission)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> FavoriteAlbum(
-        [FromBody] Guid albumId,
+        [FromBody] Command.CommandBody request,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(
             new Command
             {
-                UserId = Guid.Parse(User.Identity!.Name!),
-                AlbumId = albumId
+                UserId = User.GetUserId(),
+                Body = request
             },
             cancellationToken);
 
@@ -46,9 +51,23 @@ public class Favorite : ControllerBase
 
     public sealed record Command : IRequest<Result<Unit>>
     {
+        public sealed record CommandBody
+        {
+            [JsonPropertyName("albumId")]
+            public Guid AlbumId { get; init; }
+        }
+        
         public Guid UserId { get; init; }
-
-        public Guid AlbumId { get; init; }
+        
+        public CommandBody Body { get; init; } = null!;
+        
+        public sealed class Validator : AbstractValidator<CommandBody>
+        {
+            public Validator()
+            {
+                RuleFor(x => x.AlbumId).NotEmpty();
+            }
+        }
     }
 
     public sealed class Handler : IRequestHandler<Command, Result<Unit>>
@@ -62,15 +81,16 @@ public class Favorite : ControllerBase
 
         public async ValueTask<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
         {
+            var albumId = request.Body.AlbumId;
             var album = await _context.Albums
-                .SingleOrDefaultAsync(x => x.Id == request.AlbumId, cancellationToken);
+                .SingleOrDefaultAsync(x => x.Id == albumId, cancellationToken);
             if (album is null)
             {
                 return new Exception("Album not found");
             }
 
             var albumInFavorites = await _context.AlbumFavorites.AnyAsync(
-                x => x.AlbumId == request.AlbumId && x.UserId == request.UserId,
+                x => x.AlbumId == albumId && x.UserId == request.UserId,
                 cancellationToken);
 
             if (albumInFavorites)
@@ -82,7 +102,7 @@ public class Favorite : ControllerBase
                 new AlbumFavoriteEntity
                 {
                     UserId = request.UserId,
-                    AlbumId = request.AlbumId
+                    AlbumId = albumId
                 },
                 cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
