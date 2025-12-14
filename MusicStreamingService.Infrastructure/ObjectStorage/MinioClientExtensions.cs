@@ -100,7 +100,8 @@ public static class MinioClientExtensions
             return new AggregateException(
                 errors
                     .Where(x => x != null)
-                    .Select(x => new Exception(x.Message)));
+                    .Select(x => new Exception(x.Message))
+                    .ToList());
         }
 
         return Unit.Default;
