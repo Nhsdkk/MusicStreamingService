@@ -128,7 +128,7 @@ public sealed class Update : ControllerBase
         public ShortAlbumDto Album { get; init; } = null!;
 
         [JsonPropertyName("allowedRegions")]
-        public List<ShortRegionDto> AllowedRegions { get; init; } = null!;
+        public List<RegionDto> AllowedRegions { get; init; } = null!;
 
         public static CommandResponse FromEntity(
             SongEntity song,
@@ -150,7 +150,7 @@ public sealed class Update : ControllerBase
                 Album = ShortAlbumDto.FromEntity(
                     song.Album,
                     albumCoverUrl),
-                AllowedRegions = song.AllowedRegions.Select(ShortRegionDto.FromEntity).ToList()
+                AllowedRegions = song.AllowedRegions.Select(RegionDto.FromEntity).ToList()
             };
     }
 

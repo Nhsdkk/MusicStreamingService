@@ -73,7 +73,7 @@ public sealed class Search : ControllerBase
             public string Username { get; init; } = null!;
             
             [JsonPropertyName("region")]
-            public ShortRegionDto Region { get; init; } = null!;
+            public RegionDto Region { get; init; } = null!;
         }
         
         [JsonPropertyName("users")]
@@ -129,7 +129,7 @@ public sealed class Search : ControllerBase
             {
                 Id = x.Id,
                 Username = x.Username,
-                Region = new ShortRegionDto
+                Region = new RegionDto
                 {
                     Id = x.Region.Id,
                     Title = x.Region.Title

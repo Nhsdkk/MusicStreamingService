@@ -113,7 +113,7 @@ public sealed class Update : ControllerBase
         public string Username { get; set; } = null!;
 
         [JsonPropertyName("region")]
-        public ShortRegionDto Region { get; set; } = null!;
+        public RegionDto Region { get; set; } = null!;
 
         [JsonPropertyName("permissions")]
         public List<string> Permissions { get; set; } = null!;
@@ -221,7 +221,7 @@ public sealed class Update : ControllerBase
                 FullName = user.FullName,
                 BirthDate = user.BirthDate,
                 Username = user.Username,
-                Region = new ShortRegionDto
+                Region = new RegionDto
                 {
                     Id = user.Region.Id,
                     Title = user.Region.Title

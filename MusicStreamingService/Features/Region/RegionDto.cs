@@ -3,7 +3,7 @@ using MusicStreamingService.Data.Entities;
 
 namespace MusicStreamingService.Features.Region;
 
-public sealed record ShortRegionDto
+public sealed record RegionDto
 {
     [JsonPropertyName("id")]
     public Guid Id { get; init; }
@@ -11,8 +11,8 @@ public sealed record ShortRegionDto
     [JsonPropertyName("title")]
     public string Title { get; init; } = null!;
 
-    public static ShortRegionDto FromEntity(RegionEntity region) =>
-        new ShortRegionDto
+    public static RegionDto FromEntity(RegionEntity region) =>
+        new RegionDto
         {
             Id = region.Id,
             Title = region.Title
