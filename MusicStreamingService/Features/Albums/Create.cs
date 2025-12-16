@@ -198,7 +198,8 @@ public sealed class Create : ControllerBase
 
         public static CommandResponse FromEntity(
             AlbumEntity album,
-            string? artworkUrl) =>
+            string? artworkUrl,
+            Dictionary<string, string> songUrlMapping) =>
             new CommandResponse
             {
                 Id = album.Id,
@@ -208,7 +209,7 @@ public sealed class Create : ControllerBase
                 Artist = ShortAlbumCreatorDto.FromEntity(album.Artist),
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl ?? string.Empty,
-                Songs = album.Songs.Select(ShortAlbumSongDto.FromEntity).OrderBy(x => x.AlbumPosition).ToList()
+                Songs = album.Songs.Select(x => ShortAlbumSongDto.FromEntity(x, songUrlMapping[x.S3MediaFileName])).OrderBy(x => x.AlbumPosition).ToList()
             };
     }
 
@@ -301,6 +302,8 @@ public sealed class Create : ControllerBase
                 .Where(x => requestBody.AllowedRegions.Contains(x.Id))
                 .ToList();
 
+            var songUrlMapping = new Dictionary<string, string>();
+
             foreach (var songData in requestBody.Songs)
             {
                 var mp3FileZipArchiveEntry = zipFileToArchiveEntryMapping[songData.ZipFilename];
@@ -319,6 +322,8 @@ public sealed class Create : ControllerBase
                 {
                     throw songUploadResult.Error();
                 }
+                
+                songUrlMapping[song.S3MediaFileName] = songUploadResult.Success();
 
                 album.Songs.Add(song);
                 songsToAdd.Add(song);
@@ -326,7 +331,7 @@ public sealed class Create : ControllerBase
 
             await _context.AddRangeAsync(songsToAdd, cancellationToken);
 
-            return CommandResponse.FromEntity(album, albumArtworkLink);
+            return CommandResponse.FromEntity(album, albumArtworkLink, songUrlMapping);
         }
 
         private static SongEntity CreateSong(

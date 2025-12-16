@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MusicStreamingService.Infrastructure.DateUtils;
 
 namespace MusicStreamingService.Infrastructure.Authentication;
 
@@ -64,6 +65,9 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
                 Id = Guid.Parse("ee76a7aa-7ca4-4df9-9ab2-eb5d8d8d58ac"),
                 Title = "Russia"
             })),
+            
+            new Claim(ClaimTypes.Sid, "8ec795ec-c11f-4497-b1d7-0e5690c94f49"),
+            new Claim(ClaimTypes.DateOfBirth, DateOnly.FromDateTime(DateTime.Now.AddYears(-20)).ToString(DateFormats.FullDateFormat))
             
         ], authenticationType: Scheme.Name);
 
