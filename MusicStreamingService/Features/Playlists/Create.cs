@@ -205,8 +205,6 @@ public class Create : ControllerBase
                 await _albumStorageService.GetPresignedUrls(songs.Select(x => x.Album.S3ArtworkFilename));
             
             await _context.SaveChangesAsync(cancellationToken);
-
-            await _context.Entry(playlist).Reference(x => x.Creator).LoadAsync(cancellationToken);
             
             return CommandResponse.FromEntity(playlist, albumArtworkUrlMapping);
         }
