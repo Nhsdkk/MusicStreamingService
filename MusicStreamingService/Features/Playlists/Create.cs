@@ -150,12 +150,12 @@ public class Create : ControllerBase
         }
     }
 
-    public sealed class Hander : IRequestHandler<Command, Result<CommandResponse>>
+    public sealed class Handler : IRequestHandler<Command, Result<CommandResponse>>
     {
         private readonly MusicStreamingContext _context;
         private readonly IAlbumStorageService _albumStorageService;
 
-        public Hander(
+        public Handler(
             MusicStreamingContext context,
             IAlbumStorageService albumStorageService)
         {
