@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Auth;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
+using MusicStreamingService.Features.Devices;
+using MusicStreamingService.Features.Region;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
 using MusicStreamingService.Infrastructure.Result;
@@ -69,24 +71,6 @@ public sealed class Login : ControllerBase
 
     public sealed record CommandResponse
     {
-        public sealed record RegionDto
-        {
-            [JsonPropertyName("id")]
-            public Guid Id { get; set; }
-
-            [JsonPropertyName("title")]
-            public string Title { get; set; } = null!;
-        }
-
-        public sealed record DeviceDto
-        {
-            [JsonPropertyName("id")]
-            public Guid Id { get; set; }
-
-            [JsonPropertyName("title")]
-            public string Title { get; set; } = null!;
-        }
-
         [JsonPropertyName("id")]
         public Guid Id { get; set; }
 
@@ -103,7 +87,7 @@ public sealed class Login : ControllerBase
         public string Username { get; set; } = null!;
 
         [JsonPropertyName("region")]
-        public RegionDto Region { get; set; } = null!;
+        public ShortRegionDto Region { get; set; } = null!;
 
         [JsonPropertyName("device")]
         public DeviceDto CurrentDevice { get; set; } = null!;
@@ -188,12 +172,12 @@ public sealed class Login : ControllerBase
                 FullName = user.FullName,
                 BirthDate = user.BirthDate,
                 Username = user.Username,
-                Region = new CommandResponse.RegionDto
+                Region = new ShortRegionDto
                 {
                     Id = user.Region.Id,
                     Title = user.Region.Title,
                 },
-                CurrentDevice = user.Devices.Select(x => new CommandResponse.DeviceDto
+                CurrentDevice = user.Devices.Select(x => new DeviceDto
                 {
                     Id = x.Id,
                     Title = x.Title

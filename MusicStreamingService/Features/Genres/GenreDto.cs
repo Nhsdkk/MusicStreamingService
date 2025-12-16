@@ -3,7 +3,7 @@ using MusicStreamingService.Data.Entities;
 
 namespace MusicStreamingService.Features.Genres;
 
-public sealed record ShortGenreDto
+public sealed record GenreDto
 {
     [JsonPropertyName("id")]
     public Guid Id { get; init; }
@@ -11,8 +11,8 @@ public sealed record ShortGenreDto
     [JsonPropertyName("title")]
     public string Title { get; init; } = null!;
 
-    public static ShortGenreDto FromEntity(GenreEntity genre) =>
-        new ShortGenreDto
+    public static GenreDto FromEntity(GenreEntity genre) =>
+        new GenreDto
         {
             Id = genre.Id,
             Title = genre.Title
