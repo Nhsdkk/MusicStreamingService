@@ -44,7 +44,7 @@ public sealed class Search : ControllerBase
     public sealed record Query : BasePaginatedRequest, IRequest<QueryResponse>
     {
         [JsonPropertyName("title")]
-        public string? Title { get; init; } = null!;
+        public string? Title { get; init; }
     }
 
     public sealed record QueryResponse : BasePaginatedResponse
