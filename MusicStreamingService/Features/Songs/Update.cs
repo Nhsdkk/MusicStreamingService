@@ -122,13 +122,13 @@ public sealed class Update : ControllerBase
         public List<ShortSongArtistDto> Artists { get; init; } = null!;
 
         [JsonPropertyName("genres")]
-        public List<ShortGenreDto> Genres { get; init; } = null!;
+        public List<GenreDto> Genres { get; init; } = null!;
 
         [JsonPropertyName("album")]
         public ShortAlbumDto Album { get; init; } = null!;
 
         [JsonPropertyName("allowedRegions")]
-        public List<ShortRegionDto> AllowedRegions { get; init; } = null!;
+        public List<RegionDto> AllowedRegions { get; init; } = null!;
 
         public static CommandResponse FromEntity(
             SongEntity song,
@@ -146,11 +146,11 @@ public sealed class Update : ControllerBase
                     .Select(x =>
                         ShortSongArtistDto.FromEntity(x.Artist, x.MainArtist)
                     ).ToList(),
-                Genres = song.Genres.Select(ShortGenreDto.FromEntity).ToList(),
+                Genres = song.Genres.Select(GenreDto.FromEntity).ToList(),
                 Album = ShortAlbumDto.FromEntity(
                     song.Album,
                     albumCoverUrl),
-                AllowedRegions = song.AllowedRegions.Select(ShortRegionDto.FromEntity).ToList()
+                AllowedRegions = song.AllowedRegions.Select(RegionDto.FromEntity).ToList()
             };
     }
 
