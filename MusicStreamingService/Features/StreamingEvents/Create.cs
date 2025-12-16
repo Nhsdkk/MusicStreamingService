@@ -106,7 +106,7 @@ public sealed class Create : ControllerBase
 
             if (device.OwnerId != request.UserId)
             {
-                return new Exception("Device does not belong to the user");
+                return new Exception("Access denied: You do not have permission to use this device");
             }
 
             var song = await _context.Songs.SingleOrDefaultAsync(x => x.Id == body.SongId, cancellationToken);
