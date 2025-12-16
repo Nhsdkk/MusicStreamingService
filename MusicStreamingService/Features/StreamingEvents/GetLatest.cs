@@ -92,13 +92,13 @@ public sealed class GetLatest : ControllerBase
             public List<ShortSongArtistDto> Artists { get; init; } = new();
 
             [JsonPropertyName("allowedRegions")]
-            public List<ShortRegionDto> AllowedRegions { get; init; } = new();
+            public List<RegionDto> AllowedRegions { get; init; } = new();
 
             [JsonPropertyName("album")]
             public ShortAlbumDto Album { get; init; } = new();
 
             [JsonPropertyName("genres")]
-            public List<ShortGenreDto> Genres { get; init; } = new();
+            public List<GenreDto> Genres { get; init; } = new();
 
             public static LastPlayedSong FromEntity(
                 SongEntity song,
@@ -116,11 +116,11 @@ public sealed class GetLatest : ControllerBase
                         .Select(x => ShortSongArtistDto.FromEntity(x.Artist, x.MainArtist))
                         .ToList(),
                     AllowedRegions = song.AllowedRegions
-                        .Select(ShortRegionDto.FromEntity)
+                        .Select(RegionDto.FromEntity)
                         .ToList(),
                     Album = ShortAlbumDto.FromEntity(song.Album, albumArtUrl),
                     Genres = song.Genres
-                        .Select(ShortGenreDto.FromEntity)
+                        .Select(GenreDto.FromEntity)
                         .ToList()
                 };
         }

@@ -8,4 +8,5 @@ public static class RouteGroups
     public const string StreamingEvents = "StreamingEvents";
     public const string Genres = "Genres";
     public const string Regions = "Regions";
+    public const string Playlists = "Playlists";
 }

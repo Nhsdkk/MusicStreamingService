@@ -46,13 +46,15 @@ namespace MusicStreamingService.Data.CompiledModels
                 sentinel: new Guid("00000000-0000-0000-0000-000000000000"));
             playlistId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
 
-            var position = runtimeEntityType.AddProperty(
-                "Position",
-                typeof(long),
-                propertyInfo: typeof(PlaylistSongEntity).GetProperty("Position", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                fieldInfo: typeof(PlaylistSongEntity).GetField("<Position>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
-                sentinel: 0L);
-            position.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+            var addedAt = runtimeEntityType.AddProperty(
+                "AddedAt",
+                typeof(DateTime),
+                propertyInfo: typeof(PlaylistSongEntity).GetProperty("AddedAt", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlaylistSongEntity).GetField("<AddedAt>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                valueGenerated: ValueGenerated.OnAdd,
+                sentinel: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+            addedAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
+            addedAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
             var key = runtimeEntityType.AddKey(
                 new[] { songId, playlistId });

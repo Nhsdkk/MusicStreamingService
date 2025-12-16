@@ -247,11 +247,14 @@ public sealed class Update : ControllerBase
                 song.Genres = genres;
             }
 
+            await _context.SaveChangesAsync(cancellationToken);
+
             var songUrlResult = await _albumStorageService.GetPresignedUrl(song.Album.S3ArtworkFilename);
             if (songUrlResult.IsError)
             {
                 return songUrlResult.Error();
             }
+            
             return CommandResponse.FromEntity(
                 song,
                 albumCoverUrl: songUrlResult.Success()

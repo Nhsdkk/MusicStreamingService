@@ -7,7 +7,8 @@ internal sealed class PlaylistSongEntityConfiguration : IEntityTypeConfiguration
 {
     public void Configure(EntityTypeBuilder<PlaylistSongEntity> builder)
     {
-        builder.Property(x => x.Position).IsRequired();
+        builder.Property(x => x.AddedAt)
+            .HasDefaultValueSql("now()");
         
         builder.HasKey(x => new { x.SongId, x.PlaylistId });
 

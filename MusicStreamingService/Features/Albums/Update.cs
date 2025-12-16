@@ -302,6 +302,8 @@ public sealed class Update : ControllerBase
             var songFileNames = album.Songs.Select(x => x.S3MediaFileName).ToList();
             var songUrlMapping = await _albumStorageService.GetPresignedUrls(songFileNames);
 
+            await _context.SaveChangesAsync(cancellationToken);
+
             return CommandResponse.FromEntity(album, presignedArtworkUrl, songUrlMapping);
         }
     }

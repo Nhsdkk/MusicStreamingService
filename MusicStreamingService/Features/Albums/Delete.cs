@@ -113,6 +113,8 @@ public sealed class Delete : ControllerBase
             await _songStorageService.DeleteSongs(songsFileNames);
             
             _context.Albums.Remove(album);
+            await _context.SaveChangesAsync(cancellationToken);
+            
             return Unit.Value;
         }
     }

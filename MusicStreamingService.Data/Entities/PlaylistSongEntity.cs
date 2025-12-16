@@ -23,7 +23,7 @@ public sealed record PlaylistSongEntity
     public SongEntity Song { get; set; } = null!;
     
     /// <summary>
-    /// Position of the track in the playlist
+    /// Timestamp when song was added to the playlist
     /// </summary>
-    public long Position { get; set; }
+    public DateTime AddedAt { get; set; }
 }

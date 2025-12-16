@@ -41,7 +41,6 @@ public sealed class TransactionalPipelineBehavior<TCommand, TResponseData>
                 return response;
             }
             
-            await _context.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return response;
         }
