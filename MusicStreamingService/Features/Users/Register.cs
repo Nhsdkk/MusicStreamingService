@@ -221,6 +221,7 @@ public sealed class Register : ControllerBase
 
             var claims = UserClaimsCreator.FromEntity(user);
             var (accessToken, refreshToken) = _jwtService.GetPair(claims);
+            
             return new ResponseDto
             {
                 Id = user.Id,

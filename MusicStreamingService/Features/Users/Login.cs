@@ -87,7 +87,7 @@ public sealed class Login : ControllerBase
         public string Username { get; set; } = null!;
 
         [JsonPropertyName("region")]
-        public ShortRegionDto Region { get; set; } = null!;
+        public RegionDto Region { get; set; } = null!;
 
         [JsonPropertyName("device")]
         public DeviceDto CurrentDevice { get; set; } = null!;
@@ -172,7 +172,7 @@ public sealed class Login : ControllerBase
                 FullName = user.FullName,
                 BirthDate = user.BirthDate,
                 Username = user.Username,
-                Region = new ShortRegionDto
+                Region = new RegionDto
                 {
                     Id = user.Region.Id,
                     Title = user.Region.Title,

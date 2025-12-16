@@ -330,6 +330,7 @@ public sealed class Create : ControllerBase
             }
 
             await _context.AddRangeAsync(songsToAdd, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
 
             return CommandResponse.FromEntity(album, albumArtworkLink, songUrlMapping);
         }

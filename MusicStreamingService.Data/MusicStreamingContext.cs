@@ -56,7 +56,8 @@ public sealed class MusicStreamingContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseModel(MusicStreamingContextModel.Instance);
+        options.UseModel(MusicStreamingContextModel.Instance)
+            .EnableSensitiveDataLogging();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
