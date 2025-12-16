@@ -200,7 +200,6 @@ public class Create : ControllerBase
             }).ToList();
 
             await _context.Playlists.AddAsync(playlist, cancellationToken);
-            await _context.PlaylistSongs.AddRangeAsync(playlist.Songs, cancellationToken);
 
             var albumArtworkUrlMapping =
                 await _albumStorageService.GetPresignedUrls(songs.Select(x => x.Album.S3ArtworkFilename));
