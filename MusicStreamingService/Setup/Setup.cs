@@ -21,6 +21,17 @@ public static class Setup
         var services = builder.Services;
         var configuration = builder.Configuration;
         configuration.AddEnvironmentVariables();
+
+        services.AddCors(opts =>
+        {
+            opts.AddDefaultPolicy(policy =>
+            {
+                policy
+                    .WithOrigins("*")
+                    .WithMethods("*")
+                    .WithHeaders("*");
+            });
+        });
         
         services
             .AddControllers()
@@ -54,6 +65,8 @@ public static class Setup
             .ConfigureAuth(builder.Environment, configuration);
 
         var app = builder.Build();
+
+        app.UseCors();
 
         if (app.Environment.IsDevelopment())
         {
