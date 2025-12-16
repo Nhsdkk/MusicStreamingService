@@ -6,4 +6,5 @@ public static class RouteGroups
     public const string Songs = "Songs";
     public const string Albums = "Albums";
     public const string Genres = "Genres";
+    public const string Regions = "Regions";
 }

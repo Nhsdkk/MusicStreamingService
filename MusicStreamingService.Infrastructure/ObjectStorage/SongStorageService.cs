@@ -9,11 +9,14 @@ public interface ISongStorageService
 {
     public Task<Result<string>> GetPresignedUrl(
         string songFileName);
-    
+
+    public Task<Dictionary<string, string?>> GetPresignedUrls(
+        List<string> songFileNames);
+
     public Task<Result<string>> UploadSong(
         string songFileName,
         Stream songData);
-    
+
     public Task<Result<Unit>> DeleteSongs(
         List<string> songFileNames);
 }
@@ -35,8 +38,24 @@ public sealed class SongStorageService : ISongStorageService
     public async Task<Result<string>> GetPresignedUrl(string songFileName) =>
         await _client.GetPresignedUrl(Buckets.SongBucketName, songFileName, _configuration.ExpireTimeInSeconds);
 
+    public async Task<Dictionary<string, string?>> GetPresignedUrls(List<string> songFileNames)
+    {
+        var uniqueFileNames = songFileNames.Distinct().ToList();
+
+        var presignedUrlTasks = uniqueFileNames.Select(async fname =>
+        {
+            var urlResult = await GetPresignedUrl(fname);
+            return urlResult.Match(
+                url => new KeyValuePair<string, string?>(fname, url),
+                _ => new KeyValuePair<string, string?>(fname, null));
+        });
+
+        var result = await Task.WhenAll(presignedUrlTasks);
+        return result.ToDictionary();
+    }
+
     public async Task<Result<string>> UploadSong(
-        string songFileName, 
+        string songFileName,
         Stream songData)
     {
         await _client.UploadObject(Buckets.SongBucketName, songFileName, songData, ContentType);

@@ -31,7 +31,7 @@ public class ShortAlbumSongDto
     public List<GenreDto> Genres { get; init; } = null!;
 
     [JsonPropertyName("allowedRegions")]
-    public List<ShortRegionDto> AllowedRegions { get; init; } = null!;
+    public List<RegionDto> AllowedRegions { get; init; } = null!;
     
     [JsonPropertyName("albumPosition")]
     public long AlbumPosition { get; init; }
@@ -39,8 +39,12 @@ public class ShortAlbumSongDto
     [JsonPropertyName("titleTrack")]
     public bool IsTitleTrack { get; init; }
     
+    [JsonPropertyName("songUrl")]
+    public string? SongUrl { get; init; }
+    
     public static ShortAlbumSongDto FromEntity(
-        SongEntity song) =>
+        SongEntity song,
+        string? songUrl) =>
         new ShortAlbumSongDto
         {
             Id = song.Id,
@@ -55,9 +59,10 @@ public class ShortAlbumSongDto
                 .Select(GenreDto.FromEntity)
                 .ToList(),
             AllowedRegions = song.AllowedRegions
-                .Select(ShortRegionDto.FromEntity)
+                .Select(RegionDto.FromEntity)
                 .ToList(),
             AlbumPosition = song.AlbumPosition,
-            IsTitleTrack = song.IsTitleTrack
+            IsTitleTrack = song.IsTitleTrack,
+            SongUrl = songUrl
         };
 }
