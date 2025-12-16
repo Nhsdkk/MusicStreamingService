@@ -37,6 +37,7 @@ public sealed class TransactionalPipelineBehavior<TCommand, TResponseData>
 
             if (response.IsError)
             {
+                await transaction.RollbackAsync(cancellationToken);
                 return response;
             }
             
