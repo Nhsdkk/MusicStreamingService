@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using MusicStreamingService.Data.Entities;
 
-namespace MusicStreamingService.Features.Region;
+namespace MusicStreamingService.Features.Genres;
 
-public sealed record ShortRegionDto
+public sealed record GenreDto
 {
     [JsonPropertyName("id")]
     public Guid Id { get; init; }
@@ -11,10 +11,10 @@ public sealed record ShortRegionDto
     [JsonPropertyName("title")]
     public string Title { get; init; } = null!;
 
-    public static ShortRegionDto FromEntity(RegionEntity region) =>
-        new ShortRegionDto
+    public static GenreDto FromEntity(GenreEntity genre) =>
+        new GenreDto
         {
-            Id = region.Id,
-            Title = region.Title
+            Id = genre.Id,
+            Title = genre.Title
         };
 }

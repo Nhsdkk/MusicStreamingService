@@ -28,10 +28,10 @@ public sealed record ShortSongDto
     public bool IsExplicit { get; init; }
 
     [JsonPropertyName("genres")]
-    public List<ShortGenreDto> Genres { get; init; } = null!;
+    public List<GenreDto> Genres { get; init; } = null!;
 
     [JsonPropertyName("allowedRegions")]
-    public List<ShortRegionDto> AllowedRegions { get; init; } = null!;
+    public List<RegionDto> AllowedRegions { get; init; } = null!;
     
     [JsonPropertyName("album")]
     public ShortAlbumDto Album { get; init; } = null!;
@@ -51,10 +51,10 @@ public sealed record ShortSongDto
             IsExplicit = song.Explicit,
             Album = ShortAlbumDto.FromEntity(song.Album, albumArtworkUrl),
             Genres = song.Genres
-                .Select(ShortGenreDto.FromEntity)
+                .Select(GenreDto.FromEntity)
                 .ToList(),
             AllowedRegions = song.AllowedRegions
-                .Select(ShortRegionDto.FromEntity)
+                .Select(RegionDto.FromEntity)
                 .ToList()
         };
 }
