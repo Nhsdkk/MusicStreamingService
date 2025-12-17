@@ -26,7 +26,7 @@ public class GetSongUrl : ControllerBase
     /// <summary>
     /// Get song url for streaming
     /// </summary>
-    /// <param name="query">I</param>
+    /// <param name="query">The query containing the song ID to get the streaming URL for.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [HttpGet("/api/v1/songs/url")]
