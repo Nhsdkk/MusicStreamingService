@@ -32,7 +32,7 @@ public sealed record ShortSongDto
     public List<GenreDto> Genres { get; init; } = null!;
 
     [JsonPropertyName("allowedInUserRegion")]
-    public bool AllowedInUserRegion { get; set; }
+    public bool AllowedInUserRegion { get; init; }
     
     [JsonPropertyName("album")]
     public ShortAlbumDto Album { get; init; } = null!;
