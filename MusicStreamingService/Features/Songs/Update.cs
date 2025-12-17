@@ -249,15 +249,15 @@ public sealed class Update : ControllerBase
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var songUrlResult = await _albumStorageService.GetPresignedUrl(song.Album.S3ArtworkFilename);
-            if (songUrlResult.IsError)
+            var albumArtworkUrlResult = await _albumStorageService.GetPresignedUrl(song.Album.S3ArtworkFilename);
+            if (albumArtworkUrlResult.IsError)
             {
-                return songUrlResult.Error();
+                return albumArtworkUrlResult.Error();
             }
             
             return CommandResponse.FromEntity(
                 song,
-                albumCoverUrl: songUrlResult.Success()
+                albumCoverUrl: albumArtworkUrlResult.Success()
             );
         }
     }

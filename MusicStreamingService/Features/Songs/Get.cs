@@ -74,9 +74,6 @@ public sealed class Get : ControllerBase
         [JsonPropertyName("durationMs")]
         public long DurationMs { get; init; }
 
-        [JsonPropertyName("songUrl")]
-        public string? SongUrl { get; init; }
-
         [JsonPropertyName("likes")]
         public long Likes { get; init; }
 
@@ -85,9 +82,6 @@ public sealed class Get : ControllerBase
 
         [JsonPropertyName("artists")]
         public List<ShortSongArtistDto> Artists { get; init; } = new();
-
-        [JsonPropertyName("allowedRegions")]
-        public List<RegionDto> AllowedRegions { get; init; } = new();
 
         [JsonPropertyName("allowedInUserRegion")]
         public bool AllowedInUserRegion { get; init; }
@@ -100,7 +94,6 @@ public sealed class Get : ControllerBase
 
         public static QueryResponse FromEntity(
             SongEntity song,
-            string? songUrl,
             string? albumArtUrl,
             RegionClaim userRegion) =>
             new QueryResponse
@@ -108,14 +101,10 @@ public sealed class Get : ControllerBase
                 Id = song.Id,
                 Title = song.Title,
                 DurationMs = song.DurationMs,
-                SongUrl = songUrl,
                 Likes = song.Likes,
                 Explicit = song.Explicit,
                 Artists = song.Artists
                     .Select(x => ShortSongArtistDto.FromEntity(x.Artist, x.MainArtist))
-                    .ToList(),
-                AllowedRegions = song.AllowedRegions
-                    .Select(RegionDto.FromEntity)
                     .ToList(),
                 AllowedInUserRegion = song.AllowedRegions.Any(r => r.Id == userRegion.Id),
                 Album = ShortAlbumDto.FromEntity(song.Album, albumArtUrl),
@@ -165,15 +154,11 @@ public sealed class Get : ControllerBase
                 return new Exception($"Users under {UserConstants.AdultLegalAge} years old are not allowed to access explicit songs");
             }
 
-            var s3SongPath = song.S3MediaFileName;
-            var songUrlGetResult = await _songStorageService.GetPresignedUrl(s3SongPath);
-
             var s3AlbumArtPath = song.Album.S3ArtworkFilename;
             var albumArtUrlGetResult = await _albumStorageService.GetPresignedUrl(s3AlbumArtPath);
 
             return QueryResponse.FromEntity(
                 song,
-                songUrlGetResult.Match<string?>(url => url, _ => null),
                 albumArtUrlGetResult.Match<string?>(url => url, _ => null),
                 request.UserRegion);
         }
