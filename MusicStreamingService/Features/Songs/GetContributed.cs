@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
+using MusicStreamingService.Data.QueryExtensions;
+using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
+using MusicStreamingService.Validators;
 
 namespace MusicStreamingService.Features.Songs;
 
@@ -36,28 +39,37 @@ public sealed class GetContributed : ControllerBase
     [ProducesResponseType(typeof(QueryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetContributedSongs(
-        [FromQuery] Query request,
+        [FromQuery] Query.QueryBody request,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(
-            request,
+            new Query
+            {
+                UserRegion = User.GetUserRegion(),
+                Body = request,
+            },
             cancellationToken);
 
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Query : BasePaginatedRequest, IRequest<Result<QueryResponse>>
+    public sealed record Query : IRequest<Result<QueryResponse>>
     {
-        [JsonPropertyName("userId")]
-        public Guid UserId { get; init; }
+        public sealed record QueryBody : BasePaginatedRequest
+        {
+            [JsonPropertyName("userId")]
+            public Guid UserId { get; init; }
+        }
+        
+        public RegionClaim UserRegion { get; init; } = null!;
 
-        public sealed class Validator : AbstractValidator<Query>
+        public QueryBody Body { get; init; } = null!;
+        
+        public sealed class Validator : BasePaginatedRequestValidator<QueryBody>
         {
             public Validator()
             {
                 RuleFor(x => x.UserId).NotEmpty();
-                RuleFor(x => x.ItemsPerPage).GreaterThan(0).LessThan(100);
-                RuleFor(x => x.Page).GreaterThanOrEqualTo(0);
             }
         }
     }
@@ -85,11 +97,12 @@ public sealed class GetContributed : ControllerBase
             Query request,
             CancellationToken cancellationToken)
         {
+            var requestBody = request.Body;
             var user = await _context.Users
                 .AsNoTracking()
                 .SingleOrDefaultAsync(
                     x =>
-                        x.Id == request.UserId,
+                        x.Id == requestBody.UserId,
                     cancellationToken);
 
             if (user == null || user.Disabled)
@@ -111,8 +124,7 @@ public sealed class GetContributed : ControllerBase
                 .Include(s => s.Genres)
                 .Include(s => s.Album)
                 .OrderByDescending(x => x.Likes)
-                .Skip(request.ItemsPerPage * request.Page)
-                .Take(request.ItemsPerPage)
+                .ApplyPagination(requestBody.ItemsPerPage, requestBody.Page)
                 .ToListAsync(cancellationToken);
 
             var albumArtPaths = songs.Select(x => x.Album.S3ArtworkFilename);
@@ -122,12 +134,12 @@ public sealed class GetContributed : ControllerBase
             {
                 Songs = songs
                     .Select(s =>
-                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename], request.UserRegion)
                     ).ToList(),
                 TotalCount = totalCount,
-                ItemsPerPage = request.ItemsPerPage,
+                ItemsPerPage = requestBody.ItemsPerPage,
                 ItemCount = songs.Count,
-                Page = request.Page
+                Page = requestBody.Page,
             };
         }
     }

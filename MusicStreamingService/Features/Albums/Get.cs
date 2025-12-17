@@ -39,7 +39,8 @@ public sealed class Get : ControllerBase
             new Command
             {
                 Body = request,
-                UserAge = User.GetUserAge()
+                UserAge = User.GetUserAge(),
+                UserRegion = User.GetUserRegion(),
             },
             cancellationToken);
         
@@ -62,6 +63,8 @@ public sealed class Get : ControllerBase
         public CommandBody Body { get; init; } = null!;
         
         public int UserAge { get; init; } = 0;
+        
+        public RegionClaim UserRegion { get; init; } = null!;
         
         public sealed class Validator : AbstractValidator<CommandBody>
         {
@@ -101,8 +104,7 @@ public sealed class Get : ControllerBase
         public static CommandResponse FromEntity(
             AlbumEntity album,
             string artworkUrl,
-            Dictionary<string, string?> songUrlMapping,
-            bool allowExplicit) =>
+            RegionClaim userRegion) =>
             new CommandResponse
             {
                 Id = album.Id,
@@ -113,7 +115,7 @@ public sealed class Get : ControllerBase
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl,
                 Songs = album.Songs
-                    .Select(x => ShortAlbumSongDto.FromEntity(x, allowExplicit ? songUrlMapping[x.S3MediaFileName] : null))
+                    .Select(x => ShortAlbumSongDto.FromEntity(x, userRegion))
                     .OrderBy(x => x.AlbumPosition)
                     .ToList()
             };
@@ -122,16 +124,13 @@ public sealed class Get : ControllerBase
     public sealed class Handler : IRequestHandler<Command, Result<CommandResponse>>
     {
         private readonly MusicStreamingContext _context;
-        private readonly ISongStorageService _songStorageService;
         private readonly IAlbumStorageService _albumStorageService;
 
         public Handler(
             MusicStreamingContext context,
-            ISongStorageService songStorageService, 
             IAlbumStorageService albumStorageService)
         {
             _context = context;
-            _songStorageService = songStorageService;
             _albumStorageService = albumStorageService;
         }
 
@@ -157,8 +156,6 @@ public sealed class Get : ControllerBase
                 return new Exception("Album not found");
             }
             
-            var songFileNames = album.Songs.Select(x => x.S3MediaFileName).ToList();
-            var urlMapping = await _songStorageService.GetPresignedUrls(songFileNames);
             var artworkUrlResult = await _albumStorageService.GetPresignedUrl(album.S3ArtworkFilename);
 
             if (artworkUrlResult.IsError)
@@ -169,8 +166,7 @@ public sealed class Get : ControllerBase
             return CommandResponse.FromEntity(
                 album, 
                 artworkUrlResult.Success(),
-                urlMapping,
-                request.Body.AllowExplicit);
+                request.UserRegion);
         }
         
         

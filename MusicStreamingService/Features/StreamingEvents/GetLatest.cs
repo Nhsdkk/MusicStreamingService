@@ -47,7 +47,8 @@ public sealed class GetLatest : ControllerBase
             new Query
             {
                 Body = request,
-                UserId = User.GetUserId()
+                UserId = User.GetUserId(),
+                UserRegion = User.GetUserRegion(),
             }, cancellationToken);
 
         return result.Match<IActionResult>(Ok, BadRequest);
@@ -64,6 +65,8 @@ public sealed class GetLatest : ControllerBase
         public QueryBody Body { get; init; } = null!;
 
         public Guid UserId { get; init; }
+        
+        public RegionClaim UserRegion { get; init; } = null!;
     }
 
     public sealed record QueryResponse
@@ -79,9 +82,6 @@ public sealed class GetLatest : ControllerBase
             [JsonPropertyName("durationMs")]
             public long DurationMs { get; init; }
 
-            [JsonPropertyName("songUrl")]
-            public string? SongUrl { get; init; }
-
             [JsonPropertyName("likes")]
             public long Likes { get; init; }
 
@@ -91,8 +91,8 @@ public sealed class GetLatest : ControllerBase
             [JsonPropertyName("artists")]
             public List<ShortSongArtistDto> Artists { get; init; } = new();
 
-            [JsonPropertyName("allowedRegions")]
-            public List<RegionDto> AllowedRegions { get; init; } = new();
+            [JsonPropertyName("allowedInUserRegion")]
+            public bool AllowedInUserRegion { get; init; }
 
             [JsonPropertyName("album")]
             public ShortAlbumDto Album { get; init; } = new();
@@ -102,22 +102,20 @@ public sealed class GetLatest : ControllerBase
 
             public static LastPlayedSong FromEntity(
                 SongEntity song,
-                string? songUrl,
-                string? albumArtUrl) =>
+                string? albumArtUrl,
+                RegionClaim userRegion) =>
                 new LastPlayedSong
                 {
                     Id = song.Id,
                     Title = song.Title,
                     DurationMs = song.DurationMs,
-                    SongUrl = songUrl,
                     Likes = song.Likes,
                     Explicit = song.Explicit,
                     Artists = song.Artists
                         .Select(x => ShortSongArtistDto.FromEntity(x.Artist, x.MainArtist))
                         .ToList(),
-                    AllowedRegions = song.AllowedRegions
-                        .Select(RegionDto.FromEntity)
-                        .ToList(),
+                    AllowedInUserRegion = song.AllowedRegions
+                        .Any(x => x.Id == userRegion.Id),
                     Album = ShortAlbumDto.FromEntity(song.Album, albumArtUrl),
                     Genres = song.Genres
                         .Select(GenreDto.FromEntity)
@@ -142,8 +140,8 @@ public sealed class GetLatest : ControllerBase
 
         public static QueryResponse FromEntity(
             StreamingEventEntity streamingEvent,
-            string songUrl,
-            string artworkUrl) =>
+            string artworkUrl,
+            RegionClaim userRegion) =>
             new QueryResponse
             {
                 Id = streamingEvent.Id,
@@ -155,8 +153,8 @@ public sealed class GetLatest : ControllerBase
                 PositionMs = streamingEvent.PositionMs,
                 Song = LastPlayedSong.FromEntity(
                     streamingEvent.Song,
-                    songUrl,
-                    artworkUrl),
+                    artworkUrl,
+                    userRegion),
                 EventType = streamingEvent.EventType
             };
     }
@@ -165,15 +163,12 @@ public sealed class GetLatest : ControllerBase
     {
         private readonly MusicStreamingContext _context;
         private readonly IAlbumStorageService _albumStorageService;
-        private readonly ISongStorageService _songStorageService;
 
         public Handler(
             MusicStreamingContext context,
-            ISongStorageService songStorageService,
             IAlbumStorageService albumStorageService)
         {
             _context = context;
-            _songStorageService = songStorageService;
             _albumStorageService = albumStorageService;
         }
 
@@ -207,19 +202,13 @@ public sealed class GetLatest : ControllerBase
                 return new Exception("Device does not belong to the user");
             }
 
-            var songUrlResult = await _songStorageService.GetPresignedUrl(lastEvent.Song.S3MediaFileName);
-            if (songUrlResult.IsError)
-            {
-                return songUrlResult.Error();
-            }
-
             var albumArtUrlResult = await _albumStorageService.GetPresignedUrl(lastEvent.Song.Album.S3ArtworkFilename);
             if (albumArtUrlResult.IsError)
             {
                 return albumArtUrlResult.Error();
             }
 
-            return QueryResponse.FromEntity(lastEvent, songUrlResult.Success(), albumArtUrlResult.Success());
+            return QueryResponse.FromEntity(lastEvent, albumArtUrlResult.Success(), request.UserRegion);
         }
     }
 }

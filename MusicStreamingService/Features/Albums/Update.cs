@@ -48,6 +48,7 @@ public sealed class Update : ControllerBase
             new Command
             {
                 UserId = User.GetUserId(),
+                UserRegion = User.GetUserRegion(),
                 Body = request
             }, cancellationToken);
 
@@ -95,6 +96,8 @@ public sealed class Update : ControllerBase
         }
 
         public Guid UserId { get; init; }
+        
+        public RegionClaim UserRegion { get; init; } = null!;
 
         public CommandBody Body { get; init; } = null!;
 
@@ -172,7 +175,7 @@ public sealed class Update : ControllerBase
         public static CommandResponse FromEntity(
             AlbumEntity album,
             string? artworkUrl,
-            Dictionary<string, string?> songUrlMapping) =>
+            RegionClaim userRegion) =>
             new CommandResponse
             {
                 Id = album.Id,
@@ -183,7 +186,7 @@ public sealed class Update : ControllerBase
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl ?? string.Empty,
                 Songs = album.Songs
-                    .Select(x => ShortAlbumSongDto.FromEntity(x, songUrlMapping[x.S3MediaFileName]))
+                    .Select(x => ShortAlbumSongDto.FromEntity(x, userRegion))
                     .OrderBy(x => x.AlbumPosition)
                     .ToList()
             };
@@ -299,12 +302,9 @@ public sealed class Update : ControllerBase
                 presignedArtworkUrl = getUrlResult.Success();
             }
 
-            var songFileNames = album.Songs.Select(x => x.S3MediaFileName).ToList();
-            var songUrlMapping = await _albumStorageService.GetPresignedUrls(songFileNames);
-
             await _context.SaveChangesAsync(cancellationToken);
 
-            return CommandResponse.FromEntity(album, presignedArtworkUrl, songUrlMapping);
+            return CommandResponse.FromEntity(album, presignedArtworkUrl, request.UserRegion);
         }
     }
 }

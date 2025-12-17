@@ -4,6 +4,7 @@ using MusicStreamingService.Features.Albums;
 using MusicStreamingService.Features.Genres;
 using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
+using MusicStreamingService.Infrastructure.Authentication;
 
 namespace MusicStreamingService.Features.Songs;
 
@@ -30,15 +31,16 @@ public sealed record ShortSongDto
     [JsonPropertyName("genres")]
     public List<GenreDto> Genres { get; init; } = null!;
 
-    [JsonPropertyName("allowedRegions")]
-    public List<RegionDto> AllowedRegions { get; init; } = null!;
+    [JsonPropertyName("allowedInUserRegion")]
+    public bool AllowedInUserRegion { get; set; }
     
     [JsonPropertyName("album")]
     public ShortAlbumDto Album { get; init; } = null!;
 
     public static ShortSongDto FromEntity(
         SongEntity song,
-        string? albumArtworkUrl) =>
+        string? albumArtworkUrl,
+        RegionClaim userRegion) =>
         new ShortSongDto
         {
             Id = song.Id,
@@ -53,8 +55,7 @@ public sealed record ShortSongDto
             Genres = song.Genres
                 .Select(GenreDto.FromEntity)
                 .ToList(),
-            AllowedRegions = song.AllowedRegions
-                .Select(RegionDto.FromEntity)
-                .ToList()
+            AllowedInUserRegion = song.AllowedRegions
+                .Any(x => x.Id == userRegion.Id)
         };
 }

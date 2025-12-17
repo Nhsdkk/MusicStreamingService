@@ -45,7 +45,8 @@ public sealed class GetFavorite : ControllerBase
             new Query
             {
                 UserId = User.GetUserId(),
-                Body = request
+                Body = request,
+                UserRegion = User.GetUserRegion()
             },
             cancellationToken);
 
@@ -56,6 +57,8 @@ public sealed class GetFavorite : ControllerBase
     public sealed record Query : IRequest<Result<QueryResponse>>
     {
         public Guid UserId { get; init; }
+        
+        public RegionClaim UserRegion { get; init; } = null!;
 
         public QueryBody Body { get; init; } = null!;
 
@@ -121,7 +124,7 @@ public sealed class GetFavorite : ControllerBase
                 Page = request.Body.Page,
                 Songs = songs
                     .Select(s =>
-                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename], request.UserRegion)
                     ).ToList()
             };
         }

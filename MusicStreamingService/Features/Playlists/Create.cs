@@ -45,7 +45,8 @@ public class Create : ControllerBase
             new Command
             {
                 Body = request,
-                UserId = User.GetUserId()
+                UserId = User.GetUserId(),
+                UserRegion = User.GetUserRegion(),
             },
             cancellationToken);
 
@@ -92,6 +93,8 @@ public class Create : ControllerBase
         public CommandBody Body { get; init; } = null!;
 
         public Guid UserId { get; init; }
+        
+        public RegionClaim UserRegion { get; init; } = null!;
     }
 
     public sealed record CommandResponse
@@ -128,7 +131,8 @@ public class Create : ControllerBase
 
         public static CommandResponse FromEntity(
             PlaylistEntity playlist,
-            Dictionary<string, string?> albumArtworkUrlMapping)
+            Dictionary<string, string?> albumArtworkUrlMapping,
+            RegionClaim userRegion)
         {
             return new CommandResponse
             {
@@ -144,7 +148,12 @@ public class Create : ControllerBase
                 Likes = playlist.Likes,
                 Songs = playlist.Songs
                     .OrderBy(x => x.AddedAt)
-                    .Select(x => ShortSongDto.FromEntity(x.Song, albumArtworkUrlMapping[x.Song.Album.S3ArtworkFilename]))
+                    .Select(x =>
+                        ShortSongDto.FromEntity(
+                            x.Song,
+                            albumArtworkUrlMapping[x.Song.Album.S3ArtworkFilename],
+                            userRegion)
+                    )
                     .ToList()
             };
         }
@@ -203,10 +212,10 @@ public class Create : ControllerBase
 
             var albumArtworkUrlMapping =
                 await _albumStorageService.GetPresignedUrls(songs.Select(x => x.Album.S3ArtworkFilename));
-            
+
             await _context.SaveChangesAsync(cancellationToken);
-            
-            return CommandResponse.FromEntity(playlist, albumArtworkUrlMapping);
+
+            return CommandResponse.FromEntity(playlist, albumArtworkUrlMapping, request.UserRegion);
         }
     }
 }
