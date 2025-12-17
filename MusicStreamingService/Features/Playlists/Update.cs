@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
@@ -16,7 +17,7 @@ using MusicStreamingService.Openapi;
 namespace MusicStreamingService.Features.Playlists;
 
 [ApiController]
-public class Update : ControllerBase
+public sealed class Update : ControllerBase
 {
     private readonly IMediator _mediator;
 
@@ -43,21 +44,22 @@ public class Update : ControllerBase
         var result = await _mediator.Send(new Command
             {
                 Body = request,
-                UserId = User.GetUserId()
+                UserId = User.GetUserId(),
+                UserRegion = User.GetUserRegion(),
             },
             cancellationToken);
 
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    public sealed record Command : IRequest<Result<CommandResponse>>
+    public sealed record Command : ITransactionWrappedCommand<Result<CommandResponse>>
     {
         public sealed record CommandBody
         {
             [JsonPropertyName("id")]
             public Guid Id { get; init; }
 
-            [JsonPropertyName("name")]
+            [JsonPropertyName("title")]
             public string? Title { get; init; }
 
             [JsonPropertyName("description")]
@@ -91,6 +93,15 @@ public class Update : ControllerBase
                     RuleFor(x => x.SongsToRemove)
                         .NotEmpty()
                         .When(x => x.SongsToRemove is not null);
+                    
+                    RuleFor(x => x.SongsToAdd)
+                        .Must(x => x!.Distinct().Count() == x!.Count)
+                        .When(x => x.SongsToAdd is not null)
+                        .WithMessage("Songs to add must be unique.");
+                    RuleFor(x => x.SongsToRemove)
+                        .Must(x => x!.Distinct().Count() == x!.Count)
+                        .When(x => x.SongsToRemove is not null)
+                        .WithMessage("Songs to remove must be unique.");
                 }
             }
         }
@@ -98,6 +109,8 @@ public class Update : ControllerBase
         public CommandBody Body { get; init; } = null!;
 
         public Guid UserId { get; init; }
+        
+        public RegionClaim UserRegion { get; init; } = null!;
     }
 
     public sealed record CommandResponse
@@ -134,7 +147,8 @@ public class Update : ControllerBase
 
         public static CommandResponse FromEntity(
             PlaylistEntity playlist,
-            Dictionary<string, string?> albumArtworkUrlMapping)
+            Dictionary<string, string?> albumArtworkUrlMapping,
+            RegionClaim userRegion)
         {
             return new CommandResponse
             {
@@ -150,7 +164,7 @@ public class Update : ControllerBase
                 Likes = playlist.Likes,
                 Songs = playlist.Songs
                     .OrderBy(x => x.AddedAt)
-                    .Select(x => ShortSongDto.FromEntity(x.Song, albumArtworkUrlMapping[x.Song.Album.S3ArtworkFilename]))
+                    .Select(x => ShortSongDto.FromEntity(x.Song, albumArtworkUrlMapping[x.Song.Album.S3ArtworkFilename], userRegion))
                     .ToList()
             };
         }
@@ -209,6 +223,7 @@ public class Update : ControllerBase
                 }
                 
                 playlist.Songs.RemoveAll(x => requestBody.SongsToRemove.Contains(x.Song.Id));
+                storedSongIds.RemoveWhere(x => requestBody.SongsToRemove.Contains(x));
             }
             
             if (requestBody.SongsToAdd is not null)
@@ -240,13 +255,13 @@ public class Update : ControllerBase
                     });
                 }
             }
-
-            var albumArtworkUrlMapping =
-                await _albumStorageService.GetPresignedUrls(playlist.Songs.Select(x => x.Song.Album.S3ArtworkFilename));
             
             await _context.SaveChangesAsync(cancellationToken);
             
-            return CommandResponse.FromEntity(playlist, albumArtworkUrlMapping);
+            var albumArtworkUrlMapping =
+                await _albumStorageService.GetPresignedUrls(playlist.Songs.Select(x => x.Song.Album.S3ArtworkFilename));
+            
+            return CommandResponse.FromEntity(playlist, albumArtworkUrlMapping, request.UserRegion);
         }
     }
 }
