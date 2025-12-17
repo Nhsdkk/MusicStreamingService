@@ -32,7 +32,7 @@ public class ShortAlbumSongDto
     public List<GenreDto> Genres { get; init; } = null!;
 
     [JsonPropertyName("allowedInUserRegion")]
-    public bool AllowedInUserRegion { get; set; }
+    public bool AllowedInUserRegion { get; init; }
     
     [JsonPropertyName("albumPosition")]
     public long AlbumPosition { get; init; }
