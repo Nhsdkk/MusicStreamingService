@@ -34,7 +34,7 @@ public sealed class Update : ControllerBase
     /// <param name="request">Album data</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpPut("api/v1/albums")]
+    [HttpPut("/api/v1/albums")]
     [Authorize(Roles = Permissions.ManageAlbumsPermission)]
     [Tags(RouteGroups.Albums)]
     [Consumes("multipart/form-data")]

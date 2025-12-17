@@ -75,7 +75,7 @@ public class Create : ControllerBase
                 {
                     RuleFor(x => x.Title)
                         .NotEmpty()
-                        .MaximumLength(200);
+                        .MaximumLength(255);
                     RuleFor(x => x.Description)
                         .NotEmpty()
                         .When(x => x.Description is not null);
