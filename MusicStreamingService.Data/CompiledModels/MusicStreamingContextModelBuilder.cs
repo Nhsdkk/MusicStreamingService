@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("c2b19bf4-865d-49f0-a220-e294922e1fd7"), entityTypeCount: 22)
+            : base(skipDetectChanges: false, modelId: new Guid("cf6312fb-c187-438b-abc0-b3cd75a3b9bf"), entityTypeCount: 22)
         {
         }
 
@@ -51,7 +51,6 @@ namespace MusicStreamingService.Data.CompiledModels
             PaymentEntityEntityType.CreateForeignKey1(paymentEntity, userEntity);
             PaymentEntityEntityType.CreateForeignKey2(paymentEntity, subscriptionEntity);
             PlaylistEntityEntityType.CreateForeignKey1(playlistEntity, userEntity);
-            PlaylistEntityEntityType.CreateForeignKey2(playlistEntity, userEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey1(playlistFavoriteEntity, playlistEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey2(playlistFavoriteEntity, userEntity);
             PlaylistSongEntityEntityType.CreateForeignKey1(playlistSongEntity, playlistEntity);
@@ -78,6 +77,7 @@ namespace MusicStreamingService.Data.CompiledModels
             GenreEntityEntityType.CreateSkipNavigation1(genreEntity, songEntity, songGenreEntity);
             PermissionEntityEntityType.CreateSkipNavigation1(permissionEntity, roleEntity, rolePermissionEntity);
             PlaylistEntityEntityType.CreateSkipNavigation1(playlistEntity, userEntity, playlistFavoriteEntity);
+            PlaylistEntityEntityType.CreateSkipNavigation2(playlistEntity, userEntity, playlistFavoriteEntity);
             RegionEntityEntityType.CreateSkipNavigation1(regionEntity, songEntity, allowedDistributionEntity);
             RoleEntityEntityType.CreateSkipNavigation1(roleEntity, permissionEntity, rolePermissionEntity);
             RoleEntityEntityType.CreateSkipNavigation2(roleEntity, userEntity, userRoleEntity);

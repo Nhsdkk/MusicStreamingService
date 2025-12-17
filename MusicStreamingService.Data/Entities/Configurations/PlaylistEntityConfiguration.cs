@@ -16,11 +16,15 @@ internal sealed class PlaylistEntityConfiguration : BaseUpdatableEntityConfigura
 
         builder
             .HasOne(x => x.Creator)
-            .WithMany()
+            .WithMany(x => x.OwnedPlaylists)
             .HasForeignKey(x => x.CreatorId);
         builder
             .HasMany(x => x.Songs)
             .WithOne(x => x.Playlist)
             .HasForeignKey(x => x.PlaylistId);
+        builder
+            .HasMany(x => x.LikedByUsers)
+            .WithMany(x => x.FavoritePlaylists)
+            .UsingEntity<PlaylistFavoriteEntity>();
     }
 }
