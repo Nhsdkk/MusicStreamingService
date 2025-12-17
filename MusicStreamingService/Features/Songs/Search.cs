@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
-using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Features.Users;
@@ -122,7 +121,6 @@ public class Search : ControllerBase
 
             var query = _context.Songs
                 .AsNoTracking()
-                .Where(s => s.AllowedRegions.Any(region => region.Id == userRegion.Id))
                 .FilterByOptionalArtistName(requestBody.ArtistName)
                 .FilterByOptionalTitle(requestBody.Title)
                 .FilterByOptionalGenres(requestBody.Genres)
@@ -149,7 +147,7 @@ public class Search : ControllerBase
             {
                 Songs = songs
                     .Select(s =>
-                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename])
+                        ShortSongDto.FromEntity(s, albumArtUrls[s.Album.S3ArtworkFilename], userRegion)
                     ).ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = requestBody.ItemsPerPage,

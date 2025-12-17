@@ -4,6 +4,7 @@ using MusicStreamingService.Features.Albums;
 using MusicStreamingService.Features.Genres;
 using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
+using MusicStreamingService.Infrastructure.Authentication;
 
 namespace MusicStreamingService.Features.Songs;
 
@@ -30,8 +31,8 @@ public class ShortAlbumSongDto
     [JsonPropertyName("genres")]
     public List<GenreDto> Genres { get; init; } = null!;
 
-    [JsonPropertyName("allowedRegions")]
-    public List<RegionDto> AllowedRegions { get; init; } = null!;
+    [JsonPropertyName("allowedInUserRegion")]
+    public bool AllowedInUserRegion { get; init; }
     
     [JsonPropertyName("albumPosition")]
     public long AlbumPosition { get; init; }
@@ -39,12 +40,9 @@ public class ShortAlbumSongDto
     [JsonPropertyName("titleTrack")]
     public bool IsTitleTrack { get; init; }
     
-    [JsonPropertyName("songUrl")]
-    public string? SongUrl { get; init; }
-    
     public static ShortAlbumSongDto FromEntity(
         SongEntity song,
-        string? songUrl) =>
+        RegionClaim userRegion) =>
         new ShortAlbumSongDto
         {
             Id = song.Id,
@@ -58,11 +56,8 @@ public class ShortAlbumSongDto
             Genres = song.Genres
                 .Select(GenreDto.FromEntity)
                 .ToList(),
-            AllowedRegions = song.AllowedRegions
-                .Select(RegionDto.FromEntity)
-                .ToList(),
+            AllowedInUserRegion = song.AllowedRegions.Any(x => x.Id == userRegion.Id),
             AlbumPosition = song.AlbumPosition,
-            IsTitleTrack = song.IsTitleTrack,
-            SongUrl = songUrl
+            IsTitleTrack = song.IsTitleTrack
         };
 }
