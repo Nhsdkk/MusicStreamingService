@@ -78,7 +78,7 @@ public class GetOwned : ControllerBase
                     .ToList(),
                 TotalCount = totalCount,
                 ItemsPerPage = request.ItemsPerPage,
-                Page = request.ItemsPerPage,
+                Page = request.Page,
                 ItemCount = albums.Count,
             };
     }
