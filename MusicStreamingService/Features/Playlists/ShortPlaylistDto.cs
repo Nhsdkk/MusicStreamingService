@@ -33,6 +33,6 @@ public sealed record ShortPlaylistDto
             Description = playlist.Description,
             Creator = ShortUserDto.FromEntity(playlist.Creator),
             AccessType = playlist.AccessType,
-            Likes = playlist.LikedByUsers.Count,
+            Likes = playlist.Likes,
         };
 }

@@ -65,7 +65,6 @@ public class Search : ControllerBase
                 {
                     RuleFor(x => x.Title).MaximumLength(255).When(x => x.Title is not null);
                     RuleForEach(x => x.GenreIds).NotEmpty().When(x => x.GenreIds is not null);
-                    RuleFor(x => x.GenreIds).NotEmpty().When(x => x.GenreIds is not null);
                 }
             }
         }
