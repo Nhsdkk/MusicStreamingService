@@ -33,7 +33,7 @@ public class Get : ControllerBase
     /// <returns></returns>
     [HttpGet("/api/v1/import-tasks")]
     [Tags(RouteGroups.PlaylistImportTasks)]
-    [Authorize(Roles = Permissions.ManageAlbumsPermission)]
+    [Authorize(Roles = Permissions.ManagePlaylistsPermission)]
     [ProducesResponseType<QueryResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTasks(
         [FromQuery] Query.QueryBody request,
