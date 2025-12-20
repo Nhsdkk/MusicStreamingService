@@ -22,11 +22,11 @@ namespace MusicStreamingService.Data.CompiledModels
                 "MusicStreamingService.Data.Entities.PlaylistEntity",
                 typeof(PlaylistEntity),
                 baseEntityType,
-                propertyCount: 9,
+                propertyCount: 8,
                 navigationCount: 2,
-                skipNavigationCount: 1,
-                foreignKeyCount: 2,
-                unnamedIndexCount: 2,
+                skipNavigationCount: 2,
+                foreignKeyCount: 1,
+                unnamedIndexCount: 1,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -102,21 +102,12 @@ namespace MusicStreamingService.Data.CompiledModels
             updatedAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             updatedAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
-            var userEntityId = runtimeEntityType.AddProperty(
-                "UserEntityId",
-                typeof(Guid?),
-                nullable: true);
-            userEntityId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
             var key = runtimeEntityType.AddKey(
                 new[] { id });
             runtimeEntityType.SetPrimaryKey(key);
 
             var index = runtimeEntityType.AddIndex(
                 new[] { creatorId });
-
-            var index0 = runtimeEntityType.AddIndex(
-                new[] { userEntityId });
 
             return runtimeEntityType;
         }
@@ -136,15 +127,6 @@ namespace MusicStreamingService.Data.CompiledModels
                 propertyInfo: typeof(PlaylistEntity).GetProperty("Creator", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PlaylistEntity).GetField("<Creator>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            return runtimeForeignKey;
-        }
-
-        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
-        {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("UserEntityId") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
-                principalEntityType);
-
             var ownedPlaylists = principalEntityType.AddNavigation("OwnedPlaylists",
                 runtimeForeignKey,
                 onDependent: false,
@@ -156,6 +138,31 @@ namespace MusicStreamingService.Data.CompiledModels
         }
 
         public static RuntimeSkipNavigation CreateSkipNavigation1(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
+        {
+            var skipNavigation = declaringEntityType.AddSkipNavigation(
+                "LikedByUsers",
+                targetEntityType,
+                joinEntityType.FindForeignKey(
+                    new[] { joinEntityType.FindProperty("PlaylistId") },
+                    declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
+                    declaringEntityType),
+                true,
+                false,
+                typeof(List<UserEntity>),
+                propertyInfo: typeof(PlaylistEntity).GetProperty("LikedByUsers", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlaylistEntity).GetField("<LikedByUsers>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+
+            var inverse = targetEntityType.FindSkipNavigation("FavoritePlaylists");
+            if (inverse != null)
+            {
+                skipNavigation.Inverse = inverse;
+                inverse.Inverse = skipNavigation;
+            }
+
+            return skipNavigation;
+        }
+
+        public static RuntimeSkipNavigation CreateSkipNavigation2(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
             var skipNavigation = declaringEntityType.AddSkipNavigation(
                 "UserEntity",

@@ -36,4 +36,9 @@ public sealed record PlaylistEntity : BaseUpdatableIdEntity
     /// Playlist's songs
     /// </summary>
     public List<PlaylistSongEntity> Songs { get; set; } = new List<PlaylistSongEntity>();
+    
+    /// <summary>
+    /// Users who liked the playlist
+    /// </summary>
+    public List<UserEntity> LikedByUsers { get; set; } = new List<UserEntity>();
 }
