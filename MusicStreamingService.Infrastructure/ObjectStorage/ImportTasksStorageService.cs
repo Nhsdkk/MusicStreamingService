@@ -32,7 +32,8 @@ public sealed class ImportTasksStorageService : IImportTasksStorageService
             Buckets.ImportTasksBucketName,
             filename,
             fileStream,
-            contentType: "application/json");
+            contentType: "application/json", 
+            cancellationToken);
 
     public Task<Result<MemoryStream>> DownloadImportTask(
         string filename,

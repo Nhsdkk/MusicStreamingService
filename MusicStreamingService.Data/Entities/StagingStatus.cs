@@ -10,7 +10,7 @@ public enum StagingStatus
     /// <summary>
     /// Entry matched to the song successfully
     /// </summary>
-    Processed,
+    Matched,
     
     /// <summary>
     /// Song matching failed
