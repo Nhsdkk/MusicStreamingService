@@ -89,7 +89,7 @@ public sealed class Search : ControllerBase
 
             public long Likes { get; init; }
 
-            public ShortAlbumCreatorDto AlbumCreator { get; init; } = null!;
+            public ShortUserDto User { get; init; } = null!;
 
             public string? ArtworkUrl { get; init; }
 
@@ -102,7 +102,7 @@ public sealed class Search : ControllerBase
                     Title = album.Title,
                     Likes = album.Likes,
                     ArtworkUrl = artworkUrl,
-                    AlbumCreator = ShortAlbumCreatorDto.FromEntity(album.Artist)
+                    User = ShortUserDto.FromEntity(album.Artist)
                 };
         }
 
