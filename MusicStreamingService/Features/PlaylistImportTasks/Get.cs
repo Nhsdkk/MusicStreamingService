@@ -85,7 +85,7 @@ public class Get : ControllerBase
             [JsonPropertyName("successCount")]
             public long SuccessCount { get; init; }
 
-            [JsonPropertyName("FailedCount")]
+            [JsonPropertyName("failedCount")]
             public long FailedCount { get; init; }
         }
 
