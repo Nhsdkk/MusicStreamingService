@@ -31,7 +31,7 @@ public class GetOwned : ControllerBase
     /// <param name="request">Paginated request data</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    [HttpGet("/api/v1/playlists/search")]
+    [HttpGet("/api/v1/playlists/owned")]
     [Authorize(Roles = Permissions.ViewPlaylistsPermission)]
     [Tags(RouteGroups.Playlists)]
     [ProducesResponseType<QueryResponse>(200)]
