@@ -83,14 +83,19 @@ public sealed class Search : ControllerBase
     {
         public sealed record ShortAlbumInfo
         {
+            [JsonPropertyName("id")]
             public Guid Id { get; init; }
 
+            [JsonPropertyName("title")]
             public string Title { get; init; } = null!;
 
+            [JsonPropertyName("likes")]
             public long Likes { get; init; }
 
-            public ShortAlbumCreatorDto AlbumCreator { get; init; } = null!;
+            [JsonPropertyName("albumCreator")]
+            public ShortUserDto AlbumCreator { get; init; } = null!;
 
+            [JsonPropertyName("artworkUrl")]
             public string? ArtworkUrl { get; init; }
 
             public static ShortAlbumInfo FromEntity(
@@ -102,7 +107,7 @@ public sealed class Search : ControllerBase
                     Title = album.Title,
                     Likes = album.Likes,
                     ArtworkUrl = artworkUrl,
-                    AlbumCreator = ShortAlbumCreatorDto.FromEntity(album.Artist)
+                    AlbumCreator = ShortUserDto.FromEntity(album.Artist)
                 };
         }
 

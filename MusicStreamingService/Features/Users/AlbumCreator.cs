@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace MusicStreamingService.Features.Users;
 
-public class ShortAlbumCreatorDto
+public class ShortUserDto
 {
     [JsonPropertyName("id")]
     public Guid Id { get; init; }
@@ -10,8 +10,8 @@ public class ShortAlbumCreatorDto
     [JsonPropertyName("username")]
     public string Username { get; init; } = null!;
     
-    public static ShortAlbumCreatorDto FromEntity(Data.Entities.UserEntity user) =>
-        new ShortAlbumCreatorDto
+    public static ShortUserDto FromEntity(Data.Entities.UserEntity user) =>
+        new ShortUserDto
         {
             Id = user.Id,
             Username = user.Username

@@ -90,7 +90,7 @@ public sealed class Get : ControllerBase
         public long Likes { get; init; }
         
         [JsonPropertyName("artist")]
-        public ShortAlbumCreatorDto Artist { get; init; } = null!;
+        public ShortUserDto Artist { get; init; } = null!;
         
         [JsonPropertyName("releaseDate")]
         public DateOnly ReleaseDate { get; init; }
@@ -111,7 +111,7 @@ public sealed class Get : ControllerBase
                 Title = album.Title,
                 Description = album.Description,
                 Likes = album.Likes,
-                Artist = ShortAlbumCreatorDto.FromEntity(album.Artist),
+                Artist = ShortUserDto.FromEntity(album.Artist),
                 ReleaseDate = album.ReleaseDate,
                 ArtworkUrl = artworkUrl,
                 Songs = album.Songs
