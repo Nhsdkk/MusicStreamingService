@@ -11,17 +11,36 @@ namespace MusicStreamingService.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Playlists_Users_UserEntityId",
-                table: "Playlists");
+            // Defensive no-op if a previous migration already removed this relation.
+            migrationBuilder.Sql("""
+            DO $$
+            BEGIN
+                IF EXISTS (
+                    SELECT 1
+                    FROM information_schema.table_constraints
+                    WHERE constraint_name = 'FK_Playlists_Users_UserEntityId'
+                      AND table_name = 'Playlists'
+                ) THEN
+                    ALTER TABLE "Playlists" DROP CONSTRAINT "FK_Playlists_Users_UserEntityId";
+                END IF;
 
-            migrationBuilder.DropIndex(
-                name: "IX_Playlists_UserEntityId",
-                table: "Playlists");
+                IF EXISTS (
+                    SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND indexname = 'IX_Playlists_UserEntityId'
+                ) THEN
+                    DROP INDEX "IX_Playlists_UserEntityId";
+                END IF;
 
-            migrationBuilder.DropColumn(
-                name: "UserEntityId",
-                table: "Playlists");
+                IF EXISTS (
+                    SELECT 1
+                    FROM information_schema.columns
+                    WHERE table_name = 'Playlists'
+                      AND column_name = 'UserEntityId'
+                ) THEN
+                    ALTER TABLE "Playlists" DROP COLUMN "UserEntityId";
+                END IF;
+            END
+            $$;
+            """);
         }
 
         /// <inheritdoc />

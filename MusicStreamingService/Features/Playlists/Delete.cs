@@ -4,10 +4,10 @@ using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
-using MusicStreamingService.Infrastructure.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Playlists;
