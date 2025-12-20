@@ -17,4 +17,8 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MusicStreamingService.Common\MusicStreamingService.Common\MusicStreamingService.Common.csproj" />
+    </ItemGroup>
 </Project>

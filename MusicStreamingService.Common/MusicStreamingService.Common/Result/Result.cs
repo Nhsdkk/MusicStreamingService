@@ -1,4 +1,4 @@
-namespace MusicStreamingService.Infrastructure.Result;
+namespace MusicStreamingService.Common.Result;
 
 public interface IResult
 {

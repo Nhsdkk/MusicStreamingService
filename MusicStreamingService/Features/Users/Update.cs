@@ -11,7 +11,7 @@ using MusicStreamingService.Extensions;
 using MusicStreamingService.Features.Region;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Infrastructure.Validations;
 using MusicStreamingService.Openapi;
 

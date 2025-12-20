@@ -1,4 +1,3 @@
-using MusicStreamingService.Data.Entities.Configurations;
 using MusicStreamingService.Data.Entities.Configurations.Base;
 
 namespace MusicStreamingService.Data.Entities;

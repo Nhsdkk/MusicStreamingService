@@ -130,8 +130,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 new[] { regionId });
 
             var index1 = runtimeEntityType.AddIndex(
-                new[] { username },
-                unique: true);
+                new[] { username });
 
             return runtimeEntityType;
         }

@@ -1,6 +1,3 @@
-using System.Security.Claims;
-using MusicStreamingService.Infrastructure.Result;
-
 namespace MusicStreamingService.Infrastructure.Authentication;
 
 public interface IClaimValidator<T>

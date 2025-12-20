@@ -8,11 +8,10 @@ using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Features.Albums;
 using MusicStreamingService.Features.Genres;
-using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Songs;
@@ -117,15 +116,12 @@ public sealed class Get : ControllerBase
     public sealed class Handler : IRequestHandler<Query, Result<QueryResponse>>
     {
         private readonly MusicStreamingContext _context;
-        private readonly ISongStorageService _songStorageService;
         private readonly IAlbumStorageService _albumStorageService;
 
         public Handler(
             MusicStreamingContext context,
-            ISongStorageService songStorageService,
             IAlbumStorageService albumStorageService)
         {
-            _songStorageService = songStorageService;
             _context = context;
             _albumStorageService = albumStorageService;
         }
@@ -155,7 +151,7 @@ public sealed class Get : ControllerBase
             }
 
             var s3AlbumArtPath = song.Album.S3ArtworkFilename;
-            var albumArtUrlGetResult = await _albumStorageService.GetPresignedUrl(s3AlbumArtPath);
+            var albumArtUrlGetResult = await _albumStorageService.GetPresignedUrl(s3AlbumArtPath, cancellationToken);
 
             return QueryResponse.FromEntity(
                 song,

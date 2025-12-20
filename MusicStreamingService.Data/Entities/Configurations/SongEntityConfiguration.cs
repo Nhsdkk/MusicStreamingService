@@ -35,5 +35,11 @@ internal sealed class SongEntityConfiguration : BaseUpdatableEntityConfiguration
             .HasMany(x => x.LikedByUsers)
             .WithMany(x => x.FavoriteSongs)
             .UsingEntity<SongFavoriteEntity>();
+        
+        builder
+            .HasIndex(x => x.Title)
+            .HasMethod("GIST")
+            .HasOperators("gist_trgm_ops")
+            .IsUnique(false);
     }
 }

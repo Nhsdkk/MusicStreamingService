@@ -9,7 +9,7 @@ using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Albums;
@@ -109,8 +109,8 @@ public sealed class Delete : ControllerBase
             var songsFileNames = album.Songs.Select(x => x.S3MediaFileName).ToList();
 
             // TODO: Consider marking files for deletion and deleting them later in a background job
-            await _albumStorageService.DeleteAlbumArtwork(albumCoverFileName);
-            await _songStorageService.DeleteSongs(songsFileNames);
+            await _albumStorageService.DeleteAlbumArtwork(albumCoverFileName, cancellationToken);
+            await _songStorageService.DeleteSongs(songsFileNames, cancellationToken);
             
             _context.Albums.Remove(album);
             await _context.SaveChangesAsync(cancellationToken);

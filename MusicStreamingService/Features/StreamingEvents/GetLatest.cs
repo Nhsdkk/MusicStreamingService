@@ -9,11 +9,10 @@ using MusicStreamingService.Extensions;
 using MusicStreamingService.Features.Albums;
 using MusicStreamingService.Features.Devices;
 using MusicStreamingService.Features.Genres;
-using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.StreamingEvents;
@@ -202,7 +201,7 @@ public sealed class GetLatest : ControllerBase
                 return new Exception("Device does not belong to the user");
             }
 
-            var albumArtUrlResult = await _albumStorageService.GetPresignedUrl(lastEvent.Song.Album.S3ArtworkFilename);
+            var albumArtUrlResult = await _albumStorageService.GetPresignedUrl(lastEvent.Song.Album.S3ArtworkFilename, cancellationToken);
             if (albumArtUrlResult.IsError)
             {
                 return albumArtUrlResult.Error();

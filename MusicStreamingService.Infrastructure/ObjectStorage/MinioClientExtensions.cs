@@ -2,19 +2,52 @@ using System.Reactive;
 using Minio;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 
 namespace MusicStreamingService.Infrastructure.ObjectStorage;
 
 public static class MinioClientExtensions
 {
+    public static async Task<Result<MemoryStream>> GetObjectStream(
+        this IMinioClient minioClient,
+        string bucketName,
+        string objectName,
+        CancellationToken cancellationToken = default)
+    {
+        var objectExists =
+            await minioClient.DoesObjectExist(bucketName, objectName, cancellationToken: cancellationToken);
+
+        if (!objectExists)
+        {
+            return new Exception("File does not exist");
+        }
+
+        var memoryStream = new MemoryStream();
+
+        var args = new GetObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(objectName)
+            .WithCallbackStream(x => x.CopyTo(memoryStream));
+
+        try
+        {
+            await minioClient.GetObjectAsync(args, cancellationToken);
+            return memoryStream;
+        }
+        catch (ObjectNotFoundException e)
+        {
+            return e;
+        }
+    }
+
     public static async Task<Result<string>> GetPresignedUrl(
         this IMinioClient minioClient,
         string bucketName,
         string objectName,
-        int expiryInSeconds)
+        int expiryInSeconds,
+        CancellationToken cancellationToken = default)
     {
-        var objectExists = await minioClient.DoesObjectExist(bucketName, objectName);
+        var objectExists = await minioClient.DoesObjectExist(bucketName, objectName, cancellationToken);
 
         if (!objectExists)
         {
@@ -45,7 +78,8 @@ public static class MinioClientExtensions
     private static async Task<bool> DoesObjectExist(
         this IMinioClient minioClient,
         string bucketName,
-        string objectName)
+        string objectName,
+        CancellationToken cancellationToken = default)
     {
         var args = new StatObjectArgs()
             .WithBucket(bucketName)
@@ -53,7 +87,7 @@ public static class MinioClientExtensions
 
         try
         {
-            await minioClient.StatObjectAsync(args);
+            await minioClient.StatObjectAsync(args, cancellationToken);
             return true;
         }
         catch (Exception e)
@@ -72,7 +106,8 @@ public static class MinioClientExtensions
         string bucketName,
         string objectName,
         Stream data,
-        string contentType)
+        string contentType,
+        CancellationToken cancellationToken = default)
     {
         var args = new PutObjectArgs()
             .WithBucket(bucketName)
@@ -81,19 +116,20 @@ public static class MinioClientExtensions
             .WithObjectSize(data.Length)
             .WithContentType(contentType);
 
-        await minioClient.PutObjectAsync(args);
+        await minioClient.PutObjectAsync(args, cancellationToken);
     }
 
     public static async Task<Result<Unit>> RemoveObjects(
         this IMinioClient minioClient,
         string bucketName,
-        List<string> objectNames)
+        List<string> objectNames,
+        CancellationToken cancellationToken = default)
     {
         var args = new RemoveObjectsArgs()
             .WithBucket(bucketName)
             .WithObjects(objectNames);
 
-        var errors = await minioClient.RemoveObjectsAsync(args);
+        var errors = await minioClient.RemoveObjectsAsync(args, cancellationToken);
 
         if (errors != null && errors.Any())
         {

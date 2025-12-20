@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MusicStreamingService.Auth;
+using MusicStreamingService.BackgroundJobs;
 using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Password;
 using Scalar.AspNetCore;
-using SharpGrip.FluentValidation.AutoValidation.Mvc.Enums;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace MusicStreamingService.Setup;
@@ -62,7 +62,8 @@ public static class Setup
             .ConfigureMediatorPipelines()
             .ConfigurePasswordService(configuration)
             .ConfigureObjectStorageServices(configuration)
-            .ConfigureAuth(builder.Environment, configuration);
+            .ConfigureAuth(builder.Environment, configuration)
+            .AddHostedService<PlaylistImportWorker>();
 
         var app = builder.Build();
 

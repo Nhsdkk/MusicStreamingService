@@ -26,7 +26,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 navigationCount: 2,
                 skipNavigationCount: 3,
                 foreignKeyCount: 1,
-                unnamedIndexCount: 1,
+                unnamedIndexCount: 2,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -130,6 +130,9 @@ namespace MusicStreamingService.Data.CompiledModels
 
             var index = runtimeEntityType.AddIndex(
                 new[] { albumId });
+
+            var index0 = runtimeEntityType.AddIndex(
+                new[] { title });
 
             return runtimeEntityType;
         }

@@ -8,7 +8,7 @@ using MusicStreamingService.Data;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Songs;
@@ -108,7 +108,7 @@ public class GetSongUrl : ControllerBase
             }
             
             var s3SongPath = song.S3MediaFileName;
-            var songUrlGetResult = await _songStorageService.GetPresignedUrl(s3SongPath);
+            var songUrlGetResult = await _songStorageService.GetPresignedUrl(s3SongPath, cancellationToken);
             return songUrlGetResult.Match<Result<QueryResponse>>(
                 url => new QueryResponse { Url = url },
                 _ => new Exception("Failed to get song URL"));

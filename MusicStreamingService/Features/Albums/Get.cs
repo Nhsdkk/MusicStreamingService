@@ -11,7 +11,7 @@ using MusicStreamingService.Features.Songs;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Albums;
@@ -156,7 +156,7 @@ public sealed class Get : ControllerBase
                 return new Exception("Album not found");
             }
             
-            var artworkUrlResult = await _albumStorageService.GetPresignedUrl(album.S3ArtworkFilename);
+            var artworkUrlResult = await _albumStorageService.GetPresignedUrl(album.S3ArtworkFilename, cancellationToken);
 
             if (artworkUrlResult.IsError)
             {

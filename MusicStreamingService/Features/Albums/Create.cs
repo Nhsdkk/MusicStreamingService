@@ -14,7 +14,7 @@ using MusicStreamingService.Features.Songs;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Albums;
@@ -281,7 +281,8 @@ public sealed class Create : ControllerBase
             var albumArtworkUploadResult = await _albumStorageService.UploadAlbumArtwork(
                 albumCoverFileName,
                 requestBody.ArtworkImage.ContentType,
-                albumCoverFileStream);
+                albumCoverFileStream,
+                cancellationToken);
 
             if (albumArtworkUploadResult.IsError)
             {
@@ -320,7 +321,7 @@ public sealed class Create : ControllerBase
                 var songGenres = genres.Where(x => songData.GenreIds.Contains(x.Id)).ToList();
                 var song = CreateSong(songData, allowedSongRegions, album, songGenres);
 
-                var songUploadResult = await _songStorageService.UploadSong(song.S3MediaFileName, memoryMp3FileStream);
+                var songUploadResult = await _songStorageService.UploadSong(song.S3MediaFileName, memoryMp3FileStream, cancellationToken);
 
                 if (songUploadResult.IsError)
                 {

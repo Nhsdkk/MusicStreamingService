@@ -1,7 +1,7 @@
 using Mediator;
 using MusicStreamingService.Data;
-using MusicStreamingService.Infrastructure.Result;
-using IResult = MusicStreamingService.Infrastructure.Result.IResult;
+using MusicStreamingService.Data.DbContextExtensions;
+using IResult = MusicStreamingService.Common.Result.IResult;
 
 namespace MusicStreamingService.Commands;
 
@@ -24,30 +24,12 @@ public sealed class TransactionalPipelineBehavior<TCommand, TResponseData>
         _context = context;
     }
 
-    public async ValueTask<TResponseData> Handle(
+    public ValueTask<TResponseData> Handle(
         TCommand message,
         MessageHandlerDelegate<TCommand, TResponseData> next,
-        CancellationToken cancellationToken)
-    {
-        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-
-        try
-        {
-            var response = await next(message, cancellationToken);
-
-            if (response.IsError)
-            {
-                await transaction.RollbackAsync(cancellationToken);
-                return response;
-            }
-            
-            await transaction.CommitAsync(cancellationToken);
-            return response;
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
-        }
-    }
+        CancellationToken cancellationToken) =>
+        _context.InitializeTransaction<TResponseData>()
+            .WithHandler(ct => next(message, ct))
+            .Build()
+            .ExecuteAsync(cancellationToken);
 }

@@ -10,9 +10,8 @@ using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Data.Utils;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
-using MusicStreamingService.Infrastructure.DateUtils;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
@@ -156,8 +155,9 @@ public sealed class Search : ControllerBase
                 .ApplyPagination(request.ItemsPerPage, request.Page)
                 .ToListAsync(cancellationToken);
 
-            var albumArtworkUrlsMapping =
-                await _albumStorageService.GetPresignedUrls(albums.Select(x => x.S3ArtworkFilename));
+            var albumArtworkUrlsMapping = await _albumStorageService.GetPresignedUrls(
+                albums.Select(x => x.S3ArtworkFilename),
+                cancellationToken);
 
             return QueryResponse.FromEntity(totalCount, request, albums, albumArtworkUrlsMapping);
         }

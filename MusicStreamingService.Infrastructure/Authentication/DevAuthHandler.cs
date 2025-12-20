@@ -66,7 +66,7 @@ public class DevAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
                 Title = "Russia"
             })),
             
-            new Claim(ClaimTypes.Sid, "8ec795ec-c11f-4497-b1d7-0e5690c94f49"),
+            new Claim(ClaimTypes.Sid, "e66d6f5a-124f-4a32-935a-a89f133e0745"),
             new Claim(ClaimTypes.DateOfBirth, DateOnly.FromDateTime(DateTime.Now.AddYears(-20)).ToString(DateFormats.FullDateFormat))
             
         ], authenticationType: Scheme.Name);

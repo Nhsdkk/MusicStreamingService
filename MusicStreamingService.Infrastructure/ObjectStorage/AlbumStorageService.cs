@@ -1,25 +1,29 @@
 using System.Reactive;
 using Microsoft.Extensions.Options;
 using Minio;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 
 namespace MusicStreamingService.Infrastructure.ObjectStorage;
 
 public interface IAlbumStorageService
 {
     public Task<Result<string>> GetPresignedUrl(
-        string albumArtworkFileName);
+        string albumArtworkFileName,
+        CancellationToken cancellationToken = default);
 
     public Task<Dictionary<string, string?>> GetPresignedUrls(
-        IEnumerable<string> albumArtworkFileNames);
+        IEnumerable<string> albumArtworkFileNames,
+        CancellationToken cancellationToken = default);
 
     public Task<Result<string>> UploadAlbumArtwork(
         string albumArtworkFileName,
         string contentType,
-        Stream albumArtworkData);
+        Stream albumArtworkData,
+        CancellationToken cancellationToken = default);
 
     public Task<Result<Unit>> DeleteAlbumArtwork(
-        string albumArtworkFileName);
+        string albumArtworkFileName,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class AlbumStorageService : IAlbumStorageService
@@ -35,17 +39,23 @@ public sealed class AlbumStorageService : IAlbumStorageService
         _configuration = configuration.Value;
     }
 
-    public async Task<Result<string>> GetPresignedUrl(string albumArtworkFileName) =>
-        await _client.GetPresignedUrl(Buckets.AlbumCoverBucketName, albumArtworkFileName,
-            _configuration.ExpireTimeInSeconds);
+    public Task<Result<string>> GetPresignedUrl(
+        string albumArtworkFileName,
+        CancellationToken cancellationToken = default) =>
+        _client.GetPresignedUrl(
+            Buckets.AlbumCoverBucketName,
+            albumArtworkFileName,
+            _configuration.ExpireTimeInSeconds,
+            cancellationToken);
 
     public async Task<Dictionary<string, string?>> GetPresignedUrls(
-        IEnumerable<string> albumArtworkFileNames)
+        IEnumerable<string> albumArtworkFileNames,
+        CancellationToken cancellationToken = default)
     {
         var uniqueFileNames = albumArtworkFileNames.Distinct();
         var results = await Task.WhenAll(uniqueFileNames.Select(async fileName =>
         {
-            var urlResult = await GetPresignedUrl(fileName);
+            var urlResult = await GetPresignedUrl(fileName, cancellationToken);
             return urlResult.Match(
                 url => new KeyValuePair<string, string?>(fileName, url),
                 _ => new KeyValuePair<string, string?>(fileName, null));
@@ -57,12 +67,23 @@ public sealed class AlbumStorageService : IAlbumStorageService
     public async Task<Result<string>> UploadAlbumArtwork(
         string albumArtworkFileName,
         string contentType,
-        Stream albumArtworkData)
+        Stream albumArtworkData,
+        CancellationToken cancellationToken = default)
     {
-        await _client.UploadObject(Buckets.AlbumCoverBucketName, albumArtworkFileName, albumArtworkData, contentType);
-        return await GetPresignedUrl(albumArtworkFileName);
+        await _client.UploadObject(
+            Buckets.AlbumCoverBucketName,
+            albumArtworkFileName,
+            albumArtworkData,
+            contentType,
+            cancellationToken);
+        return await GetPresignedUrl(albumArtworkFileName, cancellationToken);
     }
 
-    public async Task<Result<Unit>> DeleteAlbumArtwork(string albumArtworkFileName) =>
-        await _client.RemoveObjects(Buckets.AlbumCoverBucketName, [albumArtworkFileName]);
+    public Task<Result<Unit>> DeleteAlbumArtwork(
+        string albumArtworkFileName,
+        CancellationToken cancellationToken = default) =>
+        _client.RemoveObjects(
+            Buckets.AlbumCoverBucketName,
+            [albumArtworkFileName],
+            cancellationToken);
 }

@@ -63,5 +63,11 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .HasMany(x => x.Roles)
             .WithMany()
             .UsingEntity<UserRoleEntity>();
+        
+        builder
+            .HasIndex(x => x.Username)
+            .HasMethod("GIST")
+            .HasOperators("gist_trgm_ops")
+            .IsUnique(false);
     }
 }

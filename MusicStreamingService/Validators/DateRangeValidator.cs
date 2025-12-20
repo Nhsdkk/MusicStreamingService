@@ -1,7 +1,5 @@
 using FluentValidation;
-using MusicStreamingService.Data;
 using MusicStreamingService.Data.Utils;
-using MusicStreamingService.Infrastructure.DateUtils;
 
 namespace MusicStreamingService.Validators;
 
