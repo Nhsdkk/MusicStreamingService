@@ -56,9 +56,6 @@ public class Get : ControllerBase
 
         public sealed class Validator : BasePaginatedRequestValidator<QueryBody>
         {
-            public Validator()
-            {
-            }
         }
 
         public Guid UserId { get; init; }
