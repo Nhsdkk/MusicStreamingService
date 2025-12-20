@@ -20,5 +20,9 @@ internal sealed class PlaylistImportStagingEntityConfiguration : BaseUpdatableEn
             .HasOne(x => x.Playlist)
             .WithMany()
             .HasForeignKey(x => x.PlaylistId);
+        builder
+            .HasOne(x => x.ImportTask)
+            .WithMany(x => x.StagingEntries)
+            .HasForeignKey(x => x.ImportTaskId);
     }
 }

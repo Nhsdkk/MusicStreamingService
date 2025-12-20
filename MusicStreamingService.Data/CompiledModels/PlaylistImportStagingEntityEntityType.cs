@@ -24,7 +24,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(PlaylistImportStagingEntity),
                 baseEntityType,
                 propertyCount: 11,
-                navigationCount: 1,
+                navigationCount: 2,
                 foreignKeyCount: 2,
                 unnamedIndexCount: 2,
                 keyCount: 1);
@@ -142,6 +142,13 @@ namespace MusicStreamingService.Data.CompiledModels
                 principalEntityType,
                 deleteBehavior: DeleteBehavior.Cascade,
                 required: true);
+
+            var importTask = declaringEntityType.AddNavigation("ImportTask",
+                runtimeForeignKey,
+                onDependent: true,
+                typeof(PlaylistImportTaskEntity),
+                propertyInfo: typeof(PlaylistImportStagingEntity).GetProperty("ImportTask", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(PlaylistImportStagingEntity).GetField("<ImportTask>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             var stagingEntries = principalEntityType.AddNavigation("StagingEntries",
                 runtimeForeignKey,
