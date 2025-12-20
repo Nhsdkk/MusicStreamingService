@@ -82,6 +82,7 @@ namespace MusicStreamingService.Data.CompiledModels
             GenreEntityEntityType.CreateSkipNavigation1(genreEntity, songEntity, songGenreEntity);
             PermissionEntityEntityType.CreateSkipNavigation1(permissionEntity, roleEntity, rolePermissionEntity);
             PlaylistEntityEntityType.CreateSkipNavigation1(playlistEntity, userEntity, playlistFavoriteEntity);
+            PlaylistEntityEntityType.CreateSkipNavigation2(playlistEntity, userEntity, playlistFavoriteEntity);
             RegionEntityEntityType.CreateSkipNavigation1(regionEntity, songEntity, allowedDistributionEntity);
             RoleEntityEntityType.CreateSkipNavigation1(roleEntity, permissionEntity, rolePermissionEntity);
             RoleEntityEntityType.CreateSkipNavigation2(roleEntity, userEntity, userRoleEntity);

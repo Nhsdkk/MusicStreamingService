@@ -22,5 +22,9 @@ internal sealed class PlaylistEntityConfiguration : BaseUpdatableEntityConfigura
             .HasMany(x => x.Songs)
             .WithOne(x => x.Playlist)
             .HasForeignKey(x => x.PlaylistId);
+        builder
+            .HasMany(x => x.LikedByUsers)
+            .WithMany(x => x.FavoritePlaylists)
+            .UsingEntity<PlaylistFavoriteEntity>();
     }
 }
