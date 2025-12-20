@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace MusicStreamingService.Data.Entities;
 
 public sealed record SubscriberEntity

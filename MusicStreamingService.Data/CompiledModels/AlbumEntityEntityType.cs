@@ -26,7 +26,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 navigationCount: 2,
                 skipNavigationCount: 1,
                 foreignKeyCount: 2,
-                unnamedIndexCount: 2,
+                unnamedIndexCount: 4,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -122,6 +122,12 @@ namespace MusicStreamingService.Data.CompiledModels
                 new[] { artistId });
 
             var index0 = runtimeEntityType.AddIndex(
+                new[] { releaseDate });
+
+            var index1 = runtimeEntityType.AddIndex(
+                new[] { title });
+
+            var index2 = runtimeEntityType.AddIndex(
                 new[] { userEntityId });
 
             return runtimeEntityType;

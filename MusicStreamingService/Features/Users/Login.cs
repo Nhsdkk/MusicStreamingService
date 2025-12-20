@@ -10,7 +10,7 @@ using MusicStreamingService.Features.Devices;
 using MusicStreamingService.Features.Region;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.Password;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
@@ -72,34 +72,34 @@ public sealed class Login : ControllerBase
     public sealed record CommandResponse
     {
         [JsonPropertyName("id")]
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
         [JsonPropertyName("email")]
-        public string Email { get; set; } = null!;
+        public string Email { get; init; } = null!;
 
         [JsonPropertyName("fullName")]
-        public string FullName { get; set; } = null!;
+        public string FullName { get; init; } = null!;
 
         [JsonPropertyName("birthDate")]
-        public DateOnly BirthDate { get; set; }
+        public DateOnly BirthDate { get; init; }
 
         [JsonPropertyName("username")]
-        public string Username { get; set; } = null!;
+        public string Username { get; init; } = null!;
 
         [JsonPropertyName("region")]
-        public RegionDto Region { get; set; } = null!;
+        public RegionDto Region { get; init; } = null!;
 
         [JsonPropertyName("device")]
-        public DeviceDto CurrentDevice { get; set; } = null!;
+        public DeviceDto CurrentDevice { get; init; } = null!;
 
         [JsonPropertyName("permissions")]
-        public List<string> Permissions { get; set; } = null!;
+        public List<string> Permissions { get; init; } = null!;
 
         [JsonPropertyName("accessToken")]
-        public string AccessToken { get; set; } = null!;
+        public string AccessToken { get; init; } = null!;
 
         [JsonPropertyName("refreshToken")]
-        public string RefreshToken { get; set; } = null!;
+        public string RefreshToken { get; init; } = null!;
     }
 
     internal sealed class Handler : IRequestHandler<Command, Result<CommandResponse>>

@@ -24,5 +24,12 @@ internal sealed class AlbumEntityConfiguration : BaseUpdatableEntityConfiguratio
             .HasForeignKey(x => x.AlbumId);
         
         builder.Property(x => x.Likes).HasDefaultValue(0).ValueGeneratedNever();
+        
+        builder
+            .HasIndex(x => x.Title)
+            .HasMethod("GIST")
+            .HasOperators("gist_trgm_ops")
+            .IsUnique(false);
+        builder.HasIndex(x => x.ReleaseDate).IsUnique(false);
     }
 }

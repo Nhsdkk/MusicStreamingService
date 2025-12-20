@@ -1,8 +1,7 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
 using MusicStreamingService.Infrastructure.DateUtils;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 
 namespace MusicStreamingService.Infrastructure.Authentication;
 

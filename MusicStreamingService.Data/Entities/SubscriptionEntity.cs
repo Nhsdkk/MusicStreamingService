@@ -1,5 +1,3 @@
-using NpgsqlTypes;
-
 namespace MusicStreamingService.Data.Entities;
 
 public sealed record SubscriptionEntity : BaseUpdatableIdEntity

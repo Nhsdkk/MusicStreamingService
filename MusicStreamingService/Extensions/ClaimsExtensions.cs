@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.DateUtils;

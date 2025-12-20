@@ -8,21 +8,16 @@ using MusicStreamingService.Data;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.StreamingEvents;
 
 [ApiController]
-public sealed class Create : ControllerBase
+public sealed class Create(IMediator mediator) : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IMediator _mediator = mediator;
 
-    public Create(IMediator mediator)
-    {
-        _mediator = mediator;
-    }
-    
     /// <summary>
     /// Create streaming event
     /// </summary>

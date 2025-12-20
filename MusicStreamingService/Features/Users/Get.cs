@@ -1,16 +1,12 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json.Serialization;
 using Mediator;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data;
-using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;
@@ -32,7 +28,7 @@ public sealed class Get : ControllerBase
     /// <returns></returns>
     [HttpGet("/api/v1/users/")]
     [Tags(RouteGroups.Users)]
-    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CommandResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Exception), StatusCodes.Status400BadRequest)]
     [Authorize(Roles = Permissions.ViewUsersPermission)]
     public async Task<IActionResult> GetUser(
@@ -48,14 +44,14 @@ public sealed class Get : ControllerBase
         return result.Match<IActionResult>(Ok, BadRequest);
     }
 
-    internal sealed record Query : IRequest<Result<Response>>
+    internal sealed record Query : IRequest<Result<CommandResponse>>
     {
         public Guid Id { get; init; }
     }
 
-    internal sealed record Response
+    public sealed record CommandResponse
     {
-        internal sealed record RegionDto
+        public sealed record RegionDto
         {
             [JsonPropertyName("id")]
             public Guid Id { get; set; }
@@ -86,7 +82,7 @@ public sealed class Get : ControllerBase
         public List<string> Permissions { get; set; } = null!;
     }
 
-    internal sealed class Handler : IRequestHandler<Query, Result<Response>>
+    internal sealed class Handler : IRequestHandler<Query, Result<CommandResponse>>
     {
         private readonly MusicStreamingContext _context;
 
@@ -95,7 +91,7 @@ public sealed class Get : ControllerBase
             _context = context;
         }
 
-        public async ValueTask<Result<Response>> Handle(Query request, CancellationToken cancellationToken)
+        public async ValueTask<Result<CommandResponse>> Handle(Query request, CancellationToken cancellationToken)
         {
             var user = await _context.Users
                 .Include(x => x.Region)
@@ -113,14 +109,14 @@ public sealed class Get : ControllerBase
                 return new Exception("User is disabled");
             }
             
-            return new Response
+            return new CommandResponse
             {
                 Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
                 BirthDate = user.BirthDate,
                 Username = user.Username,
-                Region = new Response.RegionDto
+                Region = new CommandResponse.RegionDto
                 {
                     Id = user.Region.Id,
                     Title = user.Region.Title

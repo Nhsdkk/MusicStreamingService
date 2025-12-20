@@ -1,13 +1,9 @@
-using System.Security.Claims;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MusicStreamingService.Data;
 using MusicStreamingService.Infrastructure.Authentication;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Users;

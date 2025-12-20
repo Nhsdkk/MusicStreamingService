@@ -1,8 +1,6 @@
 using System.Text.Json.Serialization;
 using MusicStreamingService.Data.Entities;
-using MusicStreamingService.Features.Albums;
 using MusicStreamingService.Features.Genres;
-using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 

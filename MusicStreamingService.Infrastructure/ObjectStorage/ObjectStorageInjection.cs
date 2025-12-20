@@ -21,7 +21,8 @@ public static class ObjectStorageInjection
         
         services
             .AddScoped<ISongStorageService, SongStorageService>()
-            .AddScoped<IAlbumStorageService, AlbumStorageService>();
+            .AddScoped<IAlbumStorageService, AlbumStorageService>()
+            .AddScoped<IImportTasksStorageService, ImportTasksStorageService>();
         
         return services;
     }

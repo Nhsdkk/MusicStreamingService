@@ -11,7 +11,7 @@ using MusicStreamingService.Extensions;
 using MusicStreamingService.Features.Songs;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Playlists;
@@ -93,7 +93,7 @@ public sealed class Update : ControllerBase
                     RuleFor(x => x.SongsToRemove)
                         .NotEmpty()
                         .When(x => x.SongsToRemove is not null);
-                    
+
                     RuleFor(x => x.SongsToAdd)
                         .Must(x => x!.Distinct().Count() == x!.Count)
                         .When(x => x.SongsToAdd is not null)
@@ -109,7 +109,7 @@ public sealed class Update : ControllerBase
         public CommandBody Body { get; init; } = null!;
 
         public Guid UserId { get; init; }
-        
+
         public RegionClaim UserRegion { get; init; } = null!;
     }
 
@@ -164,7 +164,8 @@ public sealed class Update : ControllerBase
                 Likes = playlist.Likes,
                 Songs = playlist.Songs
                     .OrderBy(x => x.AddedAt)
-                    .Select(x => ShortSongDto.FromEntity(x.Song, albumArtworkUrlMapping[x.Song.Album.S3ArtworkFilename], userRegion))
+                    .Select(x => ShortSongDto.FromEntity(x.Song, albumArtworkUrlMapping[x.Song.Album.S3ArtworkFilename],
+                        userRegion))
                     .ToList()
             };
         }
@@ -219,13 +220,13 @@ public sealed class Update : ControllerBase
             {
                 if (!requestBody.SongsToRemove.All(x => storedSongIds.Contains(x)))
                 {
-                    return new Exception("One or more songs to remove are not in the playlist");   
+                    return new Exception("One or more songs to remove are not in the playlist");
                 }
-                
+
                 playlist.Songs.RemoveAll(x => requestBody.SongsToRemove.Contains(x.Song.Id));
                 storedSongIds.RemoveWhere(x => requestBody.SongsToRemove.Contains(x));
             }
-            
+
             if (requestBody.SongsToAdd is not null)
             {
                 var songsToAdd = await _context.Songs
@@ -240,14 +241,14 @@ public sealed class Update : ControllerBase
                 {
                     return new Exception("One or more songs to add were not found");
                 }
-                
+
                 foreach (var song in songsToAdd)
                 {
                     if (storedSongIds.Contains(song.Id))
                     {
                         continue;
                     }
-                    
+
                     playlist.Songs.Add(new PlaylistSongEntity
                     {
                         Playlist = playlist,
@@ -255,12 +256,13 @@ public sealed class Update : ControllerBase
                     });
                 }
             }
-            
+
             await _context.SaveChangesAsync(cancellationToken);
-            
-            var albumArtworkUrlMapping =
-                await _albumStorageService.GetPresignedUrls(playlist.Songs.Select(x => x.Song.Album.S3ArtworkFilename));
-            
+
+            var albumArtworkUrlMapping = await _albumStorageService.GetPresignedUrls(
+                playlist.Songs.Select(x => x.Song.Album.S3ArtworkFilename),
+                cancellationToken);
+
             return CommandResponse.FromEntity(playlist, albumArtworkUrlMapping, request.UserRegion);
         }
     }

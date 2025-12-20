@@ -11,7 +11,7 @@ using MusicStreamingService.Extensions;
 using MusicStreamingService.Features.Songs;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Playlists;
@@ -93,7 +93,7 @@ public class Create : ControllerBase
         public CommandBody Body { get; init; } = null!;
 
         public Guid UserId { get; init; }
-        
+
         public RegionClaim UserRegion { get; init; } = null!;
     }
 
@@ -210,8 +210,9 @@ public class Create : ControllerBase
 
             await _context.Playlists.AddAsync(playlist, cancellationToken);
 
-            var albumArtworkUrlMapping =
-                await _albumStorageService.GetPresignedUrls(songs.Select(x => x.Album.S3ArtworkFilename));
+            var albumArtworkUrlMapping = await _albumStorageService.GetPresignedUrls(
+                songs.Select(x => x.Album.S3ArtworkFilename),
+                cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
 

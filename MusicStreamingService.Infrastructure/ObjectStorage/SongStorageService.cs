@@ -1,24 +1,28 @@
 using System.Reactive;
 using Microsoft.Extensions.Options;
 using Minio;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 
 namespace MusicStreamingService.Infrastructure.ObjectStorage;
 
 public interface ISongStorageService
 {
     public Task<Result<string>> GetPresignedUrl(
-        string songFileName);
+        string songFileName,
+        CancellationToken cancellationToken = default);
 
     public Task<Dictionary<string, string?>> GetPresignedUrls(
-        List<string> songFileNames);
+        List<string> songFileNames,
+        CancellationToken cancellationToken = default);
 
     public Task<Result<string>> UploadSong(
         string songFileName,
-        Stream songData);
+        Stream songData,
+        CancellationToken cancellationToken = default);
 
     public Task<Result<Unit>> DeleteSongs(
-        List<string> songFileNames);
+        List<string> songFileNames,
+        CancellationToken cancellationToken = default);
 }
 
 public sealed class SongStorageService : ISongStorageService
@@ -35,16 +39,24 @@ public sealed class SongStorageService : ISongStorageService
         _configuration = configuration.Value;
     }
 
-    public async Task<Result<string>> GetPresignedUrl(string songFileName) =>
-        await _client.GetPresignedUrl(Buckets.SongBucketName, songFileName, _configuration.ExpireTimeInSeconds);
+    public Task<Result<string>> GetPresignedUrl(
+        string songFileName,
+        CancellationToken cancellationToken = default) =>
+        _client.GetPresignedUrl(
+            Buckets.SongBucketName,
+            songFileName,
+            _configuration.ExpireTimeInSeconds,
+            cancellationToken);
 
-    public async Task<Dictionary<string, string?>> GetPresignedUrls(List<string> songFileNames)
+    public async Task<Dictionary<string, string?>> GetPresignedUrls(
+        List<string> songFileNames,
+        CancellationToken cancellationToken = default)
     {
         var uniqueFileNames = songFileNames.Distinct().ToList();
 
         var presignedUrlTasks = uniqueFileNames.Select(async fname =>
         {
-            var urlResult = await GetPresignedUrl(fname);
+            var urlResult = await GetPresignedUrl(fname, cancellationToken);
             return urlResult.Match(
                 url => new KeyValuePair<string, string?>(fname, url),
                 _ => new KeyValuePair<string, string?>(fname, null));
@@ -56,12 +68,18 @@ public sealed class SongStorageService : ISongStorageService
 
     public async Task<Result<string>> UploadSong(
         string songFileName,
-        Stream songData)
+        Stream songData,
+        CancellationToken cancellationToken = default)
     {
-        await _client.UploadObject(Buckets.SongBucketName, songFileName, songData, ContentType);
-        return await GetPresignedUrl(songFileName);
+        await _client.UploadObject(Buckets.SongBucketName, songFileName, songData, ContentType, cancellationToken);
+        return await GetPresignedUrl(songFileName, cancellationToken);
     }
 
-    public async Task<Result<Unit>> DeleteSongs(List<string> songFileNames) =>
-        await _client.RemoveObjects(Buckets.SongBucketName, songFileNames);
+    public Task<Result<Unit>> DeleteSongs(
+        List<string> songFileNames,
+        CancellationToken cancellationToken = default) =>
+        _client.RemoveObjects(
+            Buckets.SongBucketName,
+            songFileNames,
+            cancellationToken);
 }

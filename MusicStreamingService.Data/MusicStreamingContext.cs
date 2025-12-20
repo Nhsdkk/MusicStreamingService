@@ -51,6 +51,10 @@ public sealed class MusicStreamingContext : DbContext
     
     public DbSet<RolePermissionEntity> RolePermissions { get; set; }
     
+    public DbSet<PlaylistImportStagingEntity> PlaylistImportStagingEntries { get; set; }
+    
+    public DbSet<PlaylistImportTaskEntity> PlaylistImportTasks { get; set; }
+    
 
     public MusicStreamingContext(DbContextOptions<MusicStreamingContext> options) : base(options) { }
 
@@ -83,5 +87,7 @@ public sealed class MusicStreamingContext : DbContext
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new RoleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new RolePermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new PlaylistImportStagingEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new PlaylistImportTaskEntityConfiguration());
     }
 }

@@ -13,7 +13,7 @@ using MusicStreamingService.Features.Songs;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Albums;
@@ -277,7 +277,7 @@ public sealed class Update : ControllerBase
                 var uploadResult = await _albumStorageService.UploadAlbumArtwork(
                     newFilename,
                     body.ArtworkFile.ContentType,
-                    body.ArtworkFile.OpenReadStream());
+                    body.ArtworkFile.OpenReadStream(), cancellationToken);
 
                 if (uploadResult.IsError)
                 {
@@ -288,12 +288,12 @@ public sealed class Update : ControllerBase
                 album.S3ArtworkFilename = newFilename;
 
                 // TODO: Consider marking files for deletion and deleting them later in a background job
-                await _albumStorageService.DeleteAlbumArtwork(oldFilename);
+                await _albumStorageService.DeleteAlbumArtwork(oldFilename, cancellationToken);
             }
 
             if (presignedArtworkUrl is null)
             {
-                var getUrlResult = await _albumStorageService.GetPresignedUrl(album.S3ArtworkFilename);
+                var getUrlResult = await _albumStorageService.GetPresignedUrl(album.S3ArtworkFilename, cancellationToken);
                 if (getUrlResult.IsError)
                 {
                     throw new Exception("Failed to get album artwork URL");

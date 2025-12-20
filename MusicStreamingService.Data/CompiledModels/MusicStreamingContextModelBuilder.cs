@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("cf6312fb-c187-438b-abc0-b3cd75a3b9bf"), entityTypeCount: 22)
+            : base(skipDetectChanges: false, modelId: new Guid("74a0bda9-8e3c-4996-b538-b26e0d2c50be"), entityTypeCount: 24)
         {
         }
 
@@ -27,6 +27,8 @@ namespace MusicStreamingService.Data.CompiledModels
             var permissionEntity = PermissionEntityEntityType.Create(this);
             var playlistEntity = PlaylistEntityEntityType.Create(this);
             var playlistFavoriteEntity = PlaylistFavoriteEntityEntityType.Create(this);
+            var playlistImportStagingEntity = PlaylistImportStagingEntityEntityType.Create(this);
+            var playlistImportTaskEntity = PlaylistImportTaskEntityEntityType.Create(this);
             var playlistSongEntity = PlaylistSongEntityEntityType.Create(this);
             var regionEntity = RegionEntityEntityType.Create(this);
             var roleEntity = RoleEntityEntityType.Create(this);
@@ -53,6 +55,9 @@ namespace MusicStreamingService.Data.CompiledModels
             PlaylistEntityEntityType.CreateForeignKey1(playlistEntity, userEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey1(playlistFavoriteEntity, playlistEntity);
             PlaylistFavoriteEntityEntityType.CreateForeignKey2(playlistFavoriteEntity, userEntity);
+            PlaylistImportStagingEntityEntityType.CreateForeignKey1(playlistImportStagingEntity, playlistImportTaskEntity);
+            PlaylistImportStagingEntityEntityType.CreateForeignKey2(playlistImportStagingEntity, playlistEntity);
+            PlaylistImportTaskEntityEntityType.CreateForeignKey1(playlistImportTaskEntity, userEntity);
             PlaylistSongEntityEntityType.CreateForeignKey1(playlistSongEntity, playlistEntity);
             PlaylistSongEntityEntityType.CreateForeignKey2(playlistSongEntity, songEntity);
             RolePermissionEntityEntityType.CreateForeignKey1(rolePermissionEntity, permissionEntity);
@@ -98,6 +103,8 @@ namespace MusicStreamingService.Data.CompiledModels
             PermissionEntityEntityType.CreateAnnotations(permissionEntity);
             PlaylistEntityEntityType.CreateAnnotations(playlistEntity);
             PlaylistFavoriteEntityEntityType.CreateAnnotations(playlistFavoriteEntity);
+            PlaylistImportStagingEntityEntityType.CreateAnnotations(playlistImportStagingEntity);
+            PlaylistImportTaskEntityEntityType.CreateAnnotations(playlistImportTaskEntity);
             PlaylistSongEntityEntityType.CreateAnnotations(playlistSongEntity);
             RegionEntityEntityType.CreateAnnotations(regionEntity);
             RoleEntityEntityType.CreateAnnotations(roleEntity);

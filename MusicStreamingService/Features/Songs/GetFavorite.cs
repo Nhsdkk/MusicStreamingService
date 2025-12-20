@@ -9,7 +9,7 @@ using MusicStreamingService.Data.QueryExtensions;
 using MusicStreamingService.Extensions;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 using MusicStreamingService.Requests;
 using MusicStreamingService.Responses;
@@ -114,7 +114,7 @@ public sealed class GetFavorite : ControllerBase
                 .ToListAsync(cancellationToken);
 
             var albumArtPaths = songs.Select(x => x.Album.S3ArtworkFilename);
-            var albumArtUrls = await _albumStorageService.GetPresignedUrls(albumArtPaths);
+            var albumArtUrls = await _albumStorageService.GetPresignedUrls(albumArtPaths, cancellationToken);
 
             return new QueryResponse
             {

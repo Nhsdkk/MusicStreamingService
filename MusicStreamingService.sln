@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Env", "Env", "{6AA86A0B-557
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicStreamingService.Infrastructure", "MusicStreamingService.Infrastructure\MusicStreamingService.Infrastructure.csproj", "{535EB76D-2AD2-4590-8DBA-A1FFBA14ABE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicStreamingService.Common", "MusicStreamingService.Common\MusicStreamingService.Common\MusicStreamingService.Common.csproj", "{F92068E3-B714-4EAE-8D4A-51F4C73BCFFE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,5 +47,9 @@ Global
 		{535EB76D-2AD2-4590-8DBA-A1FFBA14ABE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{535EB76D-2AD2-4590-8DBA-A1FFBA14ABE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{535EB76D-2AD2-4590-8DBA-A1FFBA14ABE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F92068E3-B714-4EAE-8D4A-51F4C73BCFFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F92068E3-B714-4EAE-8D4A-51F4C73BCFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F92068E3-B714-4EAE-8D4A-51F4C73BCFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F92068E3-B714-4EAE-8D4A-51F4C73BCFFE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

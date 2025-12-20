@@ -68,6 +68,13 @@ namespace MusicStreamingService.Data.Migrations
 
                     b.HasIndex("ArtistId");
 
+                    b.HasIndex("ReleaseDate");
+
+                    b.HasIndex("Title");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "GIST");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gist_trgm_ops" });
+
                     b.HasIndex("UserEntityId");
 
                     b.ToTable("Albums");
@@ -286,6 +293,103 @@ namespace MusicStreamingService.Data.Migrations
                     b.ToTable("PlaylistFavorites");
                 });
 
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistImportStagingEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<string>("AlbumName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ArtistName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("BatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("ImportTaskId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PlaylistId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly>("ReleaseDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("SongTitle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImportTaskId");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.ToTable("PlaylistImportStagingEntries");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistImportTaskEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<Guid>("CreatorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("ProcessedEntries")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
+                    b.Property<string>("S3FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("TotalEntries")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("PlaylistImportTasks");
+                });
+
             modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistSongEntity", b =>
                 {
                     b.Property<Guid>("SongId")
@@ -451,6 +555,11 @@ namespace MusicStreamingService.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AlbumId");
+
+                    b.HasIndex("Title");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "GIST");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gist_trgm_ops" });
 
                     b.ToTable("Songs");
                 });
@@ -635,8 +744,10 @@ namespace MusicStreamingService.Data.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.HasIndex("Username")
-                        .IsUnique();
+                    b.HasIndex("Username");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Username"), "GIST");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Username"), new[] { "gist_trgm_ops" });
 
                     b.ToTable("Users");
                 });
@@ -767,6 +878,34 @@ namespace MusicStreamingService.Data.Migrations
                     b.Navigation("Playlist");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistImportStagingEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.PlaylistImportTaskEntity", null)
+                        .WithMany("StagingEntries")
+                        .HasForeignKey("ImportTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.PlaylistEntity", "Playlist")
+                        .WithMany()
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistImportTaskEntity", b =>
+                {
+                    b.HasOne("MusicStreamingService.Data.Entities.UserEntity", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistSongEntity", b =>
@@ -960,6 +1099,11 @@ namespace MusicStreamingService.Data.Migrations
             modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistEntity", b =>
                 {
                     b.Navigation("Songs");
+                });
+
+            modelBuilder.Entity("MusicStreamingService.Data.Entities.PlaylistImportTaskEntity", b =>
+                {
+                    b.Navigation("StagingEntries");
                 });
 
             modelBuilder.Entity("MusicStreamingService.Data.Entities.SongEntity", b =>

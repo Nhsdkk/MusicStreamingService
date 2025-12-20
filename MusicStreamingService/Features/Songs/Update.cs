@@ -14,7 +14,7 @@ using MusicStreamingService.Features.Region;
 using MusicStreamingService.Features.Users;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
-using MusicStreamingService.Infrastructure.Result;
+using MusicStreamingService.Common.Result;
 using MusicStreamingService.Openapi;
 
 namespace MusicStreamingService.Features.Songs;
@@ -249,7 +249,7 @@ public sealed class Update : ControllerBase
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var albumArtworkUrlResult = await _albumStorageService.GetPresignedUrl(song.Album.S3ArtworkFilename);
+            var albumArtworkUrlResult = await _albumStorageService.GetPresignedUrl(song.Album.S3ArtworkFilename, cancellationToken);
             if (albumArtworkUrlResult.IsError)
             {
                 return albumArtworkUrlResult.Error();
