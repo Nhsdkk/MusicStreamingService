@@ -21,7 +21,7 @@ internal sealed class PlaylistImportTaskEntityConfiguration : BaseUpdatableEntit
             .HasForeignKey(x => x.CreatorId);
         builder
             .HasMany(x => x.StagingEntries)
-            .WithOne()
+            .WithOne(x => x.ImportTask)
             .HasForeignKey(x => x.ImportTaskId);
     }
 }

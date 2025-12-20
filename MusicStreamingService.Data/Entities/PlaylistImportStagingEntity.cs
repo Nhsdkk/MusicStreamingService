@@ -11,6 +11,11 @@ public sealed record PlaylistImportStagingEntity : BaseUpdatableIdEntity
     /// Id of the playlist import task this entry belongs to
     /// </summary>
     public Guid ImportTaskId { get; set; }
+
+    /// <summary>
+    /// Playlist import task this entry belongs to
+    /// </summary>
+    public PlaylistImportTaskEntity ImportTask { get; set; } = null!;
     
     /// <summary>
     /// Title of the song to be imported
