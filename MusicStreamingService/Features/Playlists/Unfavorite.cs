@@ -33,8 +33,8 @@ public sealed class Unfavorite : ControllerBase
     [Authorize(Roles = Permissions.FavoritePlaylistsPermission)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> FavoritePlaylist(
-        Command.CommandBody request,
+    public async Task<IActionResult> UnfavoritePlaylist(
+        [FromBody] Command.CommandBody request,
         CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(
@@ -92,7 +92,7 @@ public sealed class Unfavorite : ControllerBase
                 return new Exception("Playlist not found.");
             }
 
-            var favorite = playlist.LikedByUsers.SingleOrDefault(x => x.Id != request.UserId); 
+            var favorite = playlist.LikedByUsers.SingleOrDefault(x => x.Id == request.UserId); 
             if (favorite is null)
             {
                 return new Exception("Playlist is not in favorites.");
