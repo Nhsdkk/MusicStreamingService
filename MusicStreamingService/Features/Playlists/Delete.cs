@@ -32,10 +32,10 @@ public sealed class Delete : ControllerBase
     [Tags(RouteGroups.Playlists)]
     [Authorize(Roles = Permissions.ManagePlaylistsPermission)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<Exception>(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeletePlaylist(
         [FromBody] Command.CommandBody request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         var result = await _mediator.Send(
             new Command
