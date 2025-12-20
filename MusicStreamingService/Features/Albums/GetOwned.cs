@@ -51,7 +51,7 @@ public class GetOwned : ControllerBase
     {
         [JsonPropertyName("userId")]
         public Guid UserId { get; init; }
-            
+
         public sealed class Validator : BasePaginatedRequestValidator<Query>
         {
             public Validator()
@@ -104,14 +104,16 @@ public class GetOwned : ControllerBase
                 .AsNoTracking()
                 .Include(x => x.Roles)
                 .ThenInclude(x => x.Permissions)
-                .Select(x => x.Roles.Any(r => r.Permissions.Any(p => p.Title == Permissions.ManageAlbumsPermission)))
-                .SingleOrDefaultAsync(cancellationToken);
+                .Where(x => x.Id == request.UserId)
+                .AnyAsync(
+                    x => x.Roles.Any(r => r.Permissions.Any(p => p.Title == Permissions.ManageAlbumsPermission)),
+                    cancellationToken);
 
             if (!userIsArtist)
             {
                 return new Exception("Can't find artist with the given user ID");
             }
-                
+
             var query = _context.Albums
                 .AsNoTracking()
                 .Where(x => x.ArtistId == request.UserId);
