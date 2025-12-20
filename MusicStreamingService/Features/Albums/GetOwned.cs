@@ -28,6 +28,12 @@ public class GetOwned : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Get artist's albums
+    /// </summary>
+    /// <param name="request">Id of the artist</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     [HttpGet("/api/v1/albums/owned")]
     [Authorize(Roles = Permissions.ViewAlbumsPermission)]
     [Tags(RouteGroups.Albums)]
