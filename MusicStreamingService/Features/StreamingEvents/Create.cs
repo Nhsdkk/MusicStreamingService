@@ -128,7 +128,7 @@ public sealed class Create : ControllerBase
             {
                 var endStreamEvent = new StreamingEventEntity
                 {
-                    SongId = body.SongId,
+                    SongId = lastStreamingEvent!.SongId,
                     DeviceId = body.DeviceId,
                     PositionMs = Math.Min(lastStreamingEvent!.Song.DurationMs, lastStreamingEvent.PositionMs + body.TimePlayedSinceLastRequestMs),
                     TimePlayedSinceLastRequestMs = body.TimePlayedSinceLastRequestMs,
