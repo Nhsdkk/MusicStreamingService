@@ -14,9 +14,14 @@ using MusicStreamingService.Openapi;
 namespace MusicStreamingService.Features.StreamingEvents;
 
 [ApiController]
-public sealed class Create(IMediator mediator) : ControllerBase
+public sealed class Create : ControllerBase
 {
-    private readonly IMediator _mediator = mediator;
+    private readonly IMediator _mediator;
+
+    public Create(IMediator mediator)
+    {
+        _mediator = mediator;
+    }
 
     /// <summary>
     /// Create streaming event
@@ -109,13 +114,36 @@ public sealed class Create(IMediator mediator) : ControllerBase
             {
                 return new Exception("Song not found");
             }
+            
+            var lastStreamingEvent = await _context.StreamingEvents
+                .AsNoTracking()
+                .Include(x => x.Song)
+                .Where(x => x.DeviceId == body.DeviceId)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var songSwitched = lastStreamingEvent is not null && lastStreamingEvent.SongId != body.SongId;
+            
+            if (songSwitched)
+            {
+                var endStreamEvent = new StreamingEventEntity
+                {
+                    SongId = body.SongId,
+                    DeviceId = body.DeviceId,
+                    PositionMs = Math.Min(lastStreamingEvent!.Song.DurationMs, lastStreamingEvent.PositionMs + body.TimePlayedSinceLastRequestMs),
+                    TimePlayedSinceLastRequestMs = body.TimePlayedSinceLastRequestMs,
+                    EventType = StreamingEventType.Pause
+                };
+
+                await _context.StreamingEvents.AddAsync(endStreamEvent, cancellationToken);
+            }
 
             var streamingEvent = new StreamingEventEntity
             {
                 SongId = body.SongId,
                 DeviceId = body.DeviceId,
                 PositionMs = body.PositionMs,
-                TimePlayedSinceLastRequestMs = body.TimePlayedSinceLastRequestMs,
+                TimePlayedSinceLastRequestMs = songSwitched ? 0 : body.TimePlayedSinceLastRequestMs,
                 EventType = body.EventType
             };
             

@@ -10,4 +10,5 @@ public static class RouteGroups
     public const string Regions = "Regions";
     public const string Playlists = "Playlists";
     public const string PlaylistImportTasks = "PlaylistImportTasks";
+    public const string Stats = "Stats";
 }
