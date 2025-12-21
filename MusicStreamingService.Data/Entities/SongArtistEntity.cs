@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record SongArtistEntity
+public sealed record SongArtistEntity : IAuditable
 {
     /// <summary>
     /// Id of the song 

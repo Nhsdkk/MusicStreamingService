@@ -12,7 +12,7 @@ namespace MusicStreamingService.Data.CompiledModels
     public partial class MusicStreamingContextModel
     {
         private MusicStreamingContextModel()
-            : base(skipDetectChanges: false, modelId: new Guid("44361446-22b0-4694-88ac-3ffbf793283b"), entityTypeCount: 24)
+            : base(skipDetectChanges: false, modelId: new Guid("96f1d490-9854-45d3-a4db-e2b9af4ee6f8"), entityTypeCount: 25)
         {
         }
 
@@ -21,6 +21,7 @@ namespace MusicStreamingService.Data.CompiledModels
             var albumEntity = AlbumEntityEntityType.Create(this);
             var albumFavoriteEntity = AlbumFavoriteEntityEntityType.Create(this);
             var allowedDistributionEntity = AllowedDistributionEntityEntityType.Create(this);
+            var auditLogEntity = AuditLogEntityEntityType.Create(this);
             var deviceEntity = DeviceEntityEntityType.Create(this);
             var genreEntity = GenreEntityEntityType.Create(this);
             var paymentEntity = PaymentEntityEntityType.Create(this);
@@ -97,6 +98,7 @@ namespace MusicStreamingService.Data.CompiledModels
             AlbumEntityEntityType.CreateAnnotations(albumEntity);
             AlbumFavoriteEntityEntityType.CreateAnnotations(albumFavoriteEntity);
             AllowedDistributionEntityEntityType.CreateAnnotations(allowedDistributionEntity);
+            AuditLogEntityEntityType.CreateAnnotations(auditLogEntity);
             DeviceEntityEntityType.CreateAnnotations(deviceEntity);
             GenreEntityEntityType.CreateAnnotations(genreEntity);
             PaymentEntityEntityType.CreateAnnotations(paymentEntity);

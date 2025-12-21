@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record PlaylistImportTaskEntity : BaseUpdatableIdEntity
+public sealed record PlaylistImportTaskEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Id of the user who created the import task

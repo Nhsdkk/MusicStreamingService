@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record SubscriberEntity
+public sealed record SubscriberEntity : IAuditable
 {
     /// <summary>
     /// Subscriber's id

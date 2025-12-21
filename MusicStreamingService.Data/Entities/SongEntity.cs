@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record SongEntity : BaseUpdatableIdEntity
+public sealed record SongEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Song title

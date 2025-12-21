@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record UserEntity : BaseUpdatableIdEntity
+public sealed record UserEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// User's email

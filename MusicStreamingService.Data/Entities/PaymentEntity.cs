@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record PaymentEntity : BaseIdEntity
+public sealed record PaymentEntity : BaseIdEntity, IAuditable
 {
     /// <summary>
     /// Id of the payer

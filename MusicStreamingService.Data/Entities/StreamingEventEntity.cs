@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record StreamingEventEntity : BaseIdEntity
+public sealed record StreamingEventEntity : BaseIdEntity, IAuditable
 {
     /// <summary>
     /// Id of the song playing

@@ -2,11 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using MusicStreamingService.Data.CompiledModels;
 using MusicStreamingService.Data.Entities;
 using MusicStreamingService.Data.Entities.Configurations;
+using MusicStreamingService.Data.Interceptors;
 
 namespace MusicStreamingService.Data;
 
 public sealed class MusicStreamingContext : DbContext
 {
+    private readonly AuditLogSaveChangesInterceptor _auditLogSaveChangesInterceptor;
+    
     public DbSet<UserEntity> Users { get; set; }
     
     public DbSet<RegionEntity> Regions { get; set; }
@@ -55,12 +58,21 @@ public sealed class MusicStreamingContext : DbContext
     
     public DbSet<PlaylistImportTaskEntity> PlaylistImportTasks { get; set; }
     
+    public DbSet<AuditLogEntity> AuditLogs { get; set; }
 
-    public MusicStreamingContext(DbContextOptions<MusicStreamingContext> options) : base(options) { }
+
+    public MusicStreamingContext(
+        DbContextOptions<MusicStreamingContext> options,
+        AuditLogSaveChangesInterceptor auditLogSaveChangesInterceptor
+    ) : base(options)
+    {
+        _auditLogSaveChangesInterceptor = auditLogSaveChangesInterceptor;
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseModel(MusicStreamingContextModel.Instance);
+        options.AddInterceptors(_auditLogSaveChangesInterceptor);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -89,5 +101,6 @@ public sealed class MusicStreamingContext : DbContext
         modelBuilder.ApplyConfiguration(new RolePermissionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PlaylistImportStagingEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PlaylistImportTaskEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new AuditLogEntityConfiguration());
     }
 }

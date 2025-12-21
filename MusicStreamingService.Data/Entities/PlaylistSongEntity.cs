@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record PlaylistSongEntity
+public sealed record PlaylistSongEntity : IAuditable
 {
     /// <summary>
     /// Id of the playlist, to which song is assigned

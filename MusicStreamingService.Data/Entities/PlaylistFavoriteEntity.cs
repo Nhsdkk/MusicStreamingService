@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public class PlaylistFavoriteEntity
+public class PlaylistFavoriteEntity : IAuditable
 {
     /// <summary>
     /// Id of the user, who liked this playlist

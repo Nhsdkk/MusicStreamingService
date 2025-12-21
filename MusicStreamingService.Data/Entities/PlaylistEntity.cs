@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record PlaylistEntity : BaseUpdatableIdEntity
+public sealed record PlaylistEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Name of the playlist
