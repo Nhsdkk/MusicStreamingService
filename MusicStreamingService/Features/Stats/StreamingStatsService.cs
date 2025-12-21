@@ -43,7 +43,7 @@ public sealed record TopStreamedSong
     
     public string AlbumArtworkFilename { get; init; } = null!;
 
-    public string Artists { get; set; } = null!;
+    public string Artists { get; init; } = null!;
     
     [NotMapped]
     public List<ShortSongArtistDto> ArtistsMapped => JsonSerializer.Deserialize<List<ShortSongArtistDto>>(Artists) ?? new List<ShortSongArtistDto>();
@@ -51,19 +51,45 @@ public sealed record TopStreamedSong
 
 public interface IStreamingStatsService
 {
+    /// <summary>
+    /// Get top streamed artists for the user
+    /// </summary>
+    /// <param name="userId">Id of the user</param>
+    /// <param name="limit">Amount of artists</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of top streamed artists</returns>
     public Task<List<TopStreamedArtist>> GetTopStreamedArtistsAsync(
         Guid userId,
         int limit,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Get streaming dates for the user
+    /// </summary>
+    /// <param name="userId">Id of the user</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of streaming dates</returns>
     public Task<List<StreamingDate>> GetStreamingDatesAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Get streaming dates for the user's top artist
+    /// </summary>
+    /// <param name="userId">Id of the user</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of streaming dates for top artist</returns>
     public Task<List<StreamingDate>> GetTopArtistStreamingDatesAsync(
         Guid userId,
         CancellationToken cancellationToken = default);
     
+    /// <summary>
+    /// Get top streamed songs for the user
+    /// </summary>
+    /// <param name="userId">Id of the user</param>
+    /// <param name="limit">Amount of songs</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>List of top songs</returns>
     public Task<List<TopStreamedSong>> GetTopStreamedSongsAsync(
         Guid userId,
         int limit,
@@ -185,5 +211,6 @@ public sealed class StreamingStatsService : IStreamingStatsService
                                                      JOIN "SongArtists" on "SongArtists"."SongId" = "Songs"."Id"
                                                      JOIN "Users" as artists on artists."Id" = "SongArtists"."ArtistId"
                                                      group by most_played_songs."TotalTimePlayedMs", "Songs"."Id", "Songs"."Title", "Albums"."Id", "Albums"."Title", "Albums"."S3ArtworkFilename"
+                                                     ORDER BY most_played_songs."TotalTimePlayedMs" DESC
                                                      """).ToListAsync(cancellationToken);
 }

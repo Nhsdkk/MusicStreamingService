@@ -118,7 +118,6 @@ public class Get : ControllerBase
                 AlbumTitle = topStreamedSong.AlbumTitle,
                 AlbumArtworkUrl = albumArtworkUrl,
                 Artists = topStreamedSong.ArtistsMapped
-                    .ToList()
             };
         }
 
@@ -134,6 +133,7 @@ public class Get : ControllerBase
         [JsonPropertyName("streamingDatesByTopArtist")]
         public List<StreamingDateDto> StreamingDatesByTopArtist { get; init; } = null!;
 
+        [JsonPropertyName("totalStreamedTimeMs")]
         public long TotalStreamedTimeMs { get; init; }
 
         public static QueryResponse FromStats(
@@ -157,11 +157,11 @@ public class Get : ControllerBase
     
     public sealed class Handler : IRequestHandler<Query, QueryResponse>
     {
-        private readonly StreamingStatsService _streamingStatsService;
+        private readonly IStreamingStatsService _streamingStatsService;
         private readonly IAlbumStorageService _albumStorageService;
 
         public Handler(
-            StreamingStatsService streamingStatsService,
+            IStreamingStatsService streamingStatsService,
             IAlbumStorageService albumStorageService)
         {
             _streamingStatsService = streamingStatsService;

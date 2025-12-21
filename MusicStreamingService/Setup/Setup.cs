@@ -65,7 +65,7 @@ public static class Setup
             .ConfigureObjectStorageServices(configuration)
             .ConfigureAuth(builder.Environment, configuration)
             .AddHostedService<PlaylistImportWorker>()
-            .AddScoped<StreamingStatsService>();
+            .AddScoped<IStreamingStatsService, StreamingStatsService>();
 
         var app = builder.Build();
 
