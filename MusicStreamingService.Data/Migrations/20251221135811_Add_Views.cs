@@ -112,7 +112,7 @@ namespace MusicStreamingService.Data.Migrations
                                      count(distinct sg."SongId")   as "SongCount",
                                      count(distinct sa."ArtistId") as "ArtistCount",
                                      coalesce(gs.stream_events,0)  as "StreamEvents",
-                                     coalesce(gs.total_played_ms,0)as "TotalPlayedMs"
+                                     coalesce(gs.total_played_ms,0) as "TotalPlayedMs"
                                  from "Genres" g
                                           left join "SongGenres" sg on sg."GenreId" = g."Id"
                                           left join "SongArtists" sa on sa."SongId" = sg."SongId"
