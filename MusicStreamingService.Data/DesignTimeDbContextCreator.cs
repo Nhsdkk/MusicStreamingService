@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using MusicStreamingService.Data.Interceptors;
 
 namespace MusicStreamingService.Data;
 
@@ -18,6 +19,6 @@ public class DesignTimeDbContextCreator : IDesignTimeDbContextFactory<MusicStrea
         var options = new DbContextOptionsBuilder<MusicStreamingContext>()
             .UseNpgsql(url);
         
-        return new MusicStreamingContext(options.Options);
+        return new MusicStreamingContext(options.Options, new AuditLogSaveChangesInterceptor());
     }
 }

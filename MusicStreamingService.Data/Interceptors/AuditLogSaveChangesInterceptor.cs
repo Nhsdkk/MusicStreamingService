@@ -68,7 +68,7 @@ public class AuditLogSaveChangesInterceptor : SaveChangesInterceptor
                         .ToDictionary(x => x.Metadata.Name, x => x.OriginalValue);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(EntityState), "Unexpected entity state", changedEntity.State.ToString());
+                    throw new ArgumentOutOfRangeException(nameof(EntityState), changedEntity.State, "Unexpected entity state");
             }
             
             var auditLog = new AuditLogEntity
@@ -78,7 +78,7 @@ public class AuditLogSaveChangesInterceptor : SaveChangesInterceptor
                     EntityState.Added => EntityAction.Create,
                     EntityState.Deleted => EntityAction.Delete,
                     EntityState.Modified => EntityAction.Update,
-                    _ => throw new ArgumentOutOfRangeException(nameof(EntityState), "Unexpected entity state", changedEntity.State.ToString())
+                    _ => throw new ArgumentOutOfRangeException(nameof(EntityState), changedEntity.State, "Unexpected entity state")
                 },
                 TableName = changedEntity.Metadata.GetTableName() ?? string.Empty,
                 NewValues = System.Text.Json.JsonSerializer.Serialize(newValues),
