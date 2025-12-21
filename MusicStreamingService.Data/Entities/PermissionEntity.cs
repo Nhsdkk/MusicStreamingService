@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record PermissionEntity : BaseUpdatableIdEntity
+public sealed record PermissionEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Name of the permission

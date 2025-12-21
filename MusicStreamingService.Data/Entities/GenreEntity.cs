@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record GenreEntity : BaseUpdatableIdEntity
+public sealed record GenreEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Name of the genre

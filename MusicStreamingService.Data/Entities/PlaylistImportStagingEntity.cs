@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record PlaylistImportStagingEntity : BaseUpdatableIdEntity
+public sealed record PlaylistImportStagingEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Id of the batch this entry belongs to

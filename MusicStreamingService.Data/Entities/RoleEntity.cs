@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record RoleEntity : BaseUpdatableIdEntity
+public sealed record RoleEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Title of the role

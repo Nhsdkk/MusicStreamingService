@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record DeviceEntity : BaseIdEntity
+public sealed record DeviceEntity : BaseIdEntity, IAuditable
 {
     /// <summary>
     /// Name of the device

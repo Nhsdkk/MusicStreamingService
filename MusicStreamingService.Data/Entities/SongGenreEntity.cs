@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public class SongGenreEntity
+public class SongGenreEntity : IAuditable
 {
     /// <summary>
     /// Id of the song

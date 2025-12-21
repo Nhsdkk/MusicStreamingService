@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public class UserRoleEntity
+public class UserRoleEntity : IAuditable
 {
     /// <summary>
     /// Id of the user, who has this permission

@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record SubscriptionEntity : BaseUpdatableIdEntity
+public sealed record SubscriptionEntity : BaseUpdatableIdEntity, IAuditable
 {
     /// <summary>
     /// Name of the subscription

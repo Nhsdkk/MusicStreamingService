@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed class RolePermissionEntity
+public sealed class RolePermissionEntity : IAuditable
 {
     public Guid RoleId { get; set; }
     

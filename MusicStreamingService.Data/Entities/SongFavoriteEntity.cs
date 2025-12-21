@@ -1,6 +1,8 @@
+using MusicStreamingService.Data.Interceptors;
+
 namespace MusicStreamingService.Data.Entities;
 
-public sealed record SongFavoriteEntity
+public sealed record SongFavoriteEntity : IAuditable
 {
     /// <summary>
     /// Id of the song, which user likes
