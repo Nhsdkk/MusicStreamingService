@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,14 @@ public class Get : ControllerBase
         {
             [FromQuery(Name = "playlistId")]
             public Guid PlaylistId { get; init; }
+            
+            public sealed class Validator : AbstractValidator<QueryBody>
+            {
+                public Validator()
+                {
+                    RuleFor(x => x.PlaylistId).NotEmpty();
+                }
+            }
         }
         
         public QueryBody Body { get; init; } = null!;
@@ -101,6 +110,7 @@ public class Get : ControllerBase
                 AccessType = playlist.AccessType,
                 Likes = playlist.Likes,
                 Songs = playlist.Songs
+                    .OrderByDescending(x => x.AddedAt)
                     .Select(ps => ShortSongDto.FromEntity(
                         ps.Song,
                         albumArtworkMapping[ps.Song.Album.S3ArtworkFilename],
