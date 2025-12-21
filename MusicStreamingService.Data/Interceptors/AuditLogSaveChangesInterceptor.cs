@@ -4,9 +4,17 @@ using MusicStreamingService.Data.Entities;
 
 namespace MusicStreamingService.Data.Interceptors;
 
+/// <summary>
+/// Marker interface for entities that should be included in automatic audit logging.
+/// </summary>
+/// <remarks>
+/// Any entity type implementing <see cref="IAuditable"/> will be detected by
+/// <see cref="AuditLogSaveChangesInterceptor"/> and its changes will be recorded
+/// in <see cref="AuditLogEntity"/> entries when <see cref="DbContext.SaveChanges"/>
+/// or <see cref="DbContext.SaveChangesAsync(System.Threading.CancellationToken)"/> is called.
+/// </remarks>
 public interface IAuditable
 {
-    
 }
 
 public class AuditLogSaveChangesInterceptor : SaveChangesInterceptor
