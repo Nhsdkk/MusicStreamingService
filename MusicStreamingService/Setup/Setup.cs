@@ -6,6 +6,7 @@ using MusicStreamingService.Auth;
 using MusicStreamingService.BackgroundJobs;
 using MusicStreamingService.Commands;
 using MusicStreamingService.Data;
+using MusicStreamingService.Features.Stats;
 using MusicStreamingService.Infrastructure.Authentication;
 using MusicStreamingService.Infrastructure.ObjectStorage;
 using MusicStreamingService.Infrastructure.Password;
@@ -63,7 +64,8 @@ public static class Setup
             .ConfigurePasswordService(configuration)
             .ConfigureObjectStorageServices(configuration)
             .ConfigureAuth(builder.Environment, configuration)
-            .AddHostedService<PlaylistImportWorker>();
+            .AddHostedService<PlaylistImportWorker>()
+            .AddScoped<IStreamingStatsService, StreamingStatsService>();
 
         var app = builder.Build();
 
