@@ -167,7 +167,7 @@ public sealed class StreamingStatsService : IStreamingStatsService
                                                          WHERE device_owners."Id" = {userId}
                                                            AND date_part('year', now()) = date_part('year', "StreamingEvents"."CreatedAt")
                                                          GROUP BY device_owners."Id", "Songs"."Id"
-                                                         ORDER BY "TotalTimePlayedMs"
+                                                         ORDER BY "TotalTimePlayedMs" DESC
                                                          LIMIT {limit}
                                                      )
 
