@@ -45,7 +45,7 @@ public class Get : ControllerBase
             Body = request,
             UserId = User.GetUserId(),
             UserRegion = User.GetUserRegion(),
-        },cancellationToken);
+        }, cancellationToken);
         
         return result.Match<IActionResult>(Ok, BadRequest);
     }
