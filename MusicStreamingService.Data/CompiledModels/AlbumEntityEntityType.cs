@@ -22,11 +22,11 @@ namespace MusicStreamingService.Data.CompiledModels
                 "MusicStreamingService.Data.Entities.AlbumEntity",
                 typeof(AlbumEntity),
                 baseEntityType,
-                propertyCount: 10,
+                propertyCount: 9,
                 navigationCount: 2,
                 skipNavigationCount: 1,
-                foreignKeyCount: 2,
-                unnamedIndexCount: 4,
+                foreignKeyCount: 1,
+                unnamedIndexCount: 3,
                 keyCount: 1);
 
             var id = runtimeEntityType.AddProperty(
@@ -108,12 +108,6 @@ namespace MusicStreamingService.Data.CompiledModels
             updatedAt.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
             updatedAt.AddAnnotation("Relational:DefaultValueSql", "now()");
 
-            var userEntityId = runtimeEntityType.AddProperty(
-                "UserEntityId",
-                typeof(Guid?),
-                nullable: true);
-            userEntityId.AddAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.None);
-
             var key = runtimeEntityType.AddKey(
                 new[] { id });
             runtimeEntityType.SetPrimaryKey(key);
@@ -126,9 +120,6 @@ namespace MusicStreamingService.Data.CompiledModels
 
             var index1 = runtimeEntityType.AddIndex(
                 new[] { title });
-
-            var index2 = runtimeEntityType.AddIndex(
-                new[] { userEntityId });
 
             return runtimeEntityType;
         }
@@ -148,15 +139,6 @@ namespace MusicStreamingService.Data.CompiledModels
                 propertyInfo: typeof(AlbumEntity).GetProperty("Artist", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(AlbumEntity).GetField("<Artist>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
-            return runtimeForeignKey;
-        }
-
-        public static RuntimeForeignKey CreateForeignKey2(RuntimeEntityType declaringEntityType, RuntimeEntityType principalEntityType)
-        {
-            var runtimeForeignKey = declaringEntityType.AddForeignKey(new[] { declaringEntityType.FindProperty("UserEntityId") },
-                principalEntityType.FindKey(new[] { principalEntityType.FindProperty("Id") }),
-                principalEntityType);
-
             var artistAlbums = principalEntityType.AddNavigation("ArtistAlbums",
                 runtimeForeignKey,
                 onDependent: false,
@@ -170,7 +152,7 @@ namespace MusicStreamingService.Data.CompiledModels
         public static RuntimeSkipNavigation CreateSkipNavigation1(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
         {
             var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "UserEntity",
+                "LikedByUsers",
                 targetEntityType,
                 joinEntityType.FindForeignKey(
                     new[] { joinEntityType.FindProperty("AlbumId") },
@@ -178,7 +160,9 @@ namespace MusicStreamingService.Data.CompiledModels
                     declaringEntityType),
                 true,
                 false,
-                typeof(IEnumerable<UserEntity>));
+                typeof(List<UserEntity>),
+                propertyInfo: typeof(AlbumEntity).GetProperty("LikedByUsers", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
+                fieldInfo: typeof(AlbumEntity).GetField("<LikedByUsers>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
 
             var inverse = targetEntityType.FindSkipNavigation("FavoriteAlbums");
             if (inverse != null)

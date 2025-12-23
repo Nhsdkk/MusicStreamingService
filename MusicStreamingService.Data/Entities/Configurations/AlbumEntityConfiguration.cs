@@ -16,12 +16,16 @@ internal sealed class AlbumEntityConfiguration : BaseUpdatableEntityConfiguratio
         
         builder
             .HasOne(x => x.Artist)
-            .WithMany()
+            .WithMany(x => x.ArtistAlbums)
             .HasForeignKey(x => x.ArtistId);
         builder
             .HasMany(x => x.Songs)
             .WithOne(x => x.Album)
             .HasForeignKey(x => x.AlbumId);
+        builder
+            .HasMany(x => x.LikedByUsers)
+            .WithMany(x => x.FavoriteAlbums)
+            .UsingEntity<AlbumFavoriteEntity>();    
         
         builder.Property(x => x.Likes).HasDefaultValue(0).ValueGeneratedNever();
         

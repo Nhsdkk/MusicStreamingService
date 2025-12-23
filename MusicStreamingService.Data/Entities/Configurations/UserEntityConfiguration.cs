@@ -25,7 +25,7 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .HasForeignKey(x => x.RegionId);
         builder
             .HasMany(x => x.FavoriteAlbums)
-            .WithMany()
+            .WithMany(x => x.LikedByUsers)
             .UsingEntity<AlbumFavoriteEntity>();
         builder
             .HasMany(x => x.FavoriteSongs)
@@ -53,7 +53,7 @@ internal class UserEntityConfiguration : BaseUpdatableEntityConfiguration<UserEn
             .HasForeignKey(x => x.CreatorId);
         builder
             .HasMany(x => x.FavoritePlaylists)
-            .WithMany()
+            .WithMany(x => x.LikedByUsers)
             .UsingEntity<PlaylistFavoriteEntity>();
         builder
             .HasMany(x => x.Devices)

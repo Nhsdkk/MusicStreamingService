@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicStreamingService.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicStreamingService.Data.Migrations
 {
     [DbContext(typeof(MusicStreamingContext))]
-    partial class MusicStreamingContextModelSnapshot : ModelSnapshot
+    [Migration("20251223063323_fix_navigation")]
+    partial class fix_navigation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -61,6 +64,9 @@ namespace MusicStreamingService.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<Guid?>("UserEntityId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ArtistId");
@@ -71,6 +77,8 @@ namespace MusicStreamingService.Data.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Title"), "GIST");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Title"), new[] { "gist_trgm_ops" });
+
+                    b.HasIndex("UserEntityId");
 
                     b.ToTable("Albums");
                 });
@@ -799,10 +807,14 @@ namespace MusicStreamingService.Data.Migrations
             modelBuilder.Entity("MusicStreamingService.Data.Entities.AlbumEntity", b =>
                 {
                     b.HasOne("MusicStreamingService.Data.Entities.UserEntity", "Artist")
-                        .WithMany("ArtistAlbums")
+                        .WithMany()
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MusicStreamingService.Data.Entities.UserEntity", null)
+                        .WithMany("ArtistAlbums")
+                        .HasForeignKey("UserEntityId");
 
                     b.Navigation("Artist");
                 });

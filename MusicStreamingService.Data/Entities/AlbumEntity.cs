@@ -43,4 +43,9 @@ public sealed record AlbumEntity : BaseUpdatableIdEntity, IAuditable
     /// Album songs
     /// </summary>
     public List<SongEntity> Songs { get; set; } = new List<SongEntity>();
+    
+    /// <summary>
+    /// List of users who liked the album
+    /// </summary>
+    public List<UserEntity> LikedByUsers { get; set; } = new List<UserEntity>();
 }

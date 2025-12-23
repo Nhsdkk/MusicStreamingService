@@ -82,23 +82,15 @@ public sealed class Unfavorite : ControllerBase
             Command request,
             CancellationToken cancellationToken)
         {
-            var playlist = await _context.Playlists
-                .Include(x => x.Creator)
-                .Include(x => x.LikedByUsers)
-                .SingleOrDefaultAsync(x => x.Id == request.Body.Id, cancellationToken);
+            var playlistFavorite = await _context.PlaylistFavorites
+                .SingleOrDefaultAsync(x => x.PlaylistId == request.Body.Id && x.UserId == request.UserId, cancellationToken);
 
-            if (playlist is null)
+            if (playlistFavorite is null)
             {
                 return new Exception("Playlist not found.");
             }
 
-            var favorite = playlist.LikedByUsers.SingleOrDefault(x => x.Id == request.UserId); 
-            if (favorite is null)
-            {
-                return new Exception("Playlist is not in favorites.");
-            }
-
-            playlist.LikedByUsers.Remove(favorite);
+            _context.PlaylistFavorites.Remove(playlistFavorite);
             await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;

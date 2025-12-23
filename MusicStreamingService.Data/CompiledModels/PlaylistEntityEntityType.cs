@@ -24,7 +24,7 @@ namespace MusicStreamingService.Data.CompiledModels
                 baseEntityType,
                 propertyCount: 8,
                 navigationCount: 2,
-                skipNavigationCount: 2,
+                skipNavigationCount: 1,
                 foreignKeyCount: 1,
                 unnamedIndexCount: 1,
                 keyCount: 1);
@@ -151,29 +151,6 @@ namespace MusicStreamingService.Data.CompiledModels
                 typeof(List<UserEntity>),
                 propertyInfo: typeof(PlaylistEntity).GetProperty("LikedByUsers", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly),
                 fieldInfo: typeof(PlaylistEntity).GetField("<LikedByUsers>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
-
-            var inverse = targetEntityType.FindSkipNavigation("FavoritePlaylists");
-            if (inverse != null)
-            {
-                skipNavigation.Inverse = inverse;
-                inverse.Inverse = skipNavigation;
-            }
-
-            return skipNavigation;
-        }
-
-        public static RuntimeSkipNavigation CreateSkipNavigation2(RuntimeEntityType declaringEntityType, RuntimeEntityType targetEntityType, RuntimeEntityType joinEntityType)
-        {
-            var skipNavigation = declaringEntityType.AddSkipNavigation(
-                "UserEntity",
-                targetEntityType,
-                joinEntityType.FindForeignKey(
-                    new[] { joinEntityType.FindProperty("PlaylistId") },
-                    declaringEntityType.FindKey(new[] { declaringEntityType.FindProperty("Id") }),
-                    declaringEntityType),
-                true,
-                false,
-                typeof(IEnumerable<UserEntity>));
 
             var inverse = targetEntityType.FindSkipNavigation("FavoritePlaylists");
             if (inverse != null)
