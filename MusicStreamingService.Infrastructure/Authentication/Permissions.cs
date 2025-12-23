@@ -2,11 +2,11 @@ namespace MusicStreamingService.Infrastructure.Authentication;
 
 public static class Permissions
 {
-    public const string ViewSongsPermission = "mss.songs.view";
-    public const string ManageSongsPermission = "mss.songs.manage";
-    public const string PlaySongsPermission = "mss.songs.playback";
-    public const string FavoriteSongsPermission = "mss.songs.favorite";
-    public const string AdministrateSongsPermission = "mss.songs.admin";
+    public const string ViewSongsPermission = "mss.tracks.view";
+    public const string ManageSongsPermission = "mss.tracks.manage";
+    public const string PlaySongsPermission = "mss.tracks.playback";
+    public const string FavoriteSongsPermission = "mss.tracks.favorite";
+    public const string AdministrateSongsPermission = "mss.tracks.admin";
     
     public const string ViewAlbumsPermission = "mss.albums.view";
     public const string FavoriteAlbumsPermission = "mss.albums.favorite";

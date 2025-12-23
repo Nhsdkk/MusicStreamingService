@@ -235,6 +235,7 @@ public sealed class Update : ControllerBase
                     .Include(x => x.Artists)
                     .ThenInclude(x => x.Artist)
                     .Include(x => x.AllowedRegions)
+                    .Include(x => x.Album)
                     .ToListAsync(cancellationToken);
 
                 if (songsToAdd.Count != requestBody.SongsToAdd.Count)

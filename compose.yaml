@@ -4,6 +4,10 @@
     build:
       context: .
       dockerfile: MusicStreamingService/Dockerfile
+    env_file:
+      - ./env/musicstreamingservice.env
+    ports:
+      - "5077:5077"
     networks:
       - common
   postgres:
